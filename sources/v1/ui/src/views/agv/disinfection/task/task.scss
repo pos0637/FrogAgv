@@ -1,0 +1,58 @@
+.task-list-box {
+  width: 200px;
+  background-color: #d99694;
+  margin-bottom: 10px;
+  .task-list-title {
+    font-size: 25px;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+  }
+  .task-list-name {
+    margin-left: 30px;
+    font-size: 21px;
+    color: #17375e;
+    margin-top: 5px;
+  }
+  .task-list-bom-name {
+    margin-left: 50px;
+    font-size: 18px;
+    color: #ffffff;
+  }
+  .task-list-bom-num {
+    margin-left: 5px;
+    font-size: 18px;
+    color: #ffffff;
+  }
+}
+
+.task-content {
+  width: 100%;
+  background-color: #e8d0d0;
+  margin-bottom: 10px;
+  .title {
+    font-size: 25px;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+  }
+  .position-box {
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-bottom: 50px;
+    .position {
+      width: 100px;
+      height: 100px;
+      border: 3px solid #ffffff;
+      margin-left: 100px;
+      margin-top: 50px;
+      color: #ffffff;
+      text-align: center;
+      line-height: 100px;
+    }
+    .position-pointer {
+      cursor: pointer;
+      background-color: #92d050;
+    }
+  }
+}

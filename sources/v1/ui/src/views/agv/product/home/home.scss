@@ -1,0 +1,194 @@
+.left-menu {
+  width: 200px;
+  color: #ffffff;
+  font-size: 25px;
+  text-align: center;
+  background-color: #f4e9e9;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  .menu-item {
+    height: 60px;
+    background-color: #e8d0d0;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 5px;
+  }
+  .current-menu {
+    background-color: #c0504d;
+  }
+  .pick {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    background-color: #ffffff;
+    color: red;
+    font-size: 14px;
+    line-height: 25px;
+    text-align: center;
+  }
+}
+
+.content-button {
+  color: #ffffff;
+  background-color: #f4e9e9;
+  height: 60px;
+  .btn {
+    width: 150px;
+    height: 40px;
+  }
+  .btn-default {
+    text-align: center;
+    font-size: 24px;
+    background-color: #558ed5;
+    margin-left: 50px;
+    border-radius: 10px;
+  }
+  .btn-click {
+    background-color: #17375e;
+  }
+  .btn-add {
+    background-color: #c00000;
+  }
+}
+
+.data-header-content {
+  background-color: #c0504d;
+  height: 60px;
+  font-size: 30px;
+  color: #ffffff;
+  .data-header-sort {
+    width: 250px;
+    text-align: center;
+  }
+  .data-header-name {
+    width: 300px;
+    text-align: center;
+  }
+  .data-header-num {
+    width: 200px;
+    text-align: center;
+  }
+  .data-header-done {
+    width: 250px;
+    text-align: center;
+  }
+  .data-header-operation {
+    text-align: center;
+  }
+}
+
+.data-content {
+  height: calc(100vh - 190px);
+  overflow-y: auto;
+  background-color: #f4e9e9;
+  .data-content-row,
+  .data-content-wave-row,
+  .data-content-produce-row {
+    height: 40px;
+    font-size: 25px;
+  }
+
+  .data-content-produce-row {
+    background-color: #17375e;
+  }
+  .data-content-wave-row {
+    background-color: #8090a5;
+  }
+  .data-sort {
+    width: 250px;
+    text-align: center;
+  }
+  .data-name {
+    width: 300px;
+    text-align: center;
+  }
+  .wave-name {
+    width: 300px;
+    text-align: center;
+  }
+  .bom-name {
+    width: 300px;
+    text-align: center;
+    padding-left: 40px;
+  }
+  .bom-num {
+    width: 200px;
+    text-align: center;
+  }
+  .bom-done {
+    width: 250px;
+    text-align: center;
+  }
+  .bom-add-icon {
+    background-image: url('./add.png');
+    background-size: 40px 40px;
+    width: 40px;
+    height: 40px;
+    margin-left: 300px;
+    cursor: pointer;
+  }
+}
+
+.data-wave .data-content-row:nth-child(odd) {
+  background-color: #e8d0d0;
+}
+
+.data-content-operation {
+  .bom-delete,
+  .bom-update,
+  .bom-back,
+  .bom-save {
+    width: 60px;
+    font-size: 20px;
+    background-color: #ffffff;
+    margin-left: 30px;
+    cursor: pointer;
+  }
+  .bom-delete,
+  .bom-back {
+    color: #4a375e;
+  }
+
+  .bom-update,
+  .bom-save {
+    color: #00b050;
+  }
+}
+
+.data-content-produce-operation {
+  .wave-delete,
+  .wave-add,
+  .wave-back,
+  .wave-save {
+    width: 60px;
+    font-size: 20px;
+    background-color: #ffffff;
+    margin-left: 30px;
+    cursor: pointer;
+  }
+  .wave-delete,
+  .wave-back {
+    color: #4a375e;
+  }
+
+  .wave-add,
+  .wave-save {
+    color: #00b050;
+  }
+}
+
+.data-content-wave-operation {
+  .wave-delete {
+    width: 60px;
+    font-size: 20px;
+    background-color: #ffffff;
+    margin-left: 30px;
+    cursor: pointer;
+  }
+  .wave-delete {
+    color: #4a375e;
+  }
+}
