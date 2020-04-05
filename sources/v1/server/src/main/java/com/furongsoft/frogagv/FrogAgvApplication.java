@@ -1,18 +1,11 @@
-package com.furongsoft;
+package com.furongsoft.frogagv;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
-/**
- * 应用
- *
- * @author Alex
- */
-@SpringBootApplication
-@EnableJpaAuditing
-@EnableScheduling
+@SpringBootApplication(scanBasePackages = {"com.furongsoft"})
+@MapperScan("com.furongsoft")
 public class FrogAgvApplication {
     public static void main(String[] args) {
         SpringApplication.run(FrogAgvApplication.class, args);

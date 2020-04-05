@@ -102,6 +102,4 @@ public class MyRealm extends AuthorizingRealm {
 
         return new SimpleAuthenticationInfo(user, user.getPassword(), ByteSource.Util.bytes(user.getSalt()), getName());
     }
-
-
 }

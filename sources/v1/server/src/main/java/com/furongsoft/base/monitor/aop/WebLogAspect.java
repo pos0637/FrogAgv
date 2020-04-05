@@ -25,6 +25,8 @@ import java.net.UnknownHostException;
 @Aspect
 @Component
 public class WebLogAspect {
+    @Autowired
+    private LogInfoDao logInfoDao;
 
     /**
      * 方法开始时间
@@ -34,10 +36,7 @@ public class WebLogAspect {
     /**
      * 操作方法类型
      */
-    private String[] types = new String[]{"add", "edit", "del", "login", "logout", "other"};
-
-    @Autowired
-    private LogInfoDao logInfoDao;
+    private String[] types = new String[] { "add", "edit", "del", "login", "logout", "other" };
 
     /**
      * 拦截对象
@@ -93,6 +92,7 @@ public class WebLogAspect {
         if (null == SecurityUtils.getCurrentUser()) {
             return;
         }
+
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
@@ -115,12 +115,14 @@ public class WebLogAspect {
         Long userId = null;
         // 公司ID
         String company = "未登录";
+
         for (String s : types) {
             if (methodName.toLowerCase().contains(s)) {
                 type = s;
                 break;
             }
         }
+
         // 添加异常消息
         if (null != e) {
             // 若没有异常消息，保存异常类型

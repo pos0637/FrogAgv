@@ -118,7 +118,6 @@ public interface PermissionDao extends BaseMapper<Permission> {
 
         /**
          * 检查权限名称是否存在
-         * TODO
          *
          * @return SQL语句
          */

@@ -18,6 +18,8 @@ import java.util.Date;
  */
 @TableName("t_sys_loginfo")
 public class LogInfo implements Serializable {
+    private static final long serialVersionUID = 1442602822345944955L;
+
     /**
      * 当前操作模块
      */

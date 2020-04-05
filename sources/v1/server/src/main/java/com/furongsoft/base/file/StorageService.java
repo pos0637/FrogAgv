@@ -33,9 +33,6 @@ public class StorageService {
     @Value("${upload.path}")
     private String uploadPath;
 
-    @Value("${upload.file-type}")
-    private String uploadType;
-
     @Autowired
     public StorageService(AttachmentDao attachmentDao) {
         this.attachmentDao = attachmentDao;
@@ -49,7 +46,6 @@ public class StorageService {
      * @throws BaseException 异常
      */
     public Attachment uploadFile(MultipartFile file) throws BaseException {
-        String[] imageTypes = uploadType.split(",");
         Attachment attachment = new Attachment("", "", "", 0, "", 0, "");
 
         String fileName = file.getOriginalFilename().toLowerCase();
@@ -57,18 +53,6 @@ public class StorageService {
         String newName = SnowflakeIdWorker.getInstance().nextId() + suffixName;
         if (StringUtils.isNullOrEmpty(fileName) || StringUtils.isNullOrEmpty(suffixName)) {
             throw new BaseException("上传文件名不能为空/后缀名为空");
-        }
-
-        boolean check = false;
-        for (String type : imageTypes) {
-            if (type.equals(suffixName)) {
-                check = true;
-                break;
-            }
-        }
-
-        if (!check) {
-            throw new BaseException("文件上传类型不正确。");
         }
 
         // 文件名规则: 父路径 + UUID + 扩展名

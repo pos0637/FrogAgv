@@ -1,16 +1,10 @@
 server:
   port: 8081
-  #  ssl:
-  #    enable: true
-  #    key-store: classpath:vip.gh-i.com.jks
-  #    key-store-password: qazqaz
-  #    keyStoreType: JKS
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css,image/webp,image/apng,image/png,image/jpeg,image/gif
     min-response-size: 2048
   tomcat:
-    #    uri-encoding: UTF-8
     max-threads: 1000
     max-connections: 20000
   servlet:
@@ -20,9 +14,6 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    #    url: jdbc:mysql://47.111.164.174:3306/frog_agv?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    #    username: root
-    #    password: Furong2017!@#$%^
     url: jdbc:mysql://localhost:3306/frog_agv?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
@@ -72,17 +63,6 @@ spring:
       # 最大提交请求大小
       max-request-size: 10MB
 
-  thymeleaf:
-    cache: false
-    check-template: true
-    check-template-location: true
-    enabled: true
-    encoding: utf-8
-    prefix: file:./
-    suffix: .html
-    servlet:
-      content-type: text/html
-
   messages:
     basename: i18n/messages
     encoding: UTF-8
@@ -128,7 +108,6 @@ upload:
   # 附件路径
   path: ./attachments
   basepath: ./attachments/base
-  file-type: .bmp,.jpg,.png,.jpeg
 
 logging:
   path: ./logs

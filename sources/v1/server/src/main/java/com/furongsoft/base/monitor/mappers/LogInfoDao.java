@@ -13,5 +13,4 @@ import org.springframework.stereotype.Component;
 @Mapper
 @Component
 public interface LogInfoDao extends BaseMapper<LogInfo> {
-
 }
