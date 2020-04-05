@@ -2,7 +2,7 @@ package com.furongsoft.agv.mappers;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.furongsoft.agv.entities.Area;
+import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.models.AreaModel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,13 +15,13 @@ import org.apache.ibatis.jdbc.SQL;
  * @author linyehai
  */
 @Mapper
-public interface AgvAreaDao extends BaseMapper<Area> {
+public interface AgvAreaDao extends BaseMapper<AgvArea> {
 
     @SelectProvider(type = DaoProvider.class, method = "selectAreaById")
     AreaModel selectAreaById(@Param("id") Long id);
 
     class DaoProvider {
-        private static final String MATERIAL_TABLE_NAME = Area.class.getAnnotation(TableName.class).value();
+        private static final String MATERIAL_TABLE_NAME = AgvArea.class.getAnnotation(TableName.class).value();
 
         public String selectAreaById() {
             return new SQL() {

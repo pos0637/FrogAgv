@@ -33,7 +33,7 @@ public class StorageService {
     @Value("${upload.path}")
     private String uploadPath;
 
-    @Value("${file.upload.file-type}")
+    @Value("${upload.file-type}")
     private String uploadType;
 
     @Autowired
@@ -50,7 +50,6 @@ public class StorageService {
      */
     public Attachment uploadFile(MultipartFile file) throws BaseException {
         String[] imageTypes = uploadType.split(",");
-
         Attachment attachment = new Attachment("", "", "", 0, "", 0, "");
 
         String fileName = file.getOriginalFilename().toLowerCase();
@@ -59,7 +58,8 @@ public class StorageService {
         if (StringUtils.isNullOrEmpty(fileName) || StringUtils.isNullOrEmpty(suffixName)) {
             throw new BaseException("上传文件名不能为空/后缀名为空");
         }
-        Boolean check = false;
+
+        boolean check = false;
         for (String type : imageTypes) {
             if (type.equals(suffixName)) {
                 check = true;
@@ -118,6 +118,7 @@ public class StorageService {
                     throw new BaseException.UploadFileFailException();
                 }
             }
+
             file.renameTo(target);
         } catch (IllegalStateException e) {
             Tracker.error(e);

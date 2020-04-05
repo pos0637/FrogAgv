@@ -9,7 +9,6 @@ import com.furongsoft.base.misc.Constants;
 import com.furongsoft.base.misc.SecurityUtils;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.rbac.entities.DataAuth;
-import com.furongsoft.base.rbac.entities.Role;
 import com.furongsoft.base.rbac.entities.User;
 import com.furongsoft.base.rbac.entities.UserRole;
 import com.furongsoft.base.rbac.mappers.ResourceDao;
@@ -22,7 +21,6 @@ import com.furongsoft.base.rbac.security.PasswordHelper;
 import com.furongsoft.base.services.BaseService;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 用户服务
@@ -50,12 +47,6 @@ public class UserService extends BaseService<UserDao, User> {
     private final AttachmentDao attachmentDao;
     private final UserConfigureDao userConfigureDao;
     private final UserAuthService userAuthService;
-
-    /**
-     * 普通用户角色编码
-     */
-    @Value("${auth.normal}")
-    private String normal;
 
     @Autowired
     public UserService(UserDao userDao, UserRoleService userRoleService, AreaService areaService, RoleService roleService, ResourceDao resourceDao, AttachmentDao attachmentDao, UserConfigureDao userConfigureDao, UserAuthService userAuthService) {
@@ -370,11 +361,6 @@ public class UserService extends BaseService<UserDao, User> {
         wrapper.eq("target_user_id", user.getId());
         if (userAuthService.selectCount(wrapper) == 0) {
             userAuthService.insert(new DataAuth(user.getId(), user.getId()));
-        }
-
-        Role role = roleService.getRoleByCode(normal);
-        if (!Objects.isNull(role)) {
-            userRoleService.insert(new UserRole(user.getId(), role.getId()));
         }
     }
 

@@ -1,6 +1,6 @@
 package com.furongsoft.agv.schedulers;
 
-import com.furongsoft.agv.entities.Area;
+import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 
 /**
@@ -16,7 +16,7 @@ public interface IScheduler {
      * @param destination 目的区域
      * @return 任务
      */
-    Task AddTask(Site source, Area destination);
+    Task AddTask(Site source, AgvArea destination);
 
     /**
      * 添加任务

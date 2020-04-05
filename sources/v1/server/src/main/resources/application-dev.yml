@@ -128,6 +128,7 @@ upload:
   # 附件路径
   path: ./attachments
   basepath: ./attachments/base
+  file-type: .bmp,.jpg,.png,.jpeg
 
 logging:
   path: ./logs
