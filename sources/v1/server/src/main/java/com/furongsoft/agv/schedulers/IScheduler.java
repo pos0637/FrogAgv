@@ -2,6 +2,7 @@ package com.furongsoft.agv.schedulers;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
  * AGV调度管理器
