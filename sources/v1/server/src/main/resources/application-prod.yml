@@ -9,12 +9,13 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css,image/webp,image/apng,image/png,image/jpeg,image/gif
     min-response-size: 2048
-  session:
-    timeout: PT5H
   tomcat:
     #    uri-encoding: UTF-8
     max-threads: 1000
     max-connections: 20000
+  servlet:
+    session:
+      timeout: PT5H
 
 spring:
   datasource:
@@ -131,93 +132,5 @@ logging:
   config: classpath:logback-config.xml
   level:
     root: info
-
-auth:
-  project:
-    manage: pms_all_project_manage
-    create: pms_project_create
-  normal: tenant
-  home:
-    agent: agent
-    landlord: landlord
-    enterprise: enterprise
-  auditorID: 4
-
-ai:
-  face-recognition:
-    baidu:
-      app-id: 15069785
-      api-key: uXPycpSTKZrrRfbsUxFHpxzG
-      secret-key: BdSsku30hUBlaNkiDWamOXfPBKslyLgG
-      group-id: fjdx
-      timeout: 5000
-    arc:
-      path: ./attachments/faces
-  voice-dialogue:
-    mqtt:
-      topic: eduRobotTopic
-      client-id: eduRobotClient
-      broker: tcp://110.90.126.193:8099
-      user-name: admin
-      password: public
-      keep-alive-interval: 60
-      connection-timeout: 10
-system:
-  localImage: true
-
-file:
-  upload:
-    file-type: .bmp,.jpg,.png,.jpeg
-    file-size: 3
-    compressSize: 512000
-
-wx:
-  mp:
-    configs:
-      - appId: wxef75ad7bf3dacda9
-        secret: 76bbc019e6ff1168b5e9a06295564572
-        token: weiphp
-        aesKey: may3e6S6QQAFM2Q0KPlAROuSgLqEJ5ynI34ja0kP3uA
-  pay:
-    appId: wxef75ad7bf3dacda9
-    mchId: 1534395181
-    mchKey: 08cb28a8b646d56cd415cfc83f206078
-    keyPath: classpath:apiclient_cert_hdj.p12
-    buyAgentNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/agent
-    buyLandlordNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/landlord
-    buyEnterpriseNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/enterprise
-    renewNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/renew
-    upgradeNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/upgrade
-    discountNotifyUrl: https://www.furongsoft.com:50443/api/v1/pay/notify/discount
-  redirectUrl: https://www.furongsoft.com/resources/mobile/index.html#/home
-  shareUrl: https://www.furongsoft.com/resources/mobile/index.html#/home?userId={0}
-  teamShareUrl: https://www.furongsoft.com/resources/mobile/index.html#/home?userId={0}&teamId={1}&teamNum={2}
-  userPassword: e10adc3949ba59abbe56e057f20f883e
-  miniapp:
-    configs:
-      - appid: wxbd6b3f03a9cf2d45
-        secret: 759adc0ebb692259d0e7474f728597b5
-        token: token
-        aesKey: d0e5db02e9677087de6094f1fc4537de
-        msgDataFormat: JSON
-
-water:
-  appId: 10000120
-  appSecret: 9DE32EC6642E7B8C1B0CD85C8449C2C8
-
-power:
-  userName: guest1
-  pw: 15DAC3875AD0F994A832043BE841DC7E
-
-watermark:
-  word: 小哥当家
-  style: -test
-
-SMS:
-  serverAddress: http://47.100.118.227:18002/send.do
-  account: 5410
-  password: 975685
-  temp1: 【小哥当家】您好，您收到来自用户{0}的{1}审核申请，请前往小程序中处理。
-  temp2: 【小哥当家】您好，您的审核已被处理，请前往小程序中查看。
 
 env: pro

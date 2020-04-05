@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 @Setter
-public class RestResponse extends Resource {
+public class RestResponse extends EntityModel {
     /**
      * HTTP状态码
      */
@@ -90,6 +90,4 @@ public class RestResponse extends Resource {
         this.data = data;
         this.newToken = newToken;
     }
-
-
 }

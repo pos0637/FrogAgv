@@ -3,7 +3,6 @@ package com.furongsoft.base.rbac.controllers;
 import com.furongsoft.base.misc.Constants;
 import com.furongsoft.base.misc.SecurityUtils;
 import com.furongsoft.base.rbac.mappers.ConfigDao;
-import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,14 +70,4 @@ public class SystemWebController {
         model.addAttribute("config", configDao.selectById(Constants.CONFIG_ID));
         return "/resources/index.html#/login";
     }
-
-    @RequestMapping("/")
-    public String home() throws WxErrorException {
-        if (SecurityUtils.getCurrentUser() == null) {
-            return "resources/index.html#/login";
-        } else {
-            return "resources/index.html#/home";
-        }
-    }
-
 }

@@ -119,24 +119,3 @@ logging:
   config: classpath:logback-config.xml
   level:
     root: info
-
-scheduler:
-  auth: sendWeekly
-  templatePath: ./resources/weekDaily
-  fileName: Template.xlsx
-  suffix: .xlsx
-
-auth:
-  project:
-    manage: pms_all_project_manage
-    create: pms_project_create
-  normal: normal
-
-mqtt:
-  topic: ircloudServerTopic
-  client-id: ircloudServerTopic
-  broker: tcp://112.51.3.158:1883
-  user-name: admin
-  password: public
-  keep-alive-interval: 60
-  connection-timeout: 10

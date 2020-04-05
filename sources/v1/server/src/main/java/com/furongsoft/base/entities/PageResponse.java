@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 @Setter
-public class PageResponse<T> extends PagedResources<T> {
+public class PageResponse<T> extends PagedModel<T> {
     /**
      * HTTP状态码
      */
@@ -76,9 +76,9 @@ public class PageResponse<T> extends PagedResources<T> {
         this.errno = (HttpStatus.OK.value() == code) ? 0 : -1;
     }
 
-    public PageResponse(PagedResources<T> resources) {
+    public PageResponse(PagedModel<T> resources) {
         super(resources.getContent(), resources.getMetadata(), resources.getLinks());
         this.code = HttpStatus.OK.value();
-        this.errno = (HttpStatus.OK.value() == code) ? 0 : -1;
+        this.errno = 0;
     }
 }

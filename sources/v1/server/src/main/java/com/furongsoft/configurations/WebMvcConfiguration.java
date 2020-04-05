@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceProcessor;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -66,15 +66,12 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @SuppressWarnings("unchecked")
     @Bean
-    public <T> ResourceProcessor<ResourceSupport> resourceProcessor() {
-        return new ResourceProcessor<ResourceSupport>() {
-            @Override
-            public ResourceSupport process(ResourceSupport resource) {
-                if (resource instanceof PagedResources) {
-                    return new PageResponse((PagedResources<Resource<T>>) resource);
-                } else {
-                    return new RestResponse(HttpStatus.OK, null, resource);
-                }
+    public <T extends RepresentationModel<? extends T>> RepresentationModelProcessor<RepresentationModel<T>> resourceProcessor() {
+        return resource -> {
+            if (resource instanceof PagedModel) {
+                return new PageResponse((PagedModel<EntityModel<T>>) resource);
+            } else {
+                return new RestResponse(HttpStatus.OK, null, resource);
             }
         };
     }
@@ -98,5 +95,4 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         converters.add(string);
         converters.add(fastConverter);
     }
-
 }

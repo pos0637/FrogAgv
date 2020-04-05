@@ -12,13 +12,10 @@ import com.furongsoft.base.rbac.entities.User;
 import com.furongsoft.base.rbac.models.CarUser;
 import com.furongsoft.base.rbac.models.Password;
 import com.furongsoft.base.rbac.models.UserAuth;
-import com.furongsoft.base.rbac.models.UserInfo;
 import com.furongsoft.base.rbac.security.JwtUtils;
 import com.furongsoft.base.rbac.services.ResourceService;
 import com.furongsoft.base.rbac.services.UserService;
 import com.furongsoft.base.restful.entities.RestResponse;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +23,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -245,23 +243,6 @@ public class UserController {
     @RequiresAuthentication
     public RestResponse getCurrentUser() {
         return new RestResponse(HttpStatus.OK, null, SecurityUtils.getCurrentUser());
-    }
-
-
-    /**
-     * 获取当前用户角色等信息
-     *
-     * @return 响应内容
-     */
-    @RequestMapping("/users/currentUserRole")
-    @RequiresAuthentication
-    public RestResponse getCurrentUserRole(HttpServletRequest request) {
-        WxMpUser wxMpUser = (WxMpUser) request.getSession().getAttribute("wxMpUser");
-        UserInfo userInfo = userService.getUserInfo();
-        if (wxMpUser != null) {
-            userInfo.setIconUrl(wxMpUser.getHeadImgUrl());
-        }
-        return new RestResponse(HttpStatus.OK, null, userInfo);
     }
 
     /**
