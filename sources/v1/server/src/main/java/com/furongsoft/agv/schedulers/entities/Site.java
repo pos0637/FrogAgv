@@ -1,10 +1,15 @@
 package com.furongsoft.agv.schedulers.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * 站点
  *
  * @author Alex
  */
+@Data
+@AllArgsConstructor
 public class Site {
     /**
      * 编号
@@ -12,7 +17,7 @@ public class Site {
     public String code;
 
     /**
-     * 占用站点任务
+     * 容器编码
      */
-    public Task task;
+    public String containerId;
 }

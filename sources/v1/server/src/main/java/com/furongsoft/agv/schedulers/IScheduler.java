@@ -2,6 +2,7 @@ package com.furongsoft.agv.schedulers;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
@@ -10,6 +11,13 @@ import com.furongsoft.agv.schedulers.entities.Task;
  * @author Alex
  */
 public interface IScheduler {
+    /**
+     * 初始化
+     * 
+     * @param areas 区域列表
+     */
+    void Initialize(Area[] areas);
+
     /**
      * 添加任务
      *
@@ -105,7 +113,7 @@ public interface IScheduler {
      * @param target      目的站点
      * @param event       事件消息
      */
-    void OnContainerArrived(String containerId, Site target, String event);
+    void OnContainerArrived(String containerId, Site destination, String event);
 
     /**
      * 容器离场事件
@@ -114,5 +122,5 @@ public interface IScheduler {
      * @param target      目的站点
      * @param event       事件消息
      */
-    void OnContainerLeft(String containerId, Site target, String event);
+    void OnContainerLeft(String containerId, Site destination, String event);
 }

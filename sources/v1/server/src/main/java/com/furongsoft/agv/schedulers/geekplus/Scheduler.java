@@ -2,7 +2,7 @@ package com.furongsoft.agv.schedulers.geekplus;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.BaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
@@ -10,9 +10,7 @@ import com.furongsoft.agv.schedulers.entities.Task;
  *
  * @author Alex
  */
-public class Scheduler implements IScheduler {
-
-
+public class Scheduler extends BaseScheduler {
     @Override
     public Task AddTask(Site source, AgvArea destination) {
         return null;
