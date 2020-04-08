@@ -16,10 +16,10 @@ public class Area {
     /**
      * 编码
      */
-    public String code;
+    private String code;
 
     /**
      * 站点列表
      */
-    public List<Site> sites;
+    private List<Site> sites;
 }

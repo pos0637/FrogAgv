@@ -14,10 +14,10 @@ public class Site {
     /**
      * 编号
      */
-    public String code;
+    private String code;
 
     /**
      * 容器编码
      */
-    public String containerId;
+    private String containerId;
 }

@@ -29,37 +29,37 @@ public class Task {
     /**
      * 源站点编码
      */
-    public String source;
+    private String source;
 
     /**
      * 目的站点编码
      */
-    public String destination;
+    private String destination;
 
     /**
      * 目的区域编码
      */
-    public String destinationArea;
+    private String destinationArea;
 
     /**
      * WCS任务索引
      */
-    public String wcsTaskId;
+    private String wcsTaskId;
 
     /**
      * 可替换目的站点
      */
-    public boolean replaceable;
+    private boolean replaceable;
 
     /**
      * 可取消
      */
-    public boolean cancelable;
+    private boolean cancelable;
 
     /**
      * 状态
      */
-    public Status status;
+    private Status status;
 
     public String toString() {
         try {

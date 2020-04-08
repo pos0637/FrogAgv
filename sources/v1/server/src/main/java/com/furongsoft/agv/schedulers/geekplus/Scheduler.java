@@ -33,41 +33,33 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public void OnMovingStarted(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnMovingArrived(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnMovingPaused(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnMovingWaiting(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnMovingCancelled(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnMovingFail(String agvId, String taskId, String event) {
-
     }
 
     @Override
     public void OnContainerArrived(String containerId, Site target, String event) {
-
     }
 
     @Override
     public void OnContainerLeft(String containerId, Site target, String event) {
-
     }
 }
