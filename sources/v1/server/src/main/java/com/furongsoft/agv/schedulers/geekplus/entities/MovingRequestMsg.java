@@ -1,5 +1,6 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @author Alex
  */
 @Data
+@AllArgsConstructor
 public class MovingRequestMsg {
     /**
      * 消息头参数列表
@@ -19,7 +21,35 @@ public class MovingRequestMsg {
      */
     private Body body;
 
+    /**
+     * 目标点详情
+     */
     @Data
+    @AllArgsConstructor
+    public static class Dest {
+        /**
+         * 行号
+         */
+        private int item;
+
+        /**
+         * 目标节点编码
+         */
+        private String destCode;
+
+        /**
+         * 目标节点类型（1.停靠点；2.工作站；3.货架点；4.区域；不传默认按停靠点处理）
+         */
+        private int destType;
+
+        /**
+         * 目标点优先级，默认 1 MES项目必传，MES根据流程优先级排好优先级，1为最优先，2次之，以此类推
+         */
+        private int destPriority;
+    }
+
+    @Data
+    @AllArgsConstructor
     public static class Header {
         /**
          * 防止任务重复提交，唯一码
@@ -54,6 +84,7 @@ public class MovingRequestMsg {
     }
 
     @Data
+    @AllArgsConstructor
     public static class Body {
         /**
          * 消息类型：此业务功能必须传：MovingRequestMsg
@@ -104,33 +135,10 @@ public class MovingRequestMsg {
          * 优先级，默认 1
          */
         private int priority;
-    }
-
-    @Data
-    public static class Response {
-        /**
-         * 当前回调应答消息的唯一标识
-         */
-        private String responseId;
 
         /**
-         * 回调应答代码，成功：0，失败：非0
+         * 目标点详情集合
          */
-        private String code;
-
-        /**
-         * 返回消息说明，默认填写“Success”
-         */
-        private String msg;
-
-        /**
-         * 与回调的消息类型一一对应
-         */
-        private String msgType;
-
-        /**
-         * 返回失败和成功
-         */
-        private String data;
+        private Dest[] dests;
     }
 }

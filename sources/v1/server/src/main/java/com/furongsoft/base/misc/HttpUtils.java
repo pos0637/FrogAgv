@@ -1,5 +1,7 @@
 package com.furongsoft.base.misc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -25,9 +27,10 @@ public class HttpUtils {
      * @param url     资源地址
      * @param headers 头部数据
      * @param data    数据
+     * @param clazz   返回数据类型
      * @return 结果
      */
-    public static String postJson(String url, Map<String, String> headers, String data) {
+    public static <T> T postJson(String url, Map<String, String> headers, Object data, Class<T> clazz) {
         if (headers == null) {
             headers = new LinkedHashMap<>();
         }
@@ -35,7 +38,18 @@ public class HttpUtils {
         headers.put("Accept", "application/json");
         headers.put("Content-type", "application/json");
 
-        return post(url, headers, data);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            data = data instanceof String ? data : mapper.writeValueAsString(data);
+            String result = post(url, headers, (String) data);
+            if (result == null) {
+                return null;
+            }
+
+            return mapper.readValue(result, clazz);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     /**
