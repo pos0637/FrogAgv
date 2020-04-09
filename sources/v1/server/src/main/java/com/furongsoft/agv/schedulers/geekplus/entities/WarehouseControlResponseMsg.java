@@ -1,5 +1,6 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 /**
@@ -7,6 +8,8 @@ import lombok.Data;
  *
  * @author Alex
  */
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WarehouseControlResponseMsg {
     /**
      * 当前回调应答消息的唯一标识

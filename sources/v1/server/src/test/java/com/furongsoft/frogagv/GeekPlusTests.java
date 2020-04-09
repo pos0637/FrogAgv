@@ -35,9 +35,9 @@ class GeekPlusTests {
     void removeContainer() {
         Site site = new Site();
         site.setCode("185");
-        scheduler.onContainerLeft("A000011", site, null);
+        scheduler.onContainerLeft(null, site, null);
 
         site.setCode("412");
-        scheduler.onContainerLeft("A000012", site, null);
+        scheduler.onContainerLeft(null, site, null);
     }
 }
