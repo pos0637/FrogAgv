@@ -1,12 +1,15 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 系统控制
+ * 系统控制请求消息
  *
  * @author Alex
  */
+@Data
+@AllArgsConstructor
 public class WarehouseControlRequestMsg {
     /**
      * 消息头参数列表
@@ -19,6 +22,7 @@ public class WarehouseControlRequestMsg {
     private Body body;
 
     @Data
+    @AllArgsConstructor
     public static class Header {
         /**
          * 防止任务重复提交，唯一码
@@ -53,6 +57,7 @@ public class WarehouseControlRequestMsg {
     }
 
     @Data
+    @AllArgsConstructor
     public static class Body {
         /**
          * 消息类型：此业务功能必须传-WarehouseControlRequestMsg

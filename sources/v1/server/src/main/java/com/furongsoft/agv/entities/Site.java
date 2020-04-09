@@ -64,5 +64,4 @@ public class Site extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
-
 }

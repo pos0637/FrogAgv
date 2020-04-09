@@ -6,7 +6,10 @@ import com.furongsoft.agv.schedulers.BaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingResponseMsg;
+import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMsg;
+import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
 import com.furongsoft.base.misc.HttpUtils;
+import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +26,7 @@ public class Scheduler extends BaseScheduler {
     @Value("${geekplus.url}")
     private String url;
 
-    @Value("${geekplus.url}")
+    @Value("${geekplus.clientCode}")
     private String clientCode;
 
     @Value("${geekplus.channelId}")
@@ -57,7 +60,7 @@ public class Scheduler extends BaseScheduler {
     public Task addTask(Site source, Site destination) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 3, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-2", 3, 1)}));
+                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-2", 3, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-1", 3, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if (response == null) {
             return null;
@@ -104,9 +107,21 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public void onContainerArrived(String containerId, Site target, String event) {
+        WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
+            new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
+                new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 3, target.getCode())
+        );
+        WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
+        Tracker.info(response);
     }
 
     @Override
     public void onContainerLeft(String containerId, Site target, String event) {
+        WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
+                new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
+                new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId, 3, target.getCode())
+        );
+        WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
+        Tracker.info(response);
     }
 }

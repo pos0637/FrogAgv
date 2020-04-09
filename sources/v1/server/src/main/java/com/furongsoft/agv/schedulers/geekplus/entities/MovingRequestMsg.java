@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 执行搬运
+ * 执行搬运请求消息
  *
  * @author Alex
  */
