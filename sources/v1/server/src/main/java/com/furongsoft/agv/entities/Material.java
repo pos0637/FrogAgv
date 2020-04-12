@@ -25,7 +25,7 @@ public class Material extends BaseEntity {
     private long id;
 
     /**
-     * 物料编号
+     * 物料编号 TODO 加索引
      */
     private String code;
 
@@ -35,12 +35,12 @@ public class Material extends BaseEntity {
     private String name;
 
     /**
-     * 青蛙工厂物料唯一标识
+     * 物料唯一标识
      */
     private String uuid;
 
     /**
-     * 产品规格
+     * 产品规格 TODO
      */
     private String specs;
 
@@ -58,5 +58,4 @@ public class Material extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
-
 }

@@ -42,7 +42,7 @@ public class MaterialBoxMaterial extends BaseEntity {
     private int count;
 
     /**
-     * 状态【0：未验收；1：已验收】
+     * 状态[0：未验收；1：已验收]
      */
     private int state;
 

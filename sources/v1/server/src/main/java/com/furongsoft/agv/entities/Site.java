@@ -2,13 +2,13 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
 
 /**
  * 站点信息
@@ -17,10 +17,8 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_site")
-@Getter
-@Setter
+@Data
 public class Site extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -46,7 +44,7 @@ public class Site extends BaseEntity {
     private Double locationZ;
 
     /**
-     * 类型【1：备货位；2：出货位；3：空车位；】
+     * 类型[1：备货位；2：出货位；3：空车位；]
      */
     private int type;
 

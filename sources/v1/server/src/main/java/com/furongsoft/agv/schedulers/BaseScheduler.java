@@ -1,5 +1,9 @@
 package com.furongsoft.agv.schedulers;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.entities.Area;
@@ -7,13 +11,9 @@ import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
 import com.furongsoft.base.misc.Tracker;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 /**
  * AGV调度管理器
- *
+ * 
  * @author Alex
  */
 public abstract class BaseScheduler implements IScheduler {
@@ -28,24 +28,24 @@ public abstract class BaseScheduler implements IScheduler {
     protected List<Task> tasks;
 
     @Override
-    synchronized public void initialize(Area[] areas) {
+    synchronized public void Initialize(Area[] areas) {
         this.areas = Arrays.asList(areas);
     }
 
     @Override
-    synchronized public boolean cancel(Task task) {
+    synchronized public boolean Cancel(Task task) {
         tasks.remove(task);
         return true;
     }
 
     @Override
-    synchronized public boolean cancel(Site source) {
+    synchronized public boolean Cancel(Site source) {
         getTaskBySource(source.getCode()).ifPresent(t -> tasks.remove(t));
         return true;
     }
 
     @Override
-    synchronized public void onMovingStarted(String agvId, String taskId, String event) {
+    synchronized public void OnMovingStarted(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Moving);
             log(String.format("OnMovingStarted: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -53,7 +53,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onMovingArrived(String agvId, String taskId, String event) {
+    synchronized public void OnMovingArrived(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Arrived);
             log(String.format("OnMovingArrived: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -61,7 +61,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onMovingPaused(String agvId, String taskId, String event) {
+    synchronized public void OnMovingPaused(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Paused);
             log(String.format("OnMovingPaused: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -69,7 +69,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onMovingWaiting(String agvId, String taskId, String event) {
+    synchronized public void OnMovingWaiting(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Paused);
             log(String.format("OnMovingWaiting: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -77,7 +77,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onMovingCancelled(String agvId, String taskId, String event) {
+    synchronized public void OnMovingCancelled(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Cancelled);
             log(String.format("OnMovingCancelled: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -85,7 +85,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onMovingFail(String agvId, String taskId, String event) {
+    synchronized public void OnMovingFail(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(t -> {
             t.setStatus(Status.Fail);
             log(String.format("OnMovingFail: task: %s, agv: %s, event: %s", t.toString(), agvId, event));
@@ -93,7 +93,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onContainerArrived(String containerId, Site destination, String event) {
+    synchronized public void OnContainerArrived(String containerId, Site destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
         if (site != null) {
             site.setContainerId(containerId);
@@ -102,7 +102,7 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onContainerLeft(String containerId, Site destination, String event) {
+    synchronized public void OnContainerLeft(String containerId, Site destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
         if (site != null) {
             site.setContainerId(null);
@@ -118,7 +118,7 @@ public abstract class BaseScheduler implements IScheduler {
      * @param wcsTaskId   WCS任务索引
      * @return 任务
      */
-    synchronized protected Task addTask(Site source, AgvArea destination, String wcsTaskId) {
+    synchronized protected Task AddTask(Site source, AgvArea destination, String wcsTaskId) {
         Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destination.getCode());
         if (site.isEmpty()) {
             log(String.format("AddTask destinationArea is full: %s, %s", destination.getName(), destination.getCode()));
@@ -143,7 +143,7 @@ public abstract class BaseScheduler implements IScheduler {
      * @param wcsTaskId   WCS任务索引
      * @return 任务
      */
-    synchronized protected Task addTask(Site source, Site destination, String wcsTaskId) {
+    synchronized protected Task AddTask(Site source, Site destination, String wcsTaskId) {
         if ((getSite(source.getCode()) == null) || (getSite(destination.getCode()) == null)) {
             return null;
         }
@@ -156,7 +156,7 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取站点
-     *
+     * 
      * @param code 站点编码
      * @return 站点
      */
@@ -174,17 +174,18 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取空闲站点
-     *
+     * 
      * @param destinationArea 目的区域编码
      * @return 空闲站点
      */
     synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(String destinationArea) {
-        return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst().flatMap(this::getFreeSite);
+        return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst().map(a -> getFreeSite(a))
+                .orElse(Optional.empty());
     }
 
     /**
      * 获取空闲站点
-     *
+     * 
      * @param area 区域
      * @return 空闲站点
      */
@@ -195,18 +196,19 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取默认站点
-     *
-     * @param destinationArea 目的区域编码
+     * 
+     * @param area 目的区域编码
      * @return 站点
      */
     synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(
             String destinationArea) {
-        return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst().flatMap(this::getDefaultSite);
+        return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst().map(a -> getDefaultSite(a))
+                .orElse(Optional.empty());
     }
 
     /**
      * 获取默认站点
-     *
+     * 
      * @param area 区域
      * @return 站点
      */
@@ -216,7 +218,7 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取任务
-     *
+     * 
      * @param source 源站点编码
      * @return 任务
      */
@@ -226,7 +228,7 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取任务
-     *
+     * 
      * @param destination 目的站点编码
      * @return 任务
      */
@@ -236,8 +238,8 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 获取任务
-     *
-     * @param wcsTaskId WCS任务索引
+     * 
+     * @param destination WCS任务索引
      * @return 任务
      */
     synchronized protected Optional<Task> getTaskByWcsTaskId(String wcsTaskId) {
@@ -246,7 +248,7 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 日志
-     *
+     * 
      * @param content 内容
      */
     protected void log(String content) {

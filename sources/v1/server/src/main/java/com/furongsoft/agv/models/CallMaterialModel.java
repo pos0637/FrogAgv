@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,13 +36,14 @@ public class CallMaterialModel implements Serializable {
     private Integer acceptanceCount;
 
     /**
-     * 状态【0：未配送；1：配送中；2：已完成】
+     * 状态[0：未配送；1：配送中；2：已完成]
      */
     private int state;
 
     /**
      * 叫料时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date callTime;
 
     /**
@@ -50,7 +52,7 @@ public class CallMaterialModel implements Serializable {
     private String waveDetailCode;
 
     /**
-     * 类型【1：灌装区；2：包装区；3：消毒间；4：拆包间】
+     * 类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
      */
     private int type;
 
@@ -65,34 +67,34 @@ public class CallMaterialModel implements Serializable {
     private Integer enabled;
 
     /**
-     * 产品名称
+     * 原料名称
      */
-    private String productName;
+    private String materialName;
 
     /**
-     * 产品编号
+     * 原料编号
      */
-    private String productCode;
+    private String materialCode;
 
     /**
-     * 产品唯一标识
+     * 原料唯一标识
      */
-    private String productUuid;
+    private String materialUuid;
 
     /**
-     * 产品规格
+     * 原料规格
      */
-    private String productSpecs;
+    private String materialSpecs;
 
     /**
-     * 产品单位
+     * 原料单位
      */
-    private String productUnit;
+    private String materialUnit;
 
     /**
-     * 产品批次
+     * 原料批次
      */
-    private String productBatch;
+    private String materialBatch;
 
     /**
      * 班组唯一标识（青蛙uuid）
@@ -104,4 +106,28 @@ public class CallMaterialModel implements Serializable {
      */
     private Integer areaId;
 
+    /**
+     * 波次编码
+     */
+    private String waveCode;
+
+    /**
+     * 产品ID
+     */
+    private Long productId;
+
+    /**
+     * 产品名称
+     */
+    private String productName;
+
+    /**
+     * 产品UUID
+     */
+    private String productUuid;
+
+    /**
+     * 生产线编号
+     */
+    private String productLineCode;
 }

@@ -115,14 +115,4 @@ logging:
   level:
     root: info
 
-geekplus:
-  url: http://1.119.129.226:48267
-  clientCode: geekcode
-  channelId: 11111
-  warehouseCode: geekwarehousecode
-  userId: admin
-  userKey: 123456
-  language: zh_cn
-  version: 1.0.0
-
 env: dev

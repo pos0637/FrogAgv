@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +29,7 @@ public class AcceptanceModel implements Serializable {
     /**
      * 验收时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date acceptanceTime;
 
     /**

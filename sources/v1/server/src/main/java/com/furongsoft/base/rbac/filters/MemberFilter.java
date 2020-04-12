@@ -7,6 +7,7 @@ import com.furongsoft.base.rbac.entities.User;
 import com.furongsoft.base.restful.entities.RestResponse;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,6 +17,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Component
 public class MemberFilter extends AccessControlFilter {
 
     @Override

@@ -1,7 +1,9 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -19,10 +21,8 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_acceptance")
-@Getter
-@Setter
+@Data
 public class Acceptance extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -40,6 +40,7 @@ public class Acceptance extends BaseEntity {
     /**
      * 验收时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date acceptanceTime;
 
     /**
@@ -51,6 +52,11 @@ public class Acceptance extends BaseEntity {
      * 班组名称
      */
     private String teamName;
+
+    /**
+     * 验收人 TODO
+     */
+    private Long acceptanceUser;
 
     /**
      * 区域ID(产线ID)
@@ -66,5 +72,4 @@ public class Acceptance extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
-
 }

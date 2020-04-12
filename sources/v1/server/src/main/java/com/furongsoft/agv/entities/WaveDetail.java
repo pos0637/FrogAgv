@@ -1,14 +1,13 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
 
 /**
  * 波次详情信息
@@ -17,10 +16,10 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_wave_detail")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class WaveDetail extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -36,7 +35,7 @@ public class WaveDetail extends BaseEntity {
     private String waveCode;
 
     /**
-     * 物料ID(原料)
+     * 原料物料ID
      */
     private long materialId;
 
@@ -46,13 +45,15 @@ public class WaveDetail extends BaseEntity {
     private int count;
 
     /**
-     * 状态【0：未配送；1：配送中；2：已完成】
-     */
-    private int state;
-
-    /**
      * 是否启用
      */
     private Integer enabled;
 
+    public WaveDetail(WaveDetailModel waveDetailModel) {
+        this.code = waveDetailModel.getCode();
+        this.waveCode = waveDetailModel.getWaveCode();
+        this.materialId = waveDetailModel.getMaterialId();
+        this.count = waveDetailModel.getCount();
+        this.enabled = waveDetailModel.getEnabled();
+    }
 }

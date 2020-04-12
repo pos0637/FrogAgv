@@ -1,9 +1,11 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.furongsoft.agv.models.WaveModel;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import com.furongsoft.base.misc.StringUtils;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,10 +19,10 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_wave")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Wave extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -46,27 +48,29 @@ public class Wave extends BaseEntity {
     private long areaId;
 
     /**
-     * 物料ID(产品)
+     * 产品物料ID
      */
     private long materialId;
 
     /**
-     * 执行时间
+     * 计划执行时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date executionTime;
 
     /**
-     * 完成时间
+     * 实际完成时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date finishTime;
 
     /**
-     * 状态【0：未配送；1：配送中；2：已完成】
+     * 状态[0：未配送；1：配送中；2：已完成]
      */
     private int state;
 
     /**
-     * 类型【1：灌装区；2：包装区】
+     * 类型[1：灌装区；2：包装区]
      */
     private int type;
 
@@ -75,4 +79,16 @@ public class Wave extends BaseEntity {
      */
     private Integer enabled;
 
+    public Wave(WaveModel waveModel) {
+        this.code = waveModel.getCode();
+        this.teamId = waveModel.getTeamId();
+        this.teamName = waveModel.getTeamName();
+        this.areaId = waveModel.getAreaId();
+        this.materialId = waveModel.getMaterialId();
+        this.executionTime = waveModel.getExecutionTime();
+        this.finishTime = waveModel.getFinishTime();
+        this.state = waveModel.getState();
+        this.type = waveModel.getType();
+        this.enabled = waveModel.getEnabled();
+    }
 }

@@ -44,5 +44,15 @@ export default {
     offline: 0,
     stop: 1,
     run: 2
-  }
+  },
+  siteState: [
+    { value: 0, label: '空闲' },
+    { value: 1, label: '锁定' },
+    { value: 2, label: '有货' }
+  ],
+  deliveryState: [
+    { value: 0, label: '未配送' },
+    { value: 1, label: '配送中' },
+    { value: 2, label: '已完成' }
+  ]
 }
