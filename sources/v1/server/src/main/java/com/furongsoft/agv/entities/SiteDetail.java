@@ -2,6 +2,7 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,14 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * 站点详情信息【站点瞬时备货状态】
+ * 站点详情信息[站点瞬时备货状态]
  *
  * @author linyehai
  */
 @Entity
 @TableName("t_agv_site_detail")
-@Getter
-@Setter
+@Data
 public class SiteDetail extends BaseEntity {
 
     @Id
@@ -35,7 +35,7 @@ public class SiteDetail extends BaseEntity {
     private Long stockUpRecordId;
 
     /**
-     * 状态【0：空闲；1：待出库；2：出库中；3：已出库；4：待入库；5：入库中；6：已入库】
+     * 状态[0：空闲；1：锁定；2：有货]
      */
     private int state;
 

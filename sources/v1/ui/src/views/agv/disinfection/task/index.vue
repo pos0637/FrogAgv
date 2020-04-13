@@ -32,46 +32,53 @@
         <div class="task-content">
           <div class="title">备货区</div>
           <div class="position-box flex-box flex-wrap">
-            <div v-for="(item) in cData" :key="item.id">
-              <div
-                class="position position-pointer"
-                v-if="item.bomId"
-                @click="taskOut(item.bomId,item.name)"
-              >{{item.bomName}}</div>
-              <div class="position" v-else></div>
+            <div v-for="(item) in sites" :key="item.id">
+              <div @click="taskOut(item)" class="pointer site-item">
+                <div class="position position-pointer" v-if="item.stockUpRecordId">{{item.bomName}}</div>
+                <div class="position" v-else></div>
+                <div class="site-item-name">{{item.name}}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <el-dialog
+      v-if="state.taskOutVisible"
       :visible.sync="state.taskOutVisible"
       :title="taskOutPositionName"
       class="dialog-transfer"
     >
-      <TaskOut :id="taskOutBomId" @toggleShow="toggleShow"></TaskOut>
+      <TaskOut :bom="taskOutBom" @toggleShow="toggleShow"></TaskOut>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import '../../product/home/home.scss';
-  import './task.scss';
-  import TaskOut from './taskOut';
+  import '../../product/home/home.scss'
+import './task.scss'
+import TaskOut from './taskOut'
+import request from '@/utils/request'
+import Constants from '@/utils/constants'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'home',
     components: { TaskOut },
     created() {
-      this.$store.dispatch('updateTitle', '配货任务');
-    },
+      this.loadingInfo()
+  },
     data() {
       return {
         state: {
           taskOutVisible: false
         },
+        // 加载对象
+        load: null,
+        sites: [],
         taskOutPositionName: '',
-        taskOutBomId: null,
+        taskOutBom: null,
         cData: [
           { id: 1, name: '库位1', bomName: 'BOM1', bomId: '1' },
           { id: 2, name: '库位2', bomName: '' },
@@ -84,41 +91,7 @@
           { id: 11, name: '库位1', bomName: 'BOM1', bomId: '1' },
           { id: 12, name: '库位2', bomName: '' },
           { id: 13, name: '库位3', bomName: '' },
-          { id: 14, name: '库位4', bomName: '' },
-          { id: 15, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 16, name: '库位6', bomName: '' },
-          { id: 17, name: '库位7', bomName: '' },
-          { id: 18, name: '库位8', bomName: '' },
-          { id: 21, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 22, name: '库位2', bomName: '' },
-          { id: 23, name: '库位3', bomName: '' },
-          { id: 24, name: '库位4', bomName: '' },
-          { id: 25, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 26, name: '库位6', bomName: '' },
-          { id: 31, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 322, name: '库位2', bomName: '' },
-          { id: 323, name: '库位3', bomName: '' },
-          { id: 324, name: '库位4', bomName: '' },
-          { id: 35, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 36, name: '库位6', bomName: '' },
-          { id: 37, name: '库位7', bomName: '' },
-          { id: 38, name: '库位8', bomName: '' },
-          { id: 41, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 42, name: '库位2', bomName: '' },
-          { id: 43, name: '库位3', bomName: '' },
-          { id: 44, name: '库位4', bomName: '' },
-          { id: 45, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 46, name: '库位6', bomName: '' },
-          { id: 47, name: '库位7', bomName: '' },
-          { id: 48, name: '库位8', bomName: '' },
-          { id: 51, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 52, name: '库位2', bomName: '' },
-          { id: 53, name: '库位3', bomName: '' },
-          { id: 54, name: '库位4', bomName: '' },
-          { id: 55, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 56, name: '库位6', bomName: '' },
-          { id: 57, name: '库位7', bomName: '' },
-          { id: 58, name: '库位8', bomName: '' }
+          { id: 14, name: '库位4', bomName: '' }
         ],
         datas: [
           {
@@ -160,22 +133,61 @@
             ]
           }
         ]
-      };
-    },
+      }
+  },
     methods: {
+      loadingInfo() {
+        this.$store.dispatch('updateTitle', '消毒间配货任务')
+        this.getSites()
+      },
       // 跳转到配送管理页面
       turn(url) {
-        this.$router.push({ path: url });
+        this.$router.push({ path: url })
       },
       toggleShow() {
-        this.state.taskOutVisible = false;
+        this.state.taskOutVisible = false
       },
-      taskOut(bomId, taskOutPositionName) {
-        console.log('taskOut>>>>>>>>>>>', bomId);
-        this.taskOutBomId = bomId;
-        this.taskOutPositionName = taskOutPositionName;
-        this.state.taskOutVisible = true;
+      taskOut(bom) {
+        console.log('taskOut>>>>>>>>>>>', bom)
+        this.taskOutBom = bom
+        this.taskOutPositionName = bom.name
+        this.state.taskOutVisible = true
+      },
+      getSites() {
+        request({
+          url: '/agv/sites',
+          method: 'get',
+          params: {
+            type: 4
+          }
+        })
+          .then(response => {
+            console.log('getSites*****:', response)
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.sites = response.data
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close()
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
+      },
+      // 用遮罩层显示错误信息
+      showErrorMessage(message) {
+        const options = {
+          lock: true,
+          fullscreen: true,
+          text: message,
+          spinner: '',
+          background: 'rgba(0, 0, 0, 0.7)'
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

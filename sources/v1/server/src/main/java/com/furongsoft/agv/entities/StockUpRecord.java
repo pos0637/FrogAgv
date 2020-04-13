@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * 备货记录信息【站点历史备货数据】
+ * 备货记录信息[站点历史备货数据]
  *
  * @author linyehai
  */
@@ -35,12 +35,12 @@ public class StockUpRecord extends BaseEntity {
     private long materialBoxId;
 
     /**
-     * 状态【0：未出库；1：已出库】
+     * 状态[0：未出库；1：已出库]
      */
     private int state;
 
     /**
-     * 类型【1：消毒间备货；2：拆包间备货；3：包材仓备货】
+     * 类型[1：消毒间备货；2：拆包间备货；3：包材仓备货]
      */
     private int type;
 

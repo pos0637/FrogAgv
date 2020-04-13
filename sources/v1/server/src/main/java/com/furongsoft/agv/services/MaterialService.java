@@ -4,6 +4,7 @@ import com.furongsoft.agv.entities.Material;
 import com.furongsoft.agv.mappers.MaterialDao;
 import com.furongsoft.agv.models.MaterialModel;
 import com.furongsoft.base.services.BaseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class MaterialService extends BaseService<MaterialDao, Material> {
 
     private final MaterialDao materialDao;
 
+    @Autowired
     public MaterialService(MaterialDao materialDao) {
         super(materialDao);
         this.materialDao = materialDao;

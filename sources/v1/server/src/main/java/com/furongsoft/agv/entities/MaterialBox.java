@@ -39,7 +39,7 @@ public class MaterialBox extends BaseEntity {
     private String name;
 
     /**
-     * 状态【0：空车；1：有货】
+     * 状态[0：空车；1：有货]
      */
     private int state;
 

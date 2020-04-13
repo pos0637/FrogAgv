@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ public class AcceptanceRecordModel implements Serializable {
     /**
      * 叫料ID
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date operationTime;
 
     /**
@@ -41,7 +43,7 @@ public class AcceptanceRecordModel implements Serializable {
     private String results;
 
     /**
-     * 操作类型【1：新增；2：修改；3：删除】
+     * 操作类型[1：新增；2：修改；3：删除]
      */
     private Integer type;
 

@@ -59,7 +59,7 @@
       this.loadingInfo()
   },
     props: {
-      id: [String, Number]
+      bom: [Object]
     },
     methods: {
       loadingInfo() {},

@@ -2,24 +2,24 @@
   <div class="dialog-height agv-dialog">
     <el-table
       ref="multipleTable"
-      :data="datas"
+      :data="bomDetails"
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="原料名称" width="auto">
-        <template slot-scope="scope">{{ scope.row.name }}</template>
+        <template slot-scope="scope">{{ scope.row.materialName }}</template>
       </el-table-column>
       <el-table-column label="数量" width="200">
         <template slot-scope="scope">
           <el-input v-model="scope.row.num"></el-input>
         </template>
       </el-table-column>
-      <el-table-column label="已验收" width="200">
+      <!-- <el-table-column label="已验收" width="200">
         <template slot-scope="scope">
           <el-input v-model="scope.row.done"></el-input>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
 
     <div slot="footer" class="dialog-footer" align="center">
@@ -34,7 +34,11 @@
 </template>
 
 <script>
-  export default {
+  import request from '@/utils/request'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
+
+export default {
     name: 'editBom',
     data() {
       return {
@@ -45,30 +49,101 @@
           { id: 4, name: '原料D', num: 0, done: 0 },
           { id: 5, name: '原料E', num: 0, done: 0 }
         ],
-        multipleSelection: []
+        bomDetails: [],
+        multipleSelection: [],
+        // 加载对象
+        load: null
       }
   },
     created() {
       this.loadingInfo()
   },
     props: {
-      id: [String, Number]
+      bom: [Object]
     },
     methods: {
-      loadingInfo() {},
+      loadingInfo() {
+        this.getBomDetails()
+      },
       // 弹出框标志变化
       toggleShow() {
         this.$emit('toggleShow')
       },
       // 修改信息
       updateData() {
-        console.log('updateData>>>>>>>>>>>', this.multipleSelection)
-        // 保存选择内容，成功后关闭弹出框
-        this.$emit('toggleShow')
+        const addItems = []
+        if (
+          !isEmpty(this.multipleSelection) &&
+          this.multipleSelection.length > 0
+        ) {
+          this.multipleSelection.forEach(item => {
+            const addItem = {
+              code: item.materialCode,
+              waveCode: this.bom.code,
+              materialId: item.materialId,
+              count: item.num,
+              enabled: 1
+            }
+            addItems.push(addItem)
+          })
+        } else {
+          return
+        }
+        request({
+          url: '/agv/waves/addWaveDetails',
+          method: 'POST',
+          data: addItems
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.$emit('reloadWaves')
+              this.$emit('toggleShow')
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close()
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       handleSelectionChange(val) {
-        console.log('handleSelectionChange>>>>>', val)
         this.multipleSelection = val
+      },
+      getBomDetails() {
+        request({
+          url: '/agv/waves/getBomDetails',
+          method: 'get',
+          params: {
+            materialCode: this.bom.materialCode
+          }
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.bomDetails = response.data
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close()
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
+      },
+      // 用遮罩层显示错误信息
+      showErrorMessage(message) {
+        const options = {
+          lock: true,
+          fullscreen: true,
+          text: message,
+          spinner: '',
+          background: 'rgba(0, 0, 0, 0.7)'
+        }
+        return Loading.service(options)
       }
     }
   }

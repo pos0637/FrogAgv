@@ -19,7 +19,7 @@ public class Tracker {
      *
      * @param content 信息
      */
-    public static void debug(Object content) {
+    public static void debug(String content) {
         logger.debug(makeLog(content));
     }
 
@@ -28,7 +28,7 @@ public class Tracker {
      *
      * @param content 信息
      */
-    public static void info(Object content) {
+    public static void info(String content) {
         logger.info(makeLog(content));
     }
 
@@ -37,7 +37,7 @@ public class Tracker {
      *
      * @param content 信息
      */
-    public static void warn(Object content) {
+    public static void warn(String content) {
         logger.warn(makeLog(content));
     }
 
@@ -46,7 +46,7 @@ public class Tracker {
      *
      * @param content 信息
      */
-    public static void error(Object content) {
+    public static void error(String content) {
         logger.error(makeLog(content));
     }
 
@@ -64,7 +64,7 @@ public class Tracker {
      *
      * @param content 信息
      */
-    public static void file(Object content) {
+    public static void file(String content) {
         logger.info(makeLog(content));
     }
 
@@ -74,7 +74,7 @@ public class Tracker {
      * @param content 信息
      * @return 错误信息
      */
-    private static String makeLog(Object content) {
+    private static String makeLog(String content) {
         StackTraceElement elem = new Throwable().getStackTrace()[2];
 
         return elem.getFileName() + "(" + elem.getLineNumber() + "): " + content;

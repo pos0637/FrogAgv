@@ -7,6 +7,7 @@ import com.furongsoft.base.rbac.security.JwtToken;
 import com.furongsoft.base.restful.entities.RestResponse;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletRequest;
@@ -21,6 +22,7 @@ import java.io.PrintWriter;
  *
  * @author Alex
  */
+@Component
 public class JwtFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {

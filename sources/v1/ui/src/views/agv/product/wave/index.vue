@@ -24,9 +24,11 @@
         <div class="flex-box content-button flex-align-items-center">
           <div
             class="btn btn-default flex-box flex-justify-content-center flex-align-items-center"
+            @click="showAll()"
           >显示所有</div>
           <div
             class="btn btn-default btn-click flex-box flex-justify-content-center flex-align-items-center"
+            @click="showUnFinish()"
           >未完成</div>
         </div>
         <!-- 表头内容 -->
@@ -34,38 +36,40 @@
           <div class="data-header-sort">优先级</div>
           <div class="data-header-name">名称</div>
           <div class="data-header-num">数量</div>
-          <div class="data-header-done">已验收</div>
+          <!-- <div class="data-header-done">已验收</div> -->
           <div class="data-header-operation"></div>
         </div>
         <!-- 表格内容 -->
         <div class="flex-box data-content flex-direction-column" style="width:100%; color:yellow;">
           <draggable
-            v-model="datas"
+            v-model="waves"
             :options="{animation:300}"
             @start="drag=true"
             @end="drag=false"
             @change="changeSort"
           >
-            <div v-for="(item,index) in datas" :key="item.id" class="data-wave">
+            <div v-for="(item,index) in waves" :key="item.id" class="data-wave">
               <div
                 class="data-content-produce-row flex-box flex-align-items-center"
                 style="cursor: pointer;"
               >
-                <div class="data-sort">{{'第' + (index + 1) + '波'}}</div>
-                <div class="data-name">{{item.name}}</div>
+                <div class="data-sort">{{'第' + (index + 1) + '波'+" ["+formateState(item.state)+"]"}}</div>
+                <div
+                  class="data-name"
+                >{{item.materialName+" （"+item.productLineCode+"） "+item.executionTime}}</div>
                 <!-- <div class="data-content-produce-operation flex-box flex-align-items-center">
                   <div class="wave-back" @click="backWave(item.id)">退货</div>
                   <div class="wave-save" @click="saveWave(item.id)">验收</div>
                 </div>-->
               </div>
               <draggable
-                v-model="item.boms"
+                v-model="item.waveDetailModels"
                 @start="drag=true"
                 @end="drag=false"
                 @change="changeSort"
               >
                 <div
-                  v-for="(bom) in item.boms"
+                  v-for="(bom) in item.waveDetailModels"
                   :key="bom.id"
                   class="flex-box data-content-row"
                   style="cursor: pointer;"
@@ -73,13 +77,13 @@
                   <div class="data-sort"></div>
                   <div
                     class="bom-name flex-box flex-align-items-center flex-justify-content-center"
-                  >{{bom.name}}</div>
+                  >{{bom.materialName}}</div>
                   <div
                     class="bom-num flex-box flex-align-items-center flex-justify-content-center"
-                  >{{bom.num}}</div>
-                  <div
+                  >{{bom.count}}</div>
+                  <!-- <div
                     class="bom-done flex-box flex-align-items-center flex-justify-content-center"
-                  >{{bom.done}}</div>
+                  >{{bom.done}}</div>-->
                   <!-- <div class="data-content-operation flex-box flex-align-items-center">
                     <div class="bom-back" @click="backBom(bom.id)">退货</div>
                     <div class="bom-save" @click="saveBom(bom.id)">验收</div>
@@ -106,12 +110,16 @@
   import '../home/home.scss';
   import BackBom from './backBom';
   import SaveBom from './saveBom';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
   export default {
     name: 'home',
     components: { draggable, BackBom, SaveBom },
     created() {
-      this.$store.dispatch('updateTitle', '波次管理');
+      this.loadingInfo();
     },
     data() {
       return {
@@ -119,51 +127,53 @@
           backBomVisible: false,
           saveBomVisible: false
         },
+        // 加载对象
+        load: null,
+        waveState: 0,
         backBomId: null,
         saveBomId: null,
-        datas: [
-          {
-            id: 1,
-            name: '产品A(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50, done: 45 },
-              { id: 2, name: '原料B', num: 50, done: 45 },
-              { id: 3, name: '原料C', num: 50, done: 45 },
-              { id: 4, name: '原料D', num: 50, done: 45 }
-            ]
-          },
-          {
-            id: 2,
-            name: '产品B(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50, done: 45 },
-              { id: 2, name: '原料B', num: 50, done: 45 },
-              { id: 3, name: '原料C', num: 50, done: 45 }
-            ]
-          },
-          {
-            id: 3,
-            name: '产品C(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50, done: 45 },
-              { id: 2, name: '原料B', num: 50, done: 45 },
-              { id: 3, name: '原料C', num: 50, done: 45 },
-              { id: 4, name: '原料D', num: 50, done: 45 }
-            ]
-          },
-          {
-            id: 4,
-            name: '产品D(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50, done: 45 },
-              { id: 2, name: '原料B', num: 50, done: 45 },
-              { id: 3, name: '原料C', num: 50, done: 45 }
-            ]
-          }
-        ]
+        waves: [],
+        datas: []
       };
     },
     methods: {
+      loadingInfo() {
+        this.$store.dispatch('updateTitle', '波次管理');
+        this.getWaves();
+      },
+      showAll() {
+        this.waveState = null;
+        this.getWaves();
+      },
+      showUnFinish() {
+        this.waveState = 0;
+        this.getWaves();
+      },
+      getWaves() {
+        request({
+          url: '/agv/wavesPlan',
+          method: 'get',
+          params: {
+            type: 1,
+            teamId: 'uuidxxxxb03',
+            state: this.waveState
+          }
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.waves = response.data;
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
       // 跳转到配送管理页面
       turn1() {
         this.$router.push({ path: '/dashboard' });
@@ -175,7 +185,7 @@
       // 原料退货
       backBom(bomId) {
         console.log('backBom>>>>>>>', bomId);
-        this.backBomId = backBomId;
+        this.backBomId = bomId;
       },
       // 原料验收
       saveBom(bomId) {
@@ -191,11 +201,48 @@
       },
       // 拖动之后的顺序
       changeSort() {
-        console.log(this.datas);
+        request({
+          url: '/agv/waves/updateWaves',
+          method: 'POST',
+          data: this.waves
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.getWaves();
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       toggleShow() {
         this.backBomVisible = false;
         this.saveBomVisible = false;
+      },
+      // 格式化状态
+      formateState(waveState) {
+        let stateName = '';
+        Constants.deliveryState.forEach(item => {
+          if (item.value === waveState) {
+            stateName = item.label;
+          }
+        });
+        return stateName;
+      },
+      // 用遮罩层显示错误信息
+      showErrorMessage(message) {
+        const options = {
+          lock: true,
+          fullscreen: true,
+          text: message,
+          spinner: '',
+          background: 'rgba(0, 0, 0, 0.7)'
+        };
+        return Loading.service(options);
       }
     }
   };

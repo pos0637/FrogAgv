@@ -13,10 +13,10 @@ import com.furongsoft.agv.schedulers.entities.Task;
 public interface IScheduler {
     /**
      * 初始化
-     *
+     * 
      * @param areas 区域列表
      */
-    void initialize(Area[] areas);
+    void Initialize(Area[] areas);
 
     /**
      * 添加任务
@@ -25,7 +25,7 @@ public interface IScheduler {
      * @param destination 目的区域
      * @return 任务
      */
-    Task addTask(Site source, AgvArea destination);
+    Task AddTask(Site source, AgvArea destination);
 
     /**
      * 添加任务
@@ -34,7 +34,7 @@ public interface IScheduler {
      * @param destination 目的站点
      * @return 任务
      */
-    Task addTask(Site source, Site destination);
+    Task AddTask(Site source, Site destination);
 
     /**
      * 取消任务
@@ -42,7 +42,7 @@ public interface IScheduler {
      * @param task 任务
      * @return 是否成功
      */
-    boolean cancel(Task task);
+    boolean Cancel(Task task);
 
     /**
      * 取消指定源站点所有任务
@@ -50,7 +50,7 @@ public interface IScheduler {
      * @param source 源站点
      * @return 是否成功
      */
-    boolean cancel(Site source);
+    boolean Cancel(Site source);
 
     /**
      * 搬运开始事件
@@ -59,7 +59,7 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingStarted(String agvId, String taskId, String event);
+    void OnMovingStarted(String agvId, String taskId, String event);
 
     /**
      * 搬运完成事件
@@ -68,7 +68,7 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingArrived(String agvId, String taskId, String event);
+    void OnMovingArrived(String agvId, String taskId, String event);
 
     /**
      * 搬运暂停事件
@@ -77,7 +77,7 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingPaused(String agvId, String taskId, String event);
+    void OnMovingPaused(String agvId, String taskId, String event);
 
     /**
      * 搬运等待事件
@@ -86,7 +86,7 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingWaiting(String agvId, String taskId, String event);
+    void OnMovingWaiting(String agvId, String taskId, String event);
 
     /**
      * 搬运取消事件
@@ -95,7 +95,7 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingCancelled(String agvId, String taskId, String event);
+    void OnMovingCancelled(String agvId, String taskId, String event);
 
     /**
      * 搬运失败事件
@@ -104,23 +104,23 @@ public interface IScheduler {
      * @param taskId 任务索引
      * @param event  事件消息
      */
-    void onMovingFail(String agvId, String taskId, String event);
+    void OnMovingFail(String agvId, String taskId, String event);
 
     /**
      * 容器进场事件
      *
      * @param containerId 容器索引
-     * @param destination 目的站点
+     * @param target      目的站点
      * @param event       事件消息
      */
-    void onContainerArrived(String containerId, Site destination, String event);
+    void OnContainerArrived(String containerId, Site destination, String event);
 
     /**
      * 容器离场事件
      *
      * @param containerId 容器索引
-     * @param destination 目的站点
+     * @param target      目的站点
      * @param event       事件消息
      */
-    void onContainerLeft(String containerId, Site destination, String event);
+    void OnContainerLeft(String containerId, Site destination, String event);
 }

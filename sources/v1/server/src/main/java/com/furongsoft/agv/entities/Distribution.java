@@ -1,7 +1,9 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,10 +19,8 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_distribution")
-@Getter
-@Setter
+@Data
 public class Distribution extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -38,15 +38,16 @@ public class Distribution extends BaseEntity {
     /**
      * 配货时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date distributionTime;
 
     /**
-     * 状态【0：未验收；1：部分验收；2：已验收】
+     * 状态[0：未验收；1：部分验收；2：已验收]
      */
     private int state;
 
     /**
-     * 类型【1：消毒间-灌装区；2：包材仓-包装区；3：拆包间-消毒间；4：包材仓-拆包间】
+     * 类型[1：消毒间-灌装区；2：包材仓-包装区；3：拆包间-消毒间；4：包材仓-拆包间]
      */
     private int type;
 

@@ -1,6 +1,7 @@
 package com.furongsoft.base.rbac.filters;
 
 import org.apache.shiro.web.servlet.OncePerRequestFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,6 +16,7 @@ import java.io.IOException;
  *
  * @author Alex
  */
+@Component
 public class CorsFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {

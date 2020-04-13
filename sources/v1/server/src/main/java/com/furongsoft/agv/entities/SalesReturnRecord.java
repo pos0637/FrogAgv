@@ -1,6 +1,7 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class SalesReturnRecord extends BaseEntity {
     /**
      * 操作时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date operationTime;
 
     /**
@@ -51,7 +53,7 @@ public class SalesReturnRecord extends BaseEntity {
     private String results;
 
     /**
-     * 操作类型【1：新增；2：修改；3：删除】
+     * 操作类型[1：新增；2：修改；3：删除]
      */
     private int type;
 

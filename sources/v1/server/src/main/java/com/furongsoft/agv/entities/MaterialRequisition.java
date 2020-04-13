@@ -1,6 +1,7 @@
 package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,7 @@ public class MaterialRequisition extends BaseEntity {
     /**
      * 领料时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date pickingTime;
 
     /**
