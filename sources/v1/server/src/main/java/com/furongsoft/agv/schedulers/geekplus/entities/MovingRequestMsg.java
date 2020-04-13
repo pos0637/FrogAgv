@@ -1,5 +1,6 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -85,6 +86,7 @@ public class MovingRequestMsg {
 
     @Data
     @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Body {
         /**
          * 消息类型：此业务功能必须传：MovingRequestMsg

@@ -51,24 +51,26 @@ public class Scheduler extends BaseScheduler {
     public Task addTask(Site source, AgvArea destination) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 3, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-2", 3, 1)}));
+                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 2, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-2", 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
-        return null;
+        if (response == null) {
+            return null;
+        }
+
+        return super.addTask(source, destination, response.getWorkflowWorkId());
     }
 
     @Override
     public Task addTask(Site source, Site destination) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-2", 3, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-1", 3, 1)}));
+                new MovingRequestMsg.Body("MovingRequestMsg", "11", "", source.getCode(), 2, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if (response == null) {
             return null;
         }
 
-        super.addTask(source, destination, response.getRequestId());
-
-        return null;
+        return super.addTask(source, destination, response.getWorkflowWorkId());
     }
 
     @Override
@@ -112,7 +114,7 @@ public class Scheduler extends BaseScheduler {
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 3, target.getCode())
         );
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
-        Tracker.info(response);
+        Tracker.debug(response);
     }
 
     @Override
@@ -122,6 +124,6 @@ public class Scheduler extends BaseScheduler {
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId, 3, target.getCode())
         );
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
-        Tracker.info(response);
+        Tracker.debug(response);
     }
 }
