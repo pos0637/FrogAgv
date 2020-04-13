@@ -12,7 +12,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 
 /**
- * 波次服务
+ * 站点服务
  *
  * @author linyehai
  */
@@ -39,10 +39,10 @@ public class SiteService extends BaseService<SiteDao, Site> {
     }
 
     /**
-     * 通过主键获取波次信息
+     * 通过主键获取站点信息
      *
-     * @param id 波次ID
-     * @return 波次信息
+     * @param id 站点ID
+     * @return 站点信息
      */
     public SiteModel selectSiteById(Long id) {
         SiteModel siteModel = siteDao.selectSiteById(id);

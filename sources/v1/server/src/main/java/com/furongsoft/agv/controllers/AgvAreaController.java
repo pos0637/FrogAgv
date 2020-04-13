@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * AGV区域控制层 TODO
+ * AGV区域控制层
  *
  * @author linyehai
  */
@@ -23,7 +23,7 @@ public class AgvAreaController {
     }
 
     /**
-     * 通过区域编码获取指定区域的生产线 TODO
+     * 通过区域编码获取指定区域的生产线
      *
      * @param code 区域编码 "PRODUCT_FILLING"：灌装区；"PRODUCT_PACKAGING"：包装区
      * @return 响应内容

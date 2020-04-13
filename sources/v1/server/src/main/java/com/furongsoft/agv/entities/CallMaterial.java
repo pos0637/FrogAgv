@@ -6,6 +6,7 @@ import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import java.util.Date;
  *
  * @author linyehai
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @TableName("t_agv_call_material")
 @Data
@@ -37,11 +39,6 @@ public class CallMaterial extends BaseEntity {
      * 叫料数量
      */
     private int count;
-//
-//    /**
-//     * 验收数量
-//     */
-//    private int acceptanceCount;
 
     /**
      * 状态[0：未配送；1：配送中；2：已完成；3：已取消]
@@ -91,7 +88,6 @@ public class CallMaterial extends BaseEntity {
 
     public CallMaterial(WaveDetailModel waveDetailModel) {
         this.materialId = waveDetailModel.getMaterialId();
-//        this.acceptanceCount = 0;
         this.count = waveDetailModel.getCount();
         this.state = 0;
         this.waveDetailCode = waveDetailModel.getCode();

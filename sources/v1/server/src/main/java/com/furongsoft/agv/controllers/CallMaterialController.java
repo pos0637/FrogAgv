@@ -40,7 +40,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 按条件查询配货任务 TODO
+     * 按条件查询配货任务
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
      * @param state  状态[0：未配送；1：配送中；2：已完成]
@@ -91,7 +91,7 @@ public class CallMaterialController {
     /**
      * 删除叫料信息 TODO
      *
-     * @param id
+     * @param id 叫料ID
      * @return 响应内容
      */
     @DeleteMapping("/callMaterials/{id}")
