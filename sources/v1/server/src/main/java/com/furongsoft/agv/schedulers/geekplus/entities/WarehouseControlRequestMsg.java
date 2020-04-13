@@ -1,5 +1,7 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -7,6 +9,8 @@ import lombok.Data;
  *
  * @author Alex
  */
+@Data
+@AllArgsConstructor
 public class WarehouseControlRequestMsg {
     /**
      * 消息头参数列表
@@ -19,6 +23,7 @@ public class WarehouseControlRequestMsg {
     private Body body;
 
     @Data
+    @AllArgsConstructor
     public static class Header {
         /**
          * 防止任务重复提交，唯一码
@@ -53,6 +58,8 @@ public class WarehouseControlRequestMsg {
     }
 
     @Data
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Body {
         /**
          * 消息类型：此业务功能必须传-WarehouseControlRequestMsg

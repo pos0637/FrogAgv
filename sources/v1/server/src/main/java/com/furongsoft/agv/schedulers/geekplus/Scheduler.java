@@ -110,7 +110,7 @@ public class Scheduler extends BaseScheduler {
     @Override
     public void onContainerArrived(String containerId, Site target, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
-            new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
+                new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 3, target.getCode())
         );
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
