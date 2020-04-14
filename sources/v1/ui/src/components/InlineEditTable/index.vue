@@ -44,15 +44,15 @@
 </template>
 
 <script>
-  import { isEmpty } from '@/utils/helper';
-  import request from '@/utils/request';
-  import { tableTitle } from '@/utils/i18n';
-  import MultipleSelect from '@/components/Select/multiple';
+  import { isEmpty } from '@/utils/helper'
+import request from '@/utils/request'
+import { tableTitle } from '@/utils/i18n'
+import MultipleSelect from '@/components/Select/multiple'
 
-  /**
-   * 行内编辑表格
-   */
-  export default {
+/**
+ * 行内编辑表格
+ */
+export default {
     name: 'inlineEditTable',
     components: { MultipleSelect },
     data() {
@@ -72,8 +72,8 @@
         loading: false,
         // 表格高度
         tableHeight: 200
-      };
-    },
+      }
+  },
     props: {
       // 请求URL链接 字符串类型 必填
       fetchUrl: {
@@ -108,33 +108,33 @@
       }
     },
     created() {
-      this.getList();
-    },
+      this.getList()
+  },
     methods: {
       // 获取数据
       getList(_fetchParams, _fetchUrl) {
-        const __fetchUrl = _fetchUrl || this.fetchUrl;
+        const __fetchUrl = _fetchUrl || this.fetchUrl
         if (isEmpty(__fetchUrl)) {
-          this.data = [];
-          this.total = 0;
-          return;
+          this.data = []
+          this.total = 0
+          return
         }
-        const __fetchParams = _fetchParams || this.fetchParams;
-        console.log('**************', __fetchParams, this.fetchParams);
+        const __fetchParams = _fetchParams || this.fetchParams
+        console.log('**************', __fetchParams, this.fetchParams)
 
-        __fetchParams.pageSize = this.fetchParams.pageSize || this.pageSize;
-        __fetchParams.pageNum = this.fetchParams.pageNum || this.pageNum;
+        __fetchParams.pageSize = this.fetchParams.pageSize || this.pageSize
+        __fetchParams.pageNum = this.fetchParams.pageNum || this.pageNum
         if (
           (isEmpty(this.ascs) || this.ascs.length === 0) &&
           (isEmpty(this.descs) || this.descs.length === 0)
         ) {
-          __fetchParams.ascs = this.defaultAscs.join();
-          __fetchParams.descs = this.defaultDescs.join();
+          __fetchParams.ascs = this.defaultAscs.join()
+          __fetchParams.descs = this.defaultDescs.join()
         } else {
-          __fetchParams.ascs = this.ascs.join();
-          __fetchParams.descs = this.descs.join();
+          __fetchParams.ascs = this.ascs.join()
+          __fetchParams.descs = this.descs.join()
         }
-        this.loading = true;
+        this.loading = true
         new Promise((resolve, reject) => {
           request({
             url: __fetchUrl,
@@ -142,46 +142,46 @@
             params: __fetchParams
           })
             .then(response => {
-              this.data = response.data;
-              this.total = response.total;
-              console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', this.data);
-              resolve();
+              this.data = response.data
+              this.total = response.total
+              console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', this.data)
+              resolve()
             })
             .catch(_ => {
-              this.data = [];
-              this.total = 0;
-              reject();
-            });
+              this.data = []
+              this.total = 0
+              reject()
+            })
         }).then(
           success => {
-            this.loading = false;
-            this.renderSelect(this.selectedVal);
+            this.loading = false
+            this.renderSelect(this.selectedVal)
           },
           err => {
-            this.loading = false;
+            this.loading = false
           }
-        );
+        )
       },
       // 页码变化调用
       handleSizeChange(val) {
-        this.fetchParams.pageSize = val;
-        this.getList();
+        this.fetchParams.pageSize = val
+        this.getList()
       },
       // 页数变化调用
       handleCurrentChange(val) {
-        this.fetchParams.pageNum = val;
-        this.getList();
+        this.fetchParams.pageNum = val
+        this.getList()
       },
       // 行双击事件
       rowDblclick(row, event) {
-        console.log('rowDblclick==================');
-        row.edit = true;
+        console.log('rowDblclick==================')
+        row.edit = true
       },
       // 回显
       renderSelect(val) {
-        const thiz = this;
+        const thiz = this
         if (!isEmpty(this.$refs.queryTable)) {
-          this.$refs.queryTable.clearSelection();
+          this.$refs.queryTable.clearSelection()
         }
 
         if (
@@ -193,22 +193,22 @@
           this.data.forEach(column => {
             if (val instanceof Array) {
               if (val.length == 0) {
-                thiz.$refs.queryTable.clearSelection();
+                thiz.$refs.queryTable.clearSelection()
               } else if (val.indexOf(column.id) > -1) {
-                thiz.$refs.queryTable.toggleRowSelection(column, true);
+                thiz.$refs.queryTable.toggleRowSelection(column, true)
               }
             } else {
               if (val === column.id) {
-                thiz.$refs.queryTable.toggleRowSelection(column, true);
+                thiz.$refs.queryTable.toggleRowSelection(column, true)
               }
             }
-          });
+          })
         }
         if (this.multipleTable && isEmpty(val)) {
-          thiz.$refs.queryTable.clearSelection();
+          thiz.$refs.queryTable.clearSelection()
         }
       },
       tableTitle
     }
-  };
+  }
 </script>

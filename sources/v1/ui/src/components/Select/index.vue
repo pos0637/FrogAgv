@@ -29,13 +29,13 @@
 </template>
 
 <script>
-  import request from '@/utils/request';
-  import { isEmpty } from '@/utils/helper';
+  import request from '@/utils/request'
+import { isEmpty } from '@/utils/helper'
 
-  /**
-   * 选择组件
-   */
-  export default {
+/**
+ * 选择组件
+ */
+export default {
     name: 'FrSelect',
     data() {
       return {
@@ -43,8 +43,8 @@
         options: [],
         values: '',
         datas: null
-      };
-    },
+      }
+  },
     props: {
       // 请求URL
       url: '',
@@ -52,7 +52,7 @@
       dataFunc: {
         type: Function,
         default: () => {
-          return [];
+          return []
         }
       },
       data: {
@@ -81,90 +81,90 @@
     },
     created() {
       if (isEmpty(this.url)) {
-        let tmp = this.dataFunc();
+        let tmp = this.dataFunc()
         // 如果是查询条件，加全部
         if (this.isQueryCriteria) {
           const all = {
             value: '',
             label: '全部'
-          };
-          tmp.push(all);
+          }
+          tmp.push(all)
         }
 
         Array.from(this.data).forEach(record => {
-          tmp = tmp.concat(record);
-        });
-        this.options = tmp;
+          tmp = tmp.concat(record)
+        })
+        this.options = tmp
       } else {
-        this.handleIconClick();
+        this.handleIconClick()
       }
       // 没有项目时，显示空，不显示0
       if (this.value === 0) {
-        this.values = '';
+        this.values = ''
       } else {
-        this.values = this.value;
+        this.values = this.value
       }
-      this.$emit('input', this.values);
-    },
+      this.$emit('input', this.values)
+  },
     watch: {
       value() {
-        this.values = this.value;
-        this.renderSelected(this.datas);
-        this.$emit('input', this.values);
+        this.values = this.value
+        this.renderSelected(this.datas)
+        this.$emit('input', this.values)
       },
       values() {
-        this.$emit('input', this.values);
+        this.$emit('input', this.values)
       }
     },
     methods: {
       // 渲染下拉数据
       renderSelected(data) {
         if (isEmpty(data)) {
-          return;
+          return
         }
-        let tmp = [];
+        let tmp = []
         // 如果是查询条件，加全部
         if (this.isQueryCriteria) {
           const all = {
             value: '',
             label: '全部'
-          };
-          tmp.push(all);
+          }
+          tmp.push(all)
         }
         Array.from(this.additional).forEach(add => {
-          tmp.push(add);
-        });
+          tmp.push(add)
+        })
         const render = data => {
           Array.from(data).forEach(record => {
-            let obj = {};
+            let obj = {}
             if (this.valueIsCode) {
               obj = {
                 value: Number(record.code),
                 label: record.name
-              };
+              }
             } else {
               obj = {
                 value: record.id,
                 label: record.name
-              };
+              }
             }
-            tmp = tmp.concat(obj);
+            tmp = tmp.concat(obj)
             if (record.children && record.children.length > 0) {
-              render(record.children);
+              render(record.children)
             }
-          });
-        };
-        render(data);
+          })
+        }
+        render(data)
         if (isEmpty(this.value)) {
           if (!isEmpty(this.defaultValue) && tmp.length > 0) {
             // 设置为默认值
-            this.values = this.defaultValue;
+            this.values = this.defaultValue
           } else if (this.defaultFirst && tmp.length > 0) {
             // 默认选中第一条
-            this.values = tmp[0].value;
+            this.values = tmp[0].value
           }
         }
-        return tmp;
+        return tmp
       },
       // 刷新按钮
       handleIconClick() {
@@ -174,16 +174,16 @@
             method: 'GET'
           }).then(response => {
             if (response && response.data && response.data.length > 0) {
-              this.options = this.renderSelected(response.data);
-              this.datas = response.data;
+              this.options = this.renderSelected(response.data)
+              this.datas = response.data
             } else {
-              this.options = this.additional;
-              this.datas = null;
+              this.options = this.additional
+              this.datas = null
             }
-            this.$emit('selectCallBack', this.options);
-          });
+            this.$emit('selectCallBack', this.options)
+          })
         }
       }
     }
-  };
+  }
 </script>

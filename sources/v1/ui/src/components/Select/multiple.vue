@@ -60,15 +60,15 @@
 </template>
 
 <script>
-  import ComplexTable from '@/components/ComplexTable';
-  import SearchButton from '@/components/Button';
-  import request from '@/utils/request';
-  import { isEmpty } from '@/utils/helper';
+  import ComplexTable from '@/components/ComplexTable'
+import SearchButton from '@/components/Button'
+import request from '@/utils/request'
+import { isEmpty } from '@/utils/helper'
 
-  /**
-   * 模糊选择
-   */
-  export default {
+/**
+ * 模糊选择
+ */
+export default {
     name: 'multipleSelect',
     components: { ComplexTable, SearchButton },
     data() {
@@ -82,8 +82,8 @@
         },
         values: [],
         temp: []
-      };
-    },
+      }
+  },
     props: {
       title: {
         type: String,
@@ -92,7 +92,7 @@
       url: {
         type: [String, Function],
         default: () => {
-          '';
+          ''
         }
       },
       multiple: false,
@@ -112,29 +112,29 @@
       }
     },
     created() {
-      this.temp = [];
-      this.handleIconClick();
-      this.values = this.value;
-      this.$emit('input', this.values);
-    },
+      this.temp = []
+      this.handleIconClick()
+      this.values = this.value
+      this.$emit('input', this.values)
+  },
     watch: {
       value() {
         if (isEmpty(this.value)) {
-          this.values = '';
+          this.values = ''
         } else {
-          this.values = this.value;
+          this.values = this.value
         }
       },
       values() {
-        this.$emit('input', this.values);
+        this.$emit('input', this.values)
       },
       selectFormVisible() {
         if (this.selectFormVisible) {
-          this.temp = [];
-          this.handleIconClick();
+          this.temp = []
+          this.handleIconClick()
 
           if (this.reloadAfterSave) {
-            this.handleFilter();
+            this.handleFilter()
           }
         }
       }
@@ -142,24 +142,24 @@
     methods: {
       handleFilter() {
         if (!isEmpty(this.$refs.multipleTable)) {
-          this.$refs.multipleTable.getList();
+          this.$refs.multipleTable.getList()
         }
       },
       showDialog() {
-        this.selectFormVisible = true;
+        this.selectFormVisible = true
       },
       toggleShow() {
-        this.selectFormVisible = false;
+        this.selectFormVisible = false
       },
       saveData() {
-        this.values = this.temp;
+        this.values = this.temp
         if (isEmpty(this.temp)) {
-          this.values = '';
+          this.values = ''
         } else if (this.temp.length == 0) {
-          this.values = '';
+          this.values = ''
         }
-        this.$emit('input', this.values);
-        this.toggleShow();
+        this.$emit('input', this.values)
+        this.toggleShow()
       },
       // 点击复选框事件
       handleSelectionChange(val, data) {
@@ -168,29 +168,29 @@
           if (!this.multiple) {
             if (!isEmpty(val)) {
               if (val.length > 1) {
-                const u_val = [];
+                const u_val = []
                 for (let i = 0; i < val.length - 1; i++) {
-                  u_val.push(val[i].id);
+                  u_val.push(val[i].id)
                 }
                 data.forEach(row => {
                   if (u_val.indexOf(row.id) > -1) {
                     this.$refs.multipleTable.$refs.queryTable.toggleRowSelection(
                       row,
                       false
-                    );
+                    )
                   }
-                });
+                })
               } else if (val.length === 1) {
-                this.temp = val[0].id;
+                this.temp = val[0].id
               } else {
-                this.temp = '';
+                this.temp = ''
               }
             }
           } else {
             // 多选
-            this.temp = [];
+            this.temp = []
             for (let i = 0; i < val.length; i++) {
-              this.temp.push(val[i].id);
+              this.temp.push(val[i].id)
             }
           }
         }
@@ -198,23 +198,23 @@
       // 渲染下拉框数据
       renderSelected(data) {
         if (isEmpty(data) || data.length === 0) {
-          return [];
+          return []
         }
-        let tmp = [];
+        let tmp = []
         const render = data => {
           Array.from(data).forEach(record => {
             const obj = {
               value: record.id,
               label: record.name
-            };
-            tmp = tmp.concat(obj);
-            if (record.children && record.children.length > 0) {
-              render(record.children);
             }
-          });
-        };
-        render(data);
-        return tmp;
+            tmp = tmp.concat(obj)
+            if (record.children && record.children.length > 0) {
+              render(record.children)
+            }
+          })
+        }
+        render(data)
+        return tmp
       },
       // 刷新
       handleIconClick() {
@@ -223,11 +223,11 @@
             url: this.url,
             method: 'GET'
           }).then(response => {
-            this.options = this.renderSelected(response.data);
-            this.$emit('mulCallBack', this.options);
-          });
+            this.options = this.renderSelected(response.data)
+            this.$emit('mulCallBack', this.options)
+          })
         }
       }
     }
-  };
+  }
 </script>

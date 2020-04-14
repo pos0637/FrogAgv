@@ -46,20 +46,20 @@
 </template>
 
 <script>
-  import ComplexTable from '@/components/ComplexTable';
-  import '../../product/home/home.scss';
-  import '../../table.scss';
-  import request from '@/utils/request';
-  import Constants from '@/utils/constants';
-  import { isEmpty } from '@/utils/helper';
-  import { Loading } from 'element-ui';
+  import ComplexTable from '@/components/ComplexTable'
+import '../../product/home/home.scss'
+import '../../table.scss'
+import request from '@/utils/request'
+import Constants from '@/utils/constants'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'call',
     components: { ComplexTable },
     created() {
-      this.loadingInfo();
-    },
+      this.loadingInfo()
+  },
     data() {
       return {
         fetchParams: {
@@ -111,23 +111,23 @@
             ]
           }
         ]
-      };
-    },
+      }
+  },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '消毒间叫料历史');
+        this.$store.dispatch('updateTitle', '消毒间叫料历史')
       },
       showAll() {
-        this.fetchParams.state = null;
-        this.reloadTable();
+        this.fetchParams.state = null
+        this.reloadTable()
       },
       showUnFinish() {
-        this.fetchParams.state = 0;
-        this.reloadTable();
+        this.fetchParams.state = 0
+        this.reloadTable()
       },
       // 跳转
       turn(url) {
-        this.$router.push({ path: url });
+        this.$router.push({ path: url })
       },
       toggleShow() {},
       // 取消叫料
@@ -138,38 +138,38 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              this.reloadTable();
+              this.reloadTable()
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 是否可以点击
       hasAuth(item) {
         if (item.state === Constants.deliveryState[0].value) {
-          return true;
+          return true
         } else {
-          return false;
+          return false
         }
       },
       // 格式化状态
       formaterState(state) {
-        let stateName = '';
+        let stateName = ''
         Constants.deliveryState.forEach(item => {
           if (item.value === state) {
-            stateName = item.label;
+            stateName = item.label
           }
-        });
-        return stateName;
+        })
+        return stateName
       },
       // 重新加载表格数据.
       reloadTable() {
-        this.$refs.dataTable.getList();
+        this.$refs.dataTable.getList()
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -179,9 +179,9 @@
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

@@ -30,32 +30,32 @@
 </template>
 
 <script>
-  import request from '@/utils/request';
-  import { isEmpty } from '@/utils/helper';
-  import { Loading } from 'element-ui';
+  import request from '@/utils/request'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'editBom',
     data() {
       return {
         info: {},
         // 加载对象
         load: null
-      };
-    },
+      }
+  },
     created() {
-      this.loadingInfo();
-    },
+      this.loadingInfo()
+  },
     props: {
       bom: [Object]
     },
     methods: {
       loadingInfo() {
-        this.getWave();
+        this.getWave()
       },
       // 弹出框标志变化
       toggleShow() {
-        this.$emit('toggleShow');
+        this.$emit('toggleShow')
       },
       // 修改信息
       updateData() {
@@ -66,17 +66,17 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              this.$emit('reloadWaves');
-              this.$emit('toggleShow');
+              this.$emit('reloadWaves')
+              this.$emit('toggleShow')
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       getWave() {
         request({
@@ -86,17 +86,17 @@
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.info = response.data;
+                this.info = response.data
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -106,9 +106,9 @@
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

@@ -66,12 +66,12 @@
 </template>
 
 <script>
-  import request from '@/utils/request';
-  import Constants from '@/utils/constants';
-  import { isEmpty } from '@/utils/helper';
-  import { Loading } from 'element-ui';
+  import request from '@/utils/request'
+import Constants from '@/utils/constants'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'editBom',
     data() {
       return {
@@ -83,27 +83,27 @@
         // 加载对象
         load: null,
         datas: []
-      };
-    },
+      }
+  },
     created() {
-      this.loadingInfo();
-    },
+      this.loadingInfo()
+  },
     props: {
       bom: [Object]
     },
     methods: {
       loadingInfo() {
-        this.getSiteInfo();
+        this.getSiteInfo()
       },
       isEmpty,
       // 弹出框标志变化
       toggleShow() {
-        this.$emit('toggleShow');
+        this.$emit('toggleShow')
       },
       // 修改信息
       updateData() {
-        console.log('updateData>>>>>>>>>>>');
-        this.$emit('toggleShow');
+        console.log('updateData>>>>>>>>>>>')
+        this.$emit('toggleShow')
       },
       getSiteInfo() {
         request({
@@ -111,56 +111,56 @@
           method: 'GET'
         })
           .then(response => {
-            console.log('*******:', response);
+            console.log('*******:', response)
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.info = response.data;
-                this.formmatMaterials(response.data);
+                this.info = response.data
+                this.formmatMaterials(response.data)
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 格式化站点状态
       formmatSiteState(siteState) {
-        let stateName = '';
+        let stateName = ''
         Constants.siteState.forEach(item => {
           if (item.value === siteState) {
-            stateName = item.label;
+            stateName = item.label
           }
-        });
-        return stateName;
+        })
+        return stateName
       },
       formmatDeliveryTaskState(deliveryTaskState) {
-        let stateName = '';
+        let stateName = ''
         Constants.deliveryTaskState.forEach(item => {
           if (item.value === deliveryTaskState) {
-            stateName = item.label;
+            stateName = item.label
           }
-        });
-        return stateName;
+        })
+        return stateName
       },
       formmatMaterialBoxState(materialBoxState) {
-        let stateName = '';
+        let stateName = ''
         Constants.materialBoxState.forEach(item => {
           if (item.value === materialBoxState) {
-            stateName = item.label;
+            stateName = item.label
           }
-        });
-        return stateName;
+        })
+        return stateName
       },
       // 格式化原料列表
       formmatMaterials(siteInfo) {
         if (!isEmpty(siteInfo.materialBoxModel)) {
-          this.datas = siteInfo.materialBoxModel.materialBoxMaterialModels;
+          this.datas = siteInfo.materialBoxModel.materialBoxMaterialModels
         } else {
-          this.datas = [];
+          this.datas = []
         }
       },
       // 用遮罩层显示错误信息
@@ -171,9 +171,9 @@
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

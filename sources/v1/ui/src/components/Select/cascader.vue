@@ -8,21 +8,21 @@
 </template>
 
 <script>
-  import request from '@/utils/request';
-  import { isEmpty } from '@/utils/helper';
+  import request from '@/utils/request'
+import { isEmpty } from '@/utils/helper'
 
-  /**
-   * 级联下拉界面
-   */
-  export default {
+/**
+ * 级联下拉界面
+ */
+export default {
     name: 'CascaderSelect',
     data() {
       return {
         // 列表
         options: [],
         values: []
-      };
-    },
+      }
+  },
     props: {
       // 请求URL
       url: '',
@@ -33,27 +33,27 @@
       value: ''
     },
     created() {
-      this.values = this.datas;
+      this.values = this.datas
       if (isEmpty(this.url)) {
-        this.options = this.datas;
+        this.options = this.datas
       } else {
-        this.handleIconClick();
+        this.handleIconClick()
       }
     },
     watch: {
       // 监听编辑页面datas数据
       datas() {
-        this.values = this.datas;
+        this.values = this.datas
       },
       value() {
         if (isEmpty(this.value)) {
-          this.values = [];
+          this.values = []
         } else {
-          this.values = this.value;
+          this.values = this.value
         }
       },
       values() {
-        this.$emit('input', this.values);
+        this.$emit('input', this.values)
       }
     },
     methods: {
@@ -63,30 +63,30 @@
             url: this.url,
             method: 'GET'
           }).then(response => {
-            this.options = this.renderCas(JSON.parse(response.data));
-          });
+            this.options = this.renderCas(JSON.parse(response.data))
+          })
         }
       },
       // 返回级联数据
       renderCas(data) {
-        let tmp = [];
+        let tmp = []
         if (isEmpty(data)) {
-          return tmp;
+          return tmp
         }
         Array.from(data).forEach(record => {
           const obj = {
             value: record.id,
             label: record.name
-          };
+          }
 
           if (record.children && record.children.length > 0) {
-            const children = this.renderCas(record.children);
-            obj.children = children;
+            const children = this.renderCas(record.children)
+            obj.children = children
           }
-          tmp = tmp.concat(obj);
-        });
-        return tmp;
+          tmp = tmp.concat(obj)
+        })
+        return tmp
       }
     }
-  };
+  }
 </script>

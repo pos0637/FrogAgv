@@ -78,19 +78,19 @@
 </template>
 
 <script>
-  import '../../product/home/home.scss';
-  import './call.scss';
-  import request from '@/utils/request';
-  import Constants from '@/utils/constants';
-  import { isEmpty } from '@/utils/helper';
-  import { Loading } from 'element-ui';
+  import '../../product/home/home.scss'
+import './call.scss'
+import request from '@/utils/request'
+import Constants from '@/utils/constants'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'call',
     components: {},
     created() {
-      this.loadingInfo();
-    },
+      this.loadingInfo()
+  },
     data() {
       return {
         num: '99+',
@@ -98,25 +98,25 @@
         // 加载对象
         load: null,
         callPlans: []
-      };
-    },
+      }
+  },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '消毒间叫料');
-        this.getCallPlans();
+        this.$store.dispatch('updateTitle', '消毒间叫料')
+        this.getCallPlans()
       },
       isEmpty,
       // 跳转
       turn(url) {
-        this.$router.push({ path: url });
+        this.$router.push({ path: url })
       },
       toggleShow() {},
       // 叫波次
       callWave(wave) {
         if (!isEmpty(wave.waveDetailModels) && wave.waveDetailModels.length > 0) {
           wave.waveDetailModels.forEach(item => {
-            item.areaType = 3;
-          });
+            item.areaType = 3
+          })
         }
         request({
           url: '/agv/callMaterials/addWaveDetailCallMaterials',
@@ -125,23 +125,23 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getCallPlans();
+              this.getCallPlans()
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 叫详情
       callBom(bom) {
-        let callBoms = [];
+        const callBoms = []
         if (!isEmpty(bom)) {
-          bom.areaType = 3;
-          callBoms.push(bom);
+          bom.areaType = 3
+          callBoms.push(bom)
         }
         request({
           url: '/agv/callMaterials/addWaveDetailCallMaterials',
@@ -150,16 +150,16 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getCallPlans();
+              this.getCallPlans()
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 获取叫料计划
       getCallPlans() {
@@ -174,17 +174,17 @@
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.callPlans = response.data;
+                this.callPlans = response.data
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -194,9 +194,9 @@
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>
