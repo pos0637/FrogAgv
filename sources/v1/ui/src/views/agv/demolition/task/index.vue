@@ -8,11 +8,11 @@
         >配货任务</div>
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn('/disinfection/call')"
+          @click="turn('/demolition/call')"
         >叫料</div>
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn('/disinfection/call/history')"
+          @click="turn('/demolition/call/history')"
         >叫料历史</div>
       </div>
       <!-- 右边内容 -->
@@ -20,11 +20,16 @@
         <!-- 配送任务 -->
         <div class="task-list-box">
           <div class="task-list-title">配送任务</div>
-          <div v-for="(item) in datas" :key="item.id">
-            <div class="task-list-name">{{item.name}}</div>
-            <div v-for="(bom) in item.boms" :key="bom.id" class="flex-box" style=" margin-top:5px;">
-              <div class="task-list-bom-name">{{bom.name}}</div>
-              <div class="task-list-bom-num">{{bom.num}}</div>
+          <div v-for="(item) in tasks" :key="item.id">
+            <div class="task-list-name">{{item.productName}}</div>
+            <div
+              v-for="(bom) in item.callMaterialModels"
+              :key="bom.id"
+              class="flex-box"
+              style=" margin-top:5px;"
+            >
+              <div class="task-list-bom-name">{{bom.materialName}}</div>
+              <div class="task-list-bom-num">{{bom.count}}</div>
             </div>
           </div>
         </div>
@@ -32,24 +37,28 @@
         <div class="task-content">
           <div class="title">备货区</div>
           <div class="position-box flex-box flex-wrap">
-            <div v-for="(item) in cData" :key="item.id">
-              <div
-                class="position position-pointer"
-                v-if="item.bomId"
-                @click="taskOut(item.bomId,item.name)"
-              >{{item.bomName}}</div>
-              <div class="position" v-else></div>
+            <div v-for="(item) in sites" :key="item.id">
+              <div @click="taskOut(item)" class="pointer site-item">
+                <div class="position position-pointer" v-if="item.materialBoxId">
+                  <div
+                    style="height: 100%; line-heigt:0px;"
+                  >{{formatShowName(item.materialBoxModel)}}</div>
+                </div>
+                <div class="position" v-else>（空）</div>
+                <div class="site-item-name">{{item.name}}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <el-dialog
+      v-if="state.taskOutVisible"
       :visible.sync="state.taskOutVisible"
       :title="taskOutPositionName"
       class="dialog-transfer"
     >
-      <TaskOut :id="taskOutBomId" @toggleShow="toggleShow"></TaskOut>
+      <TaskOut :bom="taskOutBom" @toggleShow="toggleShow"></TaskOut>
     </el-dialog>
   </div>
 </template>
@@ -58,111 +67,36 @@
   import '../../product/home/home.scss';
   import './task.scss';
   import TaskOut from './taskOut';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
   export default {
     name: 'home',
     components: { TaskOut },
     created() {
-      this.$store.dispatch('updateTitle', '配货任务');
+      this.loadingInfo();
     },
     data() {
       return {
         state: {
           taskOutVisible: false
         },
+        // 加载对象
+        load: null,
+        sites: [],
+        tasks: [],
         taskOutPositionName: '',
-        taskOutBomId: null,
-        cData: [
-          { id: 1, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 2, name: '库位2', bomName: '' },
-          { id: 3, name: '库位3', bomName: '' },
-          { id: 4, name: '库位4', bomName: '' },
-          { id: 5, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 6, name: '库位6', bomName: '' },
-          { id: 7, name: '库位7', bomName: '' },
-          { id: 8, name: '库位8', bomName: '' },
-          { id: 11, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 12, name: '库位2', bomName: '' },
-          { id: 13, name: '库位3', bomName: '' },
-          { id: 14, name: '库位4', bomName: '' },
-          { id: 15, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 16, name: '库位6', bomName: '' },
-          { id: 17, name: '库位7', bomName: '' },
-          { id: 18, name: '库位8', bomName: '' },
-          { id: 21, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 22, name: '库位2', bomName: '' },
-          { id: 23, name: '库位3', bomName: '' },
-          { id: 24, name: '库位4', bomName: '' },
-          { id: 25, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 26, name: '库位6', bomName: '' },
-          { id: 31, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 322, name: '库位2', bomName: '' },
-          { id: 323, name: '库位3', bomName: '' },
-          { id: 324, name: '库位4', bomName: '' },
-          { id: 35, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 36, name: '库位6', bomName: '' },
-          { id: 37, name: '库位7', bomName: '' },
-          { id: 38, name: '库位8', bomName: '' },
-          { id: 41, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 42, name: '库位2', bomName: '' },
-          { id: 43, name: '库位3', bomName: '' },
-          { id: 44, name: '库位4', bomName: '' },
-          { id: 45, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 46, name: '库位6', bomName: '' },
-          { id: 47, name: '库位7', bomName: '' },
-          { id: 48, name: '库位8', bomName: '' },
-          { id: 51, name: '库位1', bomName: 'BOM1', bomId: '1' },
-          { id: 52, name: '库位2', bomName: '' },
-          { id: 53, name: '库位3', bomName: '' },
-          { id: 54, name: '库位4', bomName: '' },
-          { id: 55, name: '库位5', bomName: 'BOM2', bomId: '2' },
-          { id: 56, name: '库位6', bomName: '' },
-          { id: 57, name: '库位7', bomName: '' },
-          { id: 58, name: '库位8', bomName: '' }
-        ],
-        datas: [
-          {
-            id: 1,
-            name: '产品A(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50 },
-              { id: 2, name: '原料B', num: 50 },
-              { id: 3, name: '原料C', num: 50 },
-              { id: 4, name: '原料D', num: 50 }
-            ]
-          },
-          {
-            id: 2,
-            name: '产品B(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50 },
-              { id: 2, name: '原料B', num: 50 },
-              { id: 3, name: '原料C', num: 50 }
-            ]
-          },
-          {
-            id: 3,
-            name: '产品C(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50 },
-              { id: 2, name: '原料B', num: 50 },
-              { id: 3, name: '原料C', num: 50 },
-              { id: 4, name: '原料D', num: 50 }
-            ]
-          },
-          {
-            id: 4,
-            name: '产品D(L15）',
-            boms: [
-              { id: 1, name: '原料A', num: 50 },
-              { id: 2, name: '原料B', num: 50 },
-              { id: 3, name: '原料C', num: 50 }
-            ]
-          }
-        ]
+        taskOutBom: null
       };
     },
     methods: {
+      loadingInfo() {
+        this.$store.dispatch('updateTitle', '拆包间配货任务');
+        this.getSites();
+        this.getDistributionTasks();
+      },
       // 跳转
       turn(url) {
         this.$router.push({ path: url });
@@ -170,11 +104,80 @@
       toggleShow() {
         this.state.taskOutVisible = false;
       },
-      taskOut(bomId, taskOutPositionName) {
-        console.log('taskOut>>>>>>>>>>>', bomId);
-        this.taskOutBomId = bomId;
-        this.taskOutPositionName = taskOutPositionName;
+      taskOut(bom) {
+        this.taskOutBom = bom;
+        this.taskOutPositionName = bom.name;
         this.state.taskOutVisible = true;
+      },
+      getSites() {
+        request({
+          url: '/agv/sites',
+          method: 'GET',
+          params: {
+            type: 5
+          }
+        })
+          .then(response => {
+            console.log(response, '------');
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.sites = response.data;
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
+      getDistributionTasks() {
+        request({
+          url: '/agv/callMaterials/distributionTasks',
+          method: 'GET',
+          params: {
+            type: 3
+          }
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.tasks = response.data;
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
+      formatShowName(item) {
+        let showName = '';
+        // if (
+        //   !isEmpty(item.materialBoxMaterialModels) &&
+        //   item.materialBoxMaterialModels.length > 0
+        // ) {
+        //   item.materialBoxMaterialModels.forEach(obj => {
+        //     showName += obj.materialName + ' ' + obj.count + ' \n';
+        //   });
+        // }
+        return showName;
+      },
+      // 用遮罩层显示错误信息
+      showErrorMessage(message) {
+        const options = {
+          lock: true,
+          fullscreen: true,
+          text: message,
+          spinner: '',
+          background: 'rgba(0, 0, 0, 0.7)'
+        };
+        return Loading.service(options);
       }
     }
   };

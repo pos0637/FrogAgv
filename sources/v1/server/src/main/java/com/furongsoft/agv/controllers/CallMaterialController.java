@@ -26,7 +26,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 根据条件获取叫料列表 TODO
+     * 根据条件获取叫料列表
      *
      * @param type   类型
      * @param state  状态
@@ -77,7 +77,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 添加波次详情叫料 TODO
+     * 添加波次详情叫料
      *
      * @param waveDetailModels 波次详情列表
      * @return 响应内容
@@ -106,9 +106,22 @@ public class CallMaterialController {
      * @return 响应内容
      */
     @PostMapping("/callMaterials/buttonCall")
-    public RestResponse buttonCallMaterial(String ipAddress) {
-        callMaterialService.buttonCallMaterial(ipAddress);
+    public RestResponse buttonCallMaterial(String ipAddress, String buttonCode) {
+        callMaterialService.buttonCallMaterial(ipAddress, buttonCode);
         return new RestResponse(HttpStatus.OK);
     }
+
+    /**
+     * 通过叫料ID取消叫料
+     *
+     * @param id 叫料ID
+     * @return 响应内容
+     */
+    @DeleteMapping("/callMaterials/cancel/{id}")
+    public RestResponse cancelCallMaterial(@NonNull @PathVariable Long id) {
+        callMaterialService.cancelCallMaterial(id);
+        return new RestResponse(HttpStatus.OK);
+    }
+
 
 }

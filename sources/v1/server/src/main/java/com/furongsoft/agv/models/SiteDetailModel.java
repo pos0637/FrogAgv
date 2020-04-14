@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.io.Serializable;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class SiteDetailModel implements Serializable {
     private long id;
 
@@ -21,9 +21,9 @@ public class SiteDetailModel implements Serializable {
     private long siteId;
 
     /**
-     * 备货ID
+     * 料框ID
      */
-    private Long stockUpRecordId;
+    private Long materialBoxId;
 
     /**
      * 状态[0：空闲；1：锁定；2：有货]

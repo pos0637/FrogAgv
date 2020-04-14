@@ -18,7 +18,7 @@ const position = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/positions/list',
-          method: 'get'
+          method: 'GET'
         })
           .then(response => {
             commit('SET_POSITION', response.data)

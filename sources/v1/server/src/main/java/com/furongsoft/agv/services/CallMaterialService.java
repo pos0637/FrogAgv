@@ -148,12 +148,27 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     }
 
     /**
-     * 按钮叫料
+     * 通过叫料ID取消叫料。
+     * 先判断这个叫料的状态是否处于未配送状态，不是未配送不可取消
+     *
+     * @param id 叫料ID
+     */
+    public void cancelCallMaterial(long id) {
+        CallMaterialModel callMaterialModel = callMaterialDao.selectUnDeliveryCallMaterialById(id);
+        if (ObjectUtils.isEmpty(callMaterialModel)) {
+            throw new BaseException("当前叫料不可取消");
+        } else {
+            callMaterialDao.deleteCallMaterial(id);
+        }
+    }
+
+    /**
+     * 按钮叫料 TODO 项目启动时，把按钮信息加载到内存中
      *
      * @param ipAddress
      */
-    public void buttonCallMaterial(String ipAddress) {
-        CallButtonModel callButtonModel = callButtonDao.selectCallButtonAreaByIpAddress(ipAddress);
+    public void buttonCallMaterial(String ipAddress, String buttonCode) {
+        CallButtonModel callButtonModel = callButtonDao.selectCallButtonAreaByIpAddress(ipAddress, buttonCode);
         if (callButtonModel.getCode().indexOf("CALL") > 0) {
             callMaterial(callButtonModel);
         }

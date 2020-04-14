@@ -152,7 +152,7 @@
       getWaves() {
         request({
           url: '/agv/wavesPlan',
-          method: 'get',
+          method: 'GET',
           params: {
             type: 1,
             teamId: 'uuidxxxxb03',

@@ -18,7 +18,7 @@ const department = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/organizations/list',
-          method: 'get'
+          method: 'GET'
         })
           .then(response => {
             commit('SET_DEPARTMENT', response.data)

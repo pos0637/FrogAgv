@@ -54,7 +54,7 @@ public interface SiteDao extends BaseMapper<Site> {
         public String selectSiteById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t2.stock_up_record_id," +
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t2.material_box_id," +
                             "t2.state AS siteDetailState,t2.delivery_task_id");
                     FROM(SITE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t2 ON t1.id = t2.site_id");
@@ -72,7 +72,7 @@ public interface SiteDao extends BaseMapper<Site> {
             return new SQL() {
                 {
                     SELECT("t3.id AS id,t1.name AS areaName, t1.id AS areaId, t1.code AS areaCode, t1.parent_id AS parentArea, t3.qr_code, t3.location_x, t3.location_y, " +
-                            "t3.location_z, t3.type, t3.name, t3.code, t5.stock_up_record_id, t5.state AS siteDetailState, t5.delivery_task_id");
+                            "t3.location_z, t3.type, t3.name, t3.code, t5.material_box_id, t5.state AS siteDetailState, t5.delivery_task_id");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.area_id");
                     LEFT_OUTER_JOIN(SITE_TABLE_NAME + " t3 ON t2.site_id = t3.id");

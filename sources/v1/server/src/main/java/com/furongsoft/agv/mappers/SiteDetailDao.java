@@ -46,7 +46,7 @@ public interface SiteDetailDao extends BaseMapper<SiteDetail> {
         public String selectSiteDetailById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.site_id,t1.stock_up_record_id,t1.state,t1.delivery_task_id,t1.enabled");
+                    SELECT("t1.id,t1.site_id,t1.material_box_id,t1.state,t1.delivery_task_id,t1.enabled");
                     FROM(SITE_DETAIL_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }

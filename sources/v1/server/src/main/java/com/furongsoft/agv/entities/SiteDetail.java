@@ -3,8 +3,6 @@ package com.furongsoft.agv.entities;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,7 +17,6 @@ import javax.persistence.Id;
 @TableName("t_agv_site_detail")
 @Data
 public class SiteDetail extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -30,9 +27,9 @@ public class SiteDetail extends BaseEntity {
     private long siteId;
 
     /**
-     * 备货ID
+     * 料框ID
      */
-    private Long stockUpRecordId;
+    private Long materialBoxId;
 
     /**
      * 状态[0：空闲；1：锁定；2：有货]

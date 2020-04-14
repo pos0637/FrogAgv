@@ -45,7 +45,7 @@ public interface CallButtonDao extends BaseMapper<CallButton> {
      * @return 按钮信息
      */
     @SelectProvider(type = DaoProvider.class, method = "selectCallButtonAreaByIpAddress")
-    CallButtonModel selectCallButtonAreaByIpAddress(@Param("ipAddress") String ipAddress);
+    CallButtonModel selectCallButtonAreaByIpAddress(@Param("ipAddress") String ipAddress, @Param("buttonCode") String buttonCode);
 
     class DaoProvider {
         private static final String CALL_BUTTON_TABLE_NAME = CallButton.class.getAnnotation(TableName.class).value();
@@ -62,7 +62,7 @@ public interface CallButtonDao extends BaseMapper<CallButton> {
         public String selectCallButtonById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.ip_address,t1.site_id,t1.code,t1.name");
+                    SELECT("t1.id,t1.ip_address,t1.button_code,t1.site_id,t1.code,t1.name");
                     FROM(CALL_BUTTON_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -77,7 +77,7 @@ public interface CallButtonDao extends BaseMapper<CallButton> {
         public String selectCallButtonByCode(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.ip_address,t1.site_id,t1.code,t1.name");
+                    SELECT("t1.id,t1.ip_address,t1.button_code,t1.site_id,t1.code,t1.name");
                     FROM(CALL_BUTTON_TABLE_NAME + " t1");
                     WHERE("t1.code = #{code}");
                 }
@@ -92,11 +92,11 @@ public interface CallButtonDao extends BaseMapper<CallButton> {
         public String selectCallButtonAreaByIpAddress() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.ip_address,t1.site_id,t1.code,t1.name,t3.name AS areaName,t3.id AS areaId, t3.type AS areaType");
+                    SELECT("t1.id,t1.ip_address,t1.button_code,t1.site_id,t1.code,t1.name,t3.name AS areaName,t3.id AS areaId, t3.type AS areaType");
                     FROM(CALL_BUTTON_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AREA_SITE_TABLE_NAME + " t2 ON t2.site_id = t1.site_id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t2.area_id = t3.id");
-                    WHERE("t1.ip_address = #{ipAddress}");
+                    WHERE("t1.ip_address = #{ipAddress} AND t1.button_code = #{buttonCode}");
                 }
             }.toString();
         }

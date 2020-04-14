@@ -51,7 +51,7 @@
       getTeams() {
         request({
           url: '/external/teams',
-          method: 'get'
+          method: 'GET'
         })
           .then(response => {
             console.log(response);

@@ -31,6 +31,15 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
     CallMaterialModel selectCallMaterialById(@Param("id") Long id);
 
     /**
+     * 通过ID获取未配送的叫料信息
+     *
+     * @param id 叫料ID
+     * @return 叫料信息
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectUnDeliveryCallMaterialById")
+    CallMaterialModel selectUnDeliveryCallMaterialById(@Param("id") Long id);
+
+    /**
      * 根据条件获取叫料列表（默认获取未完成的）
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
@@ -84,6 +93,21 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         }
 
         /**
+         * 通过ID获取未配送的叫料信息
+         *
+         * @return sql
+         */
+        public String selectUnDeliveryCallMaterialById() {
+            return new SQL() {
+                {
+                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
+                    FROM(CALL_MATERIAL_TABLE_NAME + " t1");
+                    WHERE("t1.id = #{id} AND t1.state=0");
+                }
+            }.toString();
+        }
+
+        /**
          * 通过类型获取叫料列表(默认获取到未完成的叫料列表)
          *
          * @return sql
@@ -125,7 +149,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
             return new SQL() {
                 {
                     UPDATE(CALL_MATERIAL_TABLE_NAME);
-                    SET("enable=0");
+                    SET("enabled=0");
                     WHERE("id=#{id}");
                 }
             }.toString();

@@ -5,14 +5,14 @@
       <div class="left-menu">
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn('/disinfection/task')"
+          @click="turn('/demolition/task')"
         >配货任务</div>
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
         >叫料</div>
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn('/disinfection/call/history')"
+          @click="turn('/demolition/call/history')"
         >叫料历史</div>
       </div>
       <!-- 右边内容 -->
@@ -29,33 +29,41 @@
         </div>
         <!-- 表格内容 -->
         <div class="flex-box data-content flex-direction-column" style="width:100%;">
-          <div v-for="(item) in cData" :key="item.id">
+          <div v-for="(item) in callPlans" :key="item.id">
             <div class="data-content-produce-row flex-box flex-align-items-center">
-              <div class="data-name">{{item.name}}</div>
+              <div
+                class="data-name"
+              >{{item.materialName+" （"+item.productLineCode+"）"+item.executionTime}}</div>
               <div class="bom-num"></div>
               <div class="bom-done"></div>
               <div class="data-content-produce-operation flex-box flex-align-items-center"></div>
             </div>
-            <div class="data-wave" v-for="(wave,index) in item.waves" :key="wave.id">
+            <div class="data-wave" v-for="(wave,index) in item.waveModels" :key="wave.id">
               <div class="data-content-wave-row flex-box flex-align-items-center">
                 <div class="wave-name">{{'波次' + (index + 1)}}</div>
                 <div class="bom-num"></div>
                 <div class="bom-done"></div>
-                <div class="data-content-wave-operation flex-box flex-align-items-center"></div>
+                <div class="data-content-operation flex-box flex-align-items-center">
+                  <div class="bom-delete" @click="callWave(wave)" v-if="!wave.isCalled">叫料</div>
+                </div>
               </div>
-              <div v-for="(bom) in wave.boms" :key="bom.id" class="flex-box data-content-row">
+              <div
+                v-for="(bom) in wave.waveDetailModels"
+                :key="bom.id"
+                class="flex-box data-content-row"
+              >
                 <div
                   class="bom-name flex-box flex-align-items-center flex-justify-content-center"
-                >{{bom.name}}</div>
+                >{{bom.materialName}}</div>
                 <div
                   class="bom-num flex-box flex-align-items-center flex-justify-content-center"
-                >{{bom.num}}</div>
+                >{{bom.count}}</div>
                 <div class="bom-done flex-box flex-align-items-center flex-justify-content-center">
-                  <span v-if="bom.status">已叫料</span>
+                  <span v-if="!isEmpty(bom.callId)">已叫料</span>
                   <span v-else>未叫料</span>
                 </div>
                 <div class="data-content-operation flex-box flex-align-items-center">
-                  <div class="bom-delete" @click="callBom(bom.id)" v-if="!bom.status">叫料</div>
+                  <div class="bom-delete" @click="callBom(bom)" v-if="isEmpty(bom.callId)">叫料</div>
                 </div>
               </div>
             </div>
@@ -69,65 +77,122 @@
 <script>
   import '../../product/home/home.scss';
   import './call.scss';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
   export default {
     name: 'call',
     components: {},
     created() {
-      this.$store.dispatch('updateTitle', '拆包间叫料');
+      this.loadingInfo();
     },
     data() {
       return {
+        num: '99+',
         state: {},
-        cData: [
-          {
-            id: 1,
-            name: '产品A（L15）',
-            waves: [
-              {
-                id: 1,
-                status: true,
-                boms: [
-                  { id: 1, name: '原料A', num: 50, status: true },
-                  { id: 2, name: '原料B', num: 50, status: true },
-                  { id: 3, name: '原料C', num: 50, status: true }
-                ]
-              },
-              {
-                id: 2,
-                status: true,
-                boms: [
-                  { id: 1, name: '原料A', num: 50, status: false },
-                  { id: 2, name: '原料B', num: 50, status: true }
-                ]
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: '产品B（L15）',
-            waves: [
-              {
-                id: 2,
-                status: false,
-                boms: [
-                  { id: 1, name: '原料A', num: 50, status: false },
-                  { id: 2, name: '原料B', num: 50, status: false }
-                ]
-              }
-            ]
-          }
-        ]
+        // 加载对象
+        load: null,
+        callPlans: []
       };
     },
     methods: {
+      loadingInfo() {
+        this.$store.dispatch('updateTitle', '拆包间叫料');
+        this.getCallPlans();
+      },
+      isEmpty,
       // 跳转
       turn(url) {
         this.$router.push({ path: url });
       },
       toggleShow() {},
-      callBom(bomId) {
-        console.log('callBom>>>>>>>>>>>>', bomId);
+      // 叫波次
+      callWave(wave) {
+        if (!isEmpty(wave.waveDetailModels) && wave.waveDetailModels.length > 0) {
+          wave.waveDetailModels.forEach(item => {
+            item.areaType = 4;
+          });
+        }
+        request({
+          url: '/agv/callMaterials/addWaveDetailCallMaterials',
+          method: 'POST',
+          data: wave.waveDetailModels
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.getCallPlans();
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
+      // 叫详情
+      callBom(bom) {
+        let callBoms = [];
+        if (!isEmpty(bom)) {
+          bom.areaType = 4;
+          callBoms.push(bom);
+        }
+        request({
+          url: '/agv/callMaterials/addWaveDetailCallMaterials',
+          method: 'POST',
+          data: callBoms
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.getCallPlans();
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
+      // 获取叫料计划
+      getCallPlans() {
+        request({
+          url: '/agv/waves/callPlans',
+          method: 'GET',
+          params: {
+            waveType: 1,
+            callType: 4
+          }
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              if (!isEmpty(response.data)) {
+                this.callPlans = response.data;
+              }
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close();
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
+      },
+      // 用遮罩层显示错误信息
+      showErrorMessage(message) {
+        const options = {
+          lock: true,
+          fullscreen: true,
+          text: message,
+          spinner: '',
+          background: 'rgba(0, 0, 0, 0.7)'
+        };
+        return Loading.service(options);
       }
     }
   };

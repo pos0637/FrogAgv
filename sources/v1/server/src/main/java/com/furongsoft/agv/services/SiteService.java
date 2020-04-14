@@ -49,13 +49,11 @@ public class SiteService extends BaseService<SiteDao, Site> {
         if (null != siteModel.getDeliveryTaskId()) {
             siteModel.setDeliveryTaskModel(deliveryTaskDao.selectDeliveryTaskById(siteModel.getDeliveryTaskId()));
         }
-        if (null != siteModel.getStockUpRecordId()) {
-            StockUpRecordModel stockUpRecordModel = stockUpRecordDao.selectStockUpRecordById(siteModel.getStockUpRecordId());
-            MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(stockUpRecordModel.getMaterialBoxId());
-            List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(stockUpRecordModel.getMaterialBoxId());
+        if (null != siteModel.getMaterialBoxId()) {
+            MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(siteModel.getMaterialBoxId());
+            List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
             materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
-            stockUpRecordModel.setMaterialBoxModel(materialBoxModel);
-            siteModel.setStockUpRecordModel(stockUpRecordModel);
+            siteModel.setMaterialBoxModel(materialBoxModel);
         }
         return siteModel;
     }
@@ -70,14 +68,12 @@ public class SiteService extends BaseService<SiteDao, Site> {
         List<SiteModel> siteModels = siteDao.selectLocationByAreaType(type);
         if (!CollectionUtils.isEmpty(siteModels)) {
             siteModels.forEach(siteModel -> {
-                if (null != siteModel.getStockUpRecordId()) {
+                if (null != siteModel.getMaterialBoxId()) {
                     // 获取备货信息
-                    StockUpRecordModel stockUpRecordModel = stockUpRecordDao.selectStockUpRecordById(siteModel.getStockUpRecordId());
-                    MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(stockUpRecordModel.getMaterialBoxId());
-                    List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(stockUpRecordModel.getMaterialBoxId());
+                    MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(siteModel.getMaterialBoxId());
+                    List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
                     materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
-                    stockUpRecordModel.setMaterialBoxModel(materialBoxModel);
-                    siteModel.setStockUpRecordModel(stockUpRecordModel);
+                    siteModel.setMaterialBoxModel(materialBoxModel);
                 }
                 if (null != siteModel.getDeliveryTaskId()) {
                     // 获取配送任务信息
