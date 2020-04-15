@@ -2,6 +2,7 @@ package com.furongsoft.frogagv;
 
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.entities.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,5 +47,25 @@ class GeekPlusTests {
         dst.setCode("GZ-2");
 
         scheduler.addTask(src, dst);
+    }
+
+    @Test
+    void cancel_GZ1_To_GZ2_Task() {
+        removeContainers();
+
+        Site site = new Site();
+        site.setCode("185");
+        scheduler.onContainerArrived("A000011", site, null);
+
+        Site src = new Site();
+        src.setCode("GZ-1");
+
+        Site dst = new Site();
+        dst.setCode("GZ-2");
+
+        Task task = scheduler.addTask(src, dst);
+        if (task != null) {
+            scheduler.cancel(task);
+        }
     }
 }

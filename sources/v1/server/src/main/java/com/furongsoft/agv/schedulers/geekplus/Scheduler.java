@@ -4,16 +4,15 @@ import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.BaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
-import com.furongsoft.agv.schedulers.geekplus.entities.MovingRequestMsg;
-import com.furongsoft.agv.schedulers.geekplus.entities.MovingResponseMsg;
-import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMsg;
-import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
+import com.furongsoft.agv.schedulers.geekplus.entities.*;
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * AGV调度管理器
@@ -75,12 +74,18 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public boolean cancel(Task task) {
-        return false;
+        MovingCancelRequestMsg request = new MovingCancelRequestMsg(
+                new MovingCancelRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
+                new MovingCancelRequestMsg.Body("MovingCancelMsg", task.getWcsTaskId())
+        );
+        MovingCancelResponseMsg response = HttpUtils.postJson(url, null, request, MovingCancelResponseMsg.class);
+        return response != null;
     }
 
     @Override
     public boolean cancel(Site source) {
-        return false;
+        Optional<Task> task = getTaskBySource(source.getCode());
+        return task.isPresent() && cancel(task.get());
     }
 
     @Override
