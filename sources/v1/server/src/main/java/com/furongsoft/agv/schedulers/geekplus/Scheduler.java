@@ -56,7 +56,7 @@ public class Scheduler extends BaseScheduler {
             return null;
         }
 
-        return super.addTask(source, destination, response.getWorkflowWorkId());
+        return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class Scheduler extends BaseScheduler {
             return null;
         }
 
-        return super.addTask(source, destination, response.getWorkflowWorkId());
+        return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
     @Override

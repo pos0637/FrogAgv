@@ -2,6 +2,8 @@ package com.furongsoft.agv.schedulers.geekplus.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 执行搬运响应消息
@@ -11,6 +13,15 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovingResponseMsg {
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ResponseData {
+        /**
+         * 搬运系统任务id
+         */
+        private String workflowWorkId;
+    }
+
     /**
      * 当前回调应答消息的唯一标识
      */
@@ -34,10 +45,5 @@ public class MovingResponseMsg {
     /**
      * 返回失败和成功
      */
-    private String data;
-
-    /**
-     * 搬运系统任务id
-     */
-    private String workflowWorkId;
+    private ResponseData[] data;
 }

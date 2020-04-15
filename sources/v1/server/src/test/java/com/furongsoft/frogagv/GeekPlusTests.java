@@ -2,10 +2,13 @@ package com.furongsoft.frogagv;
 
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
 
 @SpringBootTest
 class GeekPlusTests {
@@ -34,6 +37,13 @@ class GeekPlusTests {
 
     @Test
     void add_GZ1_To_GZ2_Task() {
+        scheduler.initialize(new Area[]{
+                new Area("1", new ArrayList<>() {{
+                    add(new com.furongsoft.agv.schedulers.entities.Site("GZ-1", null));
+                    add(new com.furongsoft.agv.schedulers.entities.Site("GZ-2", null));
+                }})
+        });
+
         removeContainers();
 
         Site site = new Site();

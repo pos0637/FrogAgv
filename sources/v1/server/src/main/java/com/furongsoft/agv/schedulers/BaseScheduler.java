@@ -7,9 +7,7 @@ import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
 import com.furongsoft.base.misc.Tracker;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * AGV调度管理器
@@ -20,12 +18,12 @@ public abstract class BaseScheduler implements IScheduler {
     /**
      * 区域列表
      */
-    protected List<Area> areas;
+    protected List<Area> areas = new ArrayList<>();
 
     /**
      * 任务列表
      */
-    protected List<Task> tasks;
+    protected List<Task> tasks = new LinkedList<>();
 
     @Override
     synchronized public void initialize(Area[] areas) {
