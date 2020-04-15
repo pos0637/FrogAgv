@@ -30,6 +30,11 @@ public class CallButtonModel implements Serializable {
     private String ipAddress;
 
     /**
+     * 按钮编号
+     */
+    private String buttonCode;
+
+    /**
      * 名称
      */
     private String name;

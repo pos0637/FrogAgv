@@ -18,7 +18,7 @@ const dict = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/dicts/0',
-          method: 'get'
+          method: 'GET'
         }).then(response => {
           commit('SET_DICTGROUP', response.data)
           resolve()

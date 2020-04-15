@@ -81,7 +81,7 @@ export default {
       getWave() {
         request({
           url: '/agv/waves/getWaveDetail/' + this.bom.id,
-          method: 'get'
+          method: 'GET'
         })
           .then(response => {
             if (response.errno === 0) {

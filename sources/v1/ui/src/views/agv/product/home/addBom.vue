@@ -114,7 +114,7 @@ export default {
       getBomDetails() {
         request({
           url: '/agv/waves/getBomDetails',
-          method: 'get',
+          method: 'GET',
           params: {
             materialCode: this.bom.materialCode
           }

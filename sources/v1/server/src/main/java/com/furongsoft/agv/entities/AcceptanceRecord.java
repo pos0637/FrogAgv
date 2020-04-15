@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import java.util.Date;
  *
  * @author linyehai
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @TableName("t_agv_acceptance_record")
 @Data
@@ -55,7 +57,7 @@ public class AcceptanceRecord extends BaseEntity {
     private int type;
 
     /**
-     * 区域ID(产线ID)
+     * 产线ID
      */
     private Long areaId;
 

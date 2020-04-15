@@ -68,7 +68,7 @@ const area = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/areas',
-          method: 'get'
+          method: 'GET'
         }).then(response => {
           const areaList = JSON.parse(response.data)
           commit('SET_AREAS', renderAreas(areaList))

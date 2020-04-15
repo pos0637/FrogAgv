@@ -59,7 +59,7 @@ public class StockUpRecordModel implements Serializable {
     /**
      * 料车状态
      */
-    private String materialBoxState;
+    private Integer materialBoxState;
 
     /**
      * 任务单号

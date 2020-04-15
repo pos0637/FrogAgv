@@ -41,7 +41,7 @@ public class DeliveryTaskModel implements Serializable {
     private String agvUuid;
 
     /**
-     * 状态[0：待接单；1：取货中；2：配送中；3：已完成]
+     * 状态[0：待接单；1：取货中；2：配送中；3：已完成；4：已取消]
      */
     private int state;
 

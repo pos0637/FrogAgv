@@ -43,7 +43,7 @@ const area = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/resources',
-          method: 'get'
+          method: 'GET'
         }).then(response => {
           const list = renderResources(JSON.parse(response.data))
           commit('SET_RESOURCES', list)

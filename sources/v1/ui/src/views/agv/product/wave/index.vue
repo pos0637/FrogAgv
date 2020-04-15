@@ -106,21 +106,21 @@
 </template>
 
 <script>
-  import draggable from 'vuedraggable';
-  import '../home/home.scss';
-  import BackBom from './backBom';
-  import SaveBom from './saveBom';
-  import request from '@/utils/request';
-  import Constants from '@/utils/constants';
-  import { isEmpty } from '@/utils/helper';
-  import { Loading } from 'element-ui';
+  import draggable from 'vuedraggable'
+import '../home/home.scss'
+import BackBom from './backBom'
+import SaveBom from './saveBom'
+import request from '@/utils/request'
+import Constants from '@/utils/constants'
+import { isEmpty } from '@/utils/helper'
+import { Loading } from 'element-ui'
 
-  export default {
+export default {
     name: 'home',
     components: { draggable, BackBom, SaveBom },
     created() {
-      this.loadingInfo();
-    },
+      this.loadingInfo()
+  },
     data() {
       return {
         state: {
@@ -134,25 +134,25 @@
         saveBomId: null,
         waves: [],
         datas: []
-      };
-    },
+      }
+  },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '波次管理');
-        this.getWaves();
+        this.$store.dispatch('updateTitle', '波次管理')
+        this.getWaves()
       },
       showAll() {
-        this.waveState = null;
-        this.getWaves();
+        this.waveState = null
+        this.getWaves()
       },
       showUnFinish() {
-        this.waveState = 0;
-        this.getWaves();
+        this.waveState = 0
+        this.getWaves()
       },
       getWaves() {
         request({
           url: '/agv/wavesPlan',
-          method: 'get',
+          method: 'GET',
           params: {
             type: 1,
             teamId: 'uuidxxxxb03',
@@ -162,42 +162,42 @@
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.waves = response.data;
+                this.waves = response.data
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 跳转到配送管理页面
       turn1() {
-        this.$router.push({ path: '/dashboard' });
+        this.$router.push({ path: '/dashboard' })
       },
       // 跳转到历史叫料页面
       turn3() {
-        this.$router.push({ path: '/agv/call/history' });
+        this.$router.push({ path: '/agv/call/history' })
       },
       // 原料退货
       backBom(bomId) {
-        console.log('backBom>>>>>>>', bomId);
-        this.backBomId = bomId;
+        console.log('backBom>>>>>>>', bomId)
+        this.backBomId = bomId
       },
       // 原料验收
       saveBom(bomId) {
-        console.log('saveBom>>>>>>>', bomId);
+        console.log('saveBom>>>>>>>', bomId)
       },
       // 一波退货
       backWave(waveId) {
-        console.log('backWave>>>>>>>', waveId);
+        console.log('backWave>>>>>>>', waveId)
       },
       // 一波验收
       saveWave(waveId) {
-        console.log('backWave>>>>>>>', waveId);
+        console.log('backWave>>>>>>>', waveId)
       },
       // 拖动之后的顺序
       changeSort() {
@@ -208,30 +208,30 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves();
+              this.getWaves()
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       toggleShow() {
-        this.backBomVisible = false;
-        this.saveBomVisible = false;
+        this.backBomVisible = false
+        this.saveBomVisible = false
       },
       // 格式化状态
       formateState(waveState) {
-        let stateName = '';
+        let stateName = ''
         Constants.deliveryState.forEach(item => {
           if (item.value === waveState) {
-            stateName = item.label;
+            stateName = item.label
           }
-        });
-        return stateName;
+        })
+        return stateName
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -241,9 +241,9 @@
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

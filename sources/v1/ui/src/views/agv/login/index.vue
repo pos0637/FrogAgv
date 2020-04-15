@@ -25,13 +25,13 @@
 </template>
 
 <script>
-  import './login.scss';
-  import { Loading } from 'element-ui';
+  import './login.scss'
+import { Loading } from 'element-ui'
 
-  /**
-   * 登录页
-   */
-  export default {
+/**
+ * 登录页
+ */
+export default {
     name: 'login',
     data() {
       return {
@@ -42,41 +42,41 @@
         },
         teams: [],
         load: null
-      };
-    },
+      }
+  },
     methods: {
       turnHome() {
-        this.$router.push({ path: 'dashboard' });
+        this.$router.push({ path: 'dashboard' })
       },
       getTeams() {
         request({
           url: '/external/teams',
-          method: 'get'
+          method: 'GET'
         })
           .then(response => {
-            console.log(response);
+            console.log(response)
             if (response.errno === 0) {
               // 如果加载存在
               if (!isEmpty(this.load)) {
-                this.load.close();
+                this.load.close()
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
-          });
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
       },
       // 遮罩层显示提示信息
       showErrorMessage(message) {
-        let options = {
+        const options = {
           lock: true,
           fullscreen: true,
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        };
-        return Loading.service(options);
+        }
+        return Loading.service(options)
       }
     }
-  };
+  }
 </script>

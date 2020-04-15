@@ -26,7 +26,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 根据条件获取叫料列表 TODO
+     * 根据条件获取叫料列表
      *
      * @param type   类型
      * @param state  状态
@@ -40,7 +40,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 按条件查询配货任务 TODO
+     * 按条件查询配货任务
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
      * @param state  状态[0：未配送；1：配送中；2：已完成]
@@ -77,7 +77,7 @@ public class CallMaterialController {
     }
 
     /**
-     * 添加波次详情叫料 TODO
+     * 添加波次详情叫料
      *
      * @param waveDetailModels 波次详情列表
      * @return 响应内容
@@ -91,7 +91,7 @@ public class CallMaterialController {
     /**
      * 删除叫料信息 TODO
      *
-     * @param id
+     * @param id 叫料ID
      * @return 响应内容
      */
     @DeleteMapping("/callMaterials/{id}")
@@ -106,9 +106,22 @@ public class CallMaterialController {
      * @return 响应内容
      */
     @PostMapping("/callMaterials/buttonCall")
-    public RestResponse buttonCallMaterial(String ipAddress) {
-        callMaterialService.buttonCallMaterial(ipAddress);
+    public RestResponse buttonCallMaterial(String ipAddress, String buttonCode) {
+        callMaterialService.buttonCallMaterial(ipAddress, buttonCode);
         return new RestResponse(HttpStatus.OK);
     }
+
+    /**
+     * 通过叫料ID取消叫料
+     *
+     * @param id 叫料ID
+     * @return 响应内容
+     */
+    @DeleteMapping("/callMaterials/cancel/{id}")
+    public RestResponse cancelCallMaterial(@NonNull @PathVariable Long id) {
+        callMaterialService.cancelCallMaterial(id);
+        return new RestResponse(HttpStatus.OK);
+    }
+
 
 }

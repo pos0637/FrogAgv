@@ -61,7 +61,7 @@ const permission = {
       return new Promise((resolve, reject) => {
         request({
           url: '/system/menus',
-          method: 'get'
+          method: 'GET'
         }).then(response => {
           commit('SET_ROUTERS', JSON.parse(response.data))
           resolve()

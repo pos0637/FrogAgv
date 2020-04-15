@@ -25,7 +25,7 @@ public class SiteController {
     }
 
     /**
-     * 根据区域类型获取站点列表 TODO
+     * 根据区域类型获取站点列表
      *
      * @param type 区域类型[1：生产区；2：灌装区；3：包装区；4：消毒间；5：拆包间；6：包材仓；7：生产线；8：库位区]
      * @return 响应内容
@@ -36,7 +36,7 @@ public class SiteController {
     }
 
     /**
-     * 通过id获取站点详情 TODO
+     * 通过id获取站点详情
      *
      * @param id 站点详情ID
      * @return 响应内容

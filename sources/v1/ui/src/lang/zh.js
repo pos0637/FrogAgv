@@ -198,6 +198,7 @@ export default {
     delete: '删除',
     cancel: '取 消',
     confirm: '确 定',
+    send: '配 送',
     roleTransfer: '分配角色',
     permissionTransfer: '分配权限',
     resourceTransfer: '分配资源',

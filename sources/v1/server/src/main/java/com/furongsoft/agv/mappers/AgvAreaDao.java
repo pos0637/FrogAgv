@@ -112,7 +112,7 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
         public String selectSiteDetailsByAreaCode(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t3.id,t3.site_id,t3.stock_up_record_id,t3.delivery_task_id,t3.state,t1.id,t1.parent_id AS parentAreaId,t1.type AS areaType,t1.code AS areaCode,t1.name AS areaName");
+                    SELECT("t3.id,t3.site_id,t3.material_box_id,t3.delivery_task_id,t3.state,t1.id,t1.parent_id AS parentAreaId,t1.type AS areaType,t1.code AS areaCode,t1.name AS areaName");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.area_id");
                     LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t3 ON t3.site_id=t2.site_id");

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 站点信息
@@ -76,9 +77,9 @@ public class SiteModel implements Serializable {
     private Long parentArea;
 
     /**
-     * 备货ID
+     * 料框ID
      */
-    private Long stockUpRecordId;
+    private Long materialBoxId;
 
     /**
      * 站点详情状态[0：空闲；1：锁定；2：有货]
@@ -91,9 +92,14 @@ public class SiteModel implements Serializable {
     private Long deliveryTaskId;
 
     /**
-     * 备货信息
+     * 料框信息
      */
-    private StockUpRecordModel stockUpRecordModel;
+    private MaterialBoxModel materialBoxModel;
+
+    /**
+     * 原料列表
+     */
+    private List<MaterialModel> materialModels;
 
     /**
      * 配送任务信息
