@@ -92,26 +92,32 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public void onMovingStarted(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Moving));
     }
 
     @Override
     public void onMovingArrived(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Arrived));
     }
 
     @Override
     public void onMovingPaused(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Paused));
     }
 
     @Override
     public void onMovingWaiting(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Paused));
     }
 
     @Override
     public void onMovingCancelled(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Cancelled));
     }
 
     @Override
     public void onMovingFail(String agvId, String taskId, String event) {
+        getTaskByWcsTaskId(taskId).ifPresent(value -> value.setStatus(Task.Status.Fail));
     }
 
     @Override
