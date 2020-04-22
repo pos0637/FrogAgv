@@ -34,6 +34,5 @@ public interface AcceptanceDao extends BaseMapper<Acceptance> {
         }
 
 
-
     }
 }

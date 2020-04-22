@@ -63,12 +63,14 @@ public class Scheduler extends BaseScheduler {
     public Task addTask(Site source, Site destination) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", "11", "", source.getCode(), 2, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1)}));
+                new MovingRequestMsg.Body("MovingRequestMsg", source.getOrderNo(), "", source.getCode(), 2, null, null, 1, 1, 1, new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if (response == null) {
             return null;
         }
-
+        if (response.getData() == null) {
+            return null;
+        }
         return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
@@ -113,22 +115,24 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
-    public void onContainerArrived(String containerId, Site target, String event) {
+    public boolean onContainerArrived(String containerId, Site target, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
-                new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 3, target.getCode())
+                new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 2, target.getCode())
         );
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
         Tracker.debug(response);
+        return response.getCode().equals("0");
     }
 
     @Override
-    public void onContainerLeft(String containerId, Site target, String event) {
+    public boolean onContainerLeft(String containerId, Site target, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId, 3, target.getCode())
         );
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request, WarehouseControlResponseMsg.class);
         Tracker.debug(response);
+        return response.getCode().equals("0");
     }
 }

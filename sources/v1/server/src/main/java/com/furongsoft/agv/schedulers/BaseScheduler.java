@@ -91,21 +91,25 @@ public abstract class BaseScheduler implements IScheduler {
     }
 
     @Override
-    synchronized public void onContainerArrived(String containerId, Site destination, String event) {
+    synchronized public boolean onContainerArrived(String containerId, Site destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
         if (site != null) {
             site.setContainerId(containerId);
             log(String.format("OnContainerArrived: container: %s, event: %s", containerId, event));
+            return true;
         }
+        return false;
     }
 
     @Override
-    synchronized public void onContainerLeft(String containerId, Site destination, String event) {
+    synchronized public boolean onContainerLeft(String containerId, Site destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
         if (site != null) {
             site.setContainerId(null);
             log(String.format("OnContainerLeft: container: %s, event: %s", containerId, event));
+            return false;
         }
+        return true;
     }
 
     /**

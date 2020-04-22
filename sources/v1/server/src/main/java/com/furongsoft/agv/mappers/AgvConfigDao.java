@@ -29,7 +29,7 @@ public interface AgvConfigDao extends BaseMapper<AgvConfig> {
 
     class DaoProvider {
         private static final String AGV_CONFIG_TABLE_NAME = AgvConfig.class.getAnnotation(TableName.class).value();
-        
+
         /**
          * 根据主键获取配置信息
          *

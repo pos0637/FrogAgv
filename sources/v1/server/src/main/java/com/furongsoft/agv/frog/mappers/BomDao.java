@@ -1,9 +1,9 @@
-package com.furongsoft.agv.mappers;
+package com.furongsoft.agv.frog.mappers;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.furongsoft.agv.entities.Bom;
-import com.furongsoft.agv.models.BomModel;
+import com.furongsoft.agv.frog.entities.Bom;
+import com.furongsoft.agv.frog.models.BomModel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -32,8 +32,8 @@ public interface BomDao extends BaseMapper<Bom> {
      * @param materialCode 物料编号
      * @return BOM详情
      */
-    @SelectProvider(type = DaoProvider.class, method = "selectBomByMaterialCode")
-    BomModel selectBomByMaterialCode(@Param("materialCode") String materialCode);
+    @SelectProvider(type = DaoProvider.class, method = "selectBomByMaterialUuid")
+    BomModel selectBomByMaterialUuid(@Param("materialCode") String materialCode);
 
     class DaoProvider {
         private static final String BOM_TABLE_NAME = Bom.class.getAnnotation(TableName.class).value();
@@ -58,7 +58,7 @@ public interface BomDao extends BaseMapper<Bom> {
          *
          * @return sql
          */
-        public String selectBomByMaterialCode() {
+        public String selectBomByMaterialUuid() {
             return new SQL() {
                 {
                     SELECT("t1.id,t1.material_code,t1.full_count,t1.version");

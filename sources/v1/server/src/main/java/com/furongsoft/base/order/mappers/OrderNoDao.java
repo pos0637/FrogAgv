@@ -20,7 +20,7 @@ public interface OrderNoDao extends BaseMapper<OrderNo> {
      * @return 最新编号
      */
     @SelectProvider(type = DaoProvider.class, method = "getNewOrderNo")
-    public Long getNewOrderNo(String orderCode);
+    Long getNewOrderNo(String orderCode);
 
     class DaoProvider {
 

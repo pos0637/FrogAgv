@@ -1,5 +1,6 @@
 package com.furongsoft.base.rbac.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -13,8 +14,7 @@ import javax.validation.constraints.Pattern;
  *
  * @author chenfuqian
  */
-@Getter
-@Setter
+@Data
 public class CarUser {
 
     @NotBlank(message = "user.name.notNull")

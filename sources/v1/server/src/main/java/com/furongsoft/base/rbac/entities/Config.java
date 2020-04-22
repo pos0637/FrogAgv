@@ -2,6 +2,7 @@ package com.furongsoft.base.rbac.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,8 +22,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "t_sys_config")
 @TableName("t_sys_config")
-@Getter
-@Setter
+@Data
 public class Config extends BaseEntity implements Serializable {
     /**
      * 索引

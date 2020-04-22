@@ -2,8 +2,7 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
@@ -18,10 +17,8 @@ import javax.validation.constraints.NotBlank;
  */
 @Entity
 @TableName("t_agv_material_box")
-@Getter
-@Setter
+@Data
 public class MaterialBox extends BaseEntity {
-
     @Id
     @GeneratedValue
     private long id;
@@ -32,6 +29,11 @@ public class MaterialBox extends BaseEntity {
     @Length(max = 255, message = "料框二维码不能超过255个字符")
     @NotBlank(message = "料框二维码不为空")
     private String qrCode;
+
+    /**
+     * 容器编码
+     */
+    private String code;
 
     /**
      * 料框名称

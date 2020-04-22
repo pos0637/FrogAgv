@@ -23,12 +23,12 @@ public class UUIDUtils {
      * @param number UUID数量
      * @return UUID数组
      */
-    public static String[] getUUID(int number){
-        if(number < 1){
+    public static String[] getUUID(int number) {
+        if (number < 1) {
             return null;
         }
         String[] retArray = new String[number];
-        for(int i=0;i<number;i++){
+        for (int i = 0; i < number; i++) {
             retArray[i] = getUUID();
         }
         return retArray;

@@ -34,6 +34,5 @@ public interface AcceptanceRecordDao extends BaseMapper<AcceptanceRecord> {
         }
 
 
-
     }
 }

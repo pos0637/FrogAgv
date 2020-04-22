@@ -2,6 +2,7 @@ package com.furongsoft.base.rbac.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -21,8 +22,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "t_sys_role")
 @TableName("t_sys_role")
-@Getter
-@Setter
+@Data
 public class Role extends BaseEntity implements Serializable {
     /**
      * 索引

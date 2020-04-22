@@ -1,11 +1,9 @@
 package com.furongsoft.agv.services;
 
 import com.furongsoft.agv.entities.WaveDetail;
-import com.furongsoft.agv.mappers.BomDao;
-import com.furongsoft.agv.mappers.BomDetailDao;
+import com.furongsoft.agv.frog.mappers.BomDao;
+import com.furongsoft.agv.frog.mappers.BomDetailDao;
 import com.furongsoft.agv.mappers.WaveDetailDao;
-import com.furongsoft.agv.models.BomDetailModel;
-import com.furongsoft.agv.models.BomModel;
 import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.base.misc.UUIDUtils;
 import com.furongsoft.base.services.BaseService;
@@ -126,16 +124,5 @@ public class WaveDetailService extends BaseService<WaveDetailDao, WaveDetail> {
                 insertBatch(insertDetails);
             }
         }
-    }
-
-    /**
-     * 通过波次信息获取BOM清单
-     *
-     * @param materialCode 原料UUID
-     * @return bom清单
-     */
-    public List<BomDetailModel> selectBomDetailsByWave(String materialCode) {
-        BomModel bomModel = bomDao.selectBomByMaterialCode(materialCode);
-        return bomDetailDao.selectBomDetailByBomId(bomModel.getId());
     }
 }

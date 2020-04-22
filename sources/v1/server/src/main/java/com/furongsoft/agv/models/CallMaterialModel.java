@@ -1,6 +1,7 @@
 package com.furongsoft.agv.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,7 @@ import java.util.Date;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class CallMaterialModel implements Serializable {
     /**
      * 主键
@@ -36,7 +36,7 @@ public class CallMaterialModel implements Serializable {
     private Integer acceptanceCount;
 
     /**
-     * 状态[0：未配送；1：配送中；2：已完成]
+     * 状态[1：未配送；2：配送中；3：已完成；4：已取消]
      */
     private int state;
 

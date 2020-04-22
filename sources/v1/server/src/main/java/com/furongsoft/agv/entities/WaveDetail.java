@@ -3,7 +3,9 @@ package com.furongsoft.agv.entities;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

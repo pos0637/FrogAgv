@@ -1,9 +1,9 @@
 package com.furongsoft.agv.schedulers.entities;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 区域

@@ -1,13 +1,13 @@
 package com.furongsoft.base.file.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * @author chenfuqian
  */
-@Getter
-@Setter
+@Data
 public class FileModel {
 
     private Long id;

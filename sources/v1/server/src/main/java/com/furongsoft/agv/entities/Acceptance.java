@@ -4,14 +4,10 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -44,7 +40,7 @@ public class Acceptance extends BaseEntity {
     private Date acceptanceTime;
 
     /**
-     * 班组唯一标识（青蛙工厂的uuid）
+     * 班组唯一标识（uuid）
      */
     private String teamId;
 

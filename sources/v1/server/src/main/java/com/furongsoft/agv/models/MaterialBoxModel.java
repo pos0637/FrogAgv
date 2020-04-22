@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,7 @@ import java.util.List;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class MaterialBoxModel implements Serializable {
     private long id;
 
@@ -20,6 +20,11 @@ public class MaterialBoxModel implements Serializable {
      * 料框二维码
      */
     private String qrCode;
+
+    /**
+     * 容器编码
+     */
+    private String code;
 
     /**
      * 料框名称

@@ -43,7 +43,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
      * 根据条件获取叫料列表（默认获取未完成的）
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
-     * @param state  状态[0：未配送；1：配送中；2：已完成]
+     * @param state  状态[1：未配送；2：配送中；3：已完成；4：已取消]
      * @param teamId 班组唯一标识
      * @param areaId 区域ID（产线ID）
      * @return 叫料列表
@@ -69,6 +69,16 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
      */
     @UpdateProvider(type = DaoProvider.class, method = "deleteCallMaterial")
     boolean deleteCallMaterial(@Param("id") long id);
+
+    /**
+     * 更新叫料状态
+     *
+     * @param id    叫料ID
+     * @param state 状态
+     * @return 是否成功
+     */
+    @UpdateProvider(type = DaoProvider.class, method = "updateCallMaterialState")
+    boolean updateCallMaterialState(@Param("id") long id, int state);
 
     class DaoProvider {
         private static final String CALL_MATERIAL_TABLE_NAME = CallMaterial.class.getAnnotation(TableName.class).value();
@@ -102,7 +112,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                 {
                     SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
-                    WHERE("t1.id = #{id} AND t1.state=0");
+                    WHERE("t1.id = #{id} AND t1.state=1");
                 }
             }.toString();
         }
@@ -126,7 +136,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t6 ON t1.area_id = t6.id");
                     WHERE("t1.enabled = 1 and t1.type=#{type} and t3.enabled=1 and t4.enabled=1");
                     if (null != param.get("state") && (int) param.get("state") == 0) {
-                        WHERE("t1.state <> 2");
+                        WHERE("t1.state <> 3 AND t1.state <>4");
                     } else if (null != param.get("state")) {
                         WHERE("t1.state = #{state}");
                     }
@@ -166,6 +176,21 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                     SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.wave_detail_code = #{waveDetailCode} AND t1.type = #{areaType} AND t1.enabled = 1");
+                }
+            }.toString();
+        }
+
+        /**
+         * 更新叫料状态
+         *
+         * @return sql
+         */
+        public String updateCallMaterialState() {
+            return new SQL() {
+                {
+                    UPDATE(CALL_MATERIAL_TABLE_NAME);
+                    SET("state=#{state}");
+                    WHERE("id=#{id}");
                 }
             }.toString();
         }

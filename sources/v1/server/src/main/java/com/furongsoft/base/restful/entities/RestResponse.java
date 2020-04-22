@@ -2,6 +2,7 @@ package com.furongsoft.base.restful.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.EntityModel;
@@ -12,8 +13,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author Alex
  */
-@Getter
-@Setter
+@Data
 public class RestResponse extends EntityModel {
     /**
      * HTTP状态码

@@ -1,6 +1,7 @@
 package com.furongsoft.base.entities;
 
 import com.baomidou.mybatisplus.plugins.Page;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,7 @@ import java.util.List;
  *
  * @author Alex
  */
-@Getter
-@Setter
+@Data
 public class PageRequest {
     /**
      * 页码

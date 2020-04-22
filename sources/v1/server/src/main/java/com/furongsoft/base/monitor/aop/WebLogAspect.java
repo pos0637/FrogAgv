@@ -36,7 +36,7 @@ public class WebLogAspect {
     /**
      * 操作方法类型
      */
-    private String[] types = new String[] { "add", "edit", "del", "login", "logout", "other" };
+    private String[] types = new String[]{"add", "edit", "del", "login", "logout", "other"};
 
     /**
      * 拦截对象

@@ -1,6 +1,7 @@
 package com.furongsoft.agv.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,7 @@ import java.util.List;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class WaveModel implements Serializable {
     /**
      * 主键
@@ -27,7 +27,7 @@ public class WaveModel implements Serializable {
     private String code;
 
     /**
-     * 班组唯一标识（青蛙工厂的uuid）
+     * 班组唯一标识（uuid）
      */
     private String teamId;
 

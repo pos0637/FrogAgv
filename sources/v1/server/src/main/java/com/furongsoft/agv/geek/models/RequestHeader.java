@@ -18,7 +18,7 @@ public class RequestHeader {
 
     private String warehouseCode;
 
-    private String channelId ;
+    private String channelId;
 
     private String userId;
 

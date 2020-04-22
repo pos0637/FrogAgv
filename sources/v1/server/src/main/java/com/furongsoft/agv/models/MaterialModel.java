@@ -1,7 +1,8 @@
 package com.furongsoft.agv.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -10,10 +11,10 @@ import java.io.Serializable;
  *
  * @author linyehai
  */
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MaterialModel implements Serializable {
-
     /**
      * 主键
      */
@@ -30,7 +31,25 @@ public class MaterialModel implements Serializable {
     private String name;
 
     /**
-     * 青蛙工厂唯一标识
+     * 唯一标识
      */
     private String uuid;
+
+    /**
+     * 数量
+     */
+    private int count;
+
+    /**
+     * 原料类型：[1：内包材；2：外包材；3：其它]
+     */
+    private int type;
+
+    public MaterialModel(long id, String name, String uuid, int count, int type) {
+        this.id = id;
+        this.name = name;
+        this.uuid = uuid;
+        this.count = count;
+        this.type = type;
+    }
 }

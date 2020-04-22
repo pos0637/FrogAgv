@@ -1,7 +1,12 @@
 package com.furongsoft.agv.services;
 
+import com.furongsoft.agv.devices.mappers.CallButtonDao;
+import com.furongsoft.agv.devices.model.CallButtonModel;
 import com.furongsoft.agv.entities.CallMaterial;
-import com.furongsoft.agv.mappers.*;
+import com.furongsoft.agv.mappers.AgvAreaDao;
+import com.furongsoft.agv.mappers.CallMaterialDao;
+import com.furongsoft.agv.mappers.WaveDao;
+import com.furongsoft.agv.mappers.WaveDetailDao;
 import com.furongsoft.agv.models.*;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.services.BaseService;
@@ -28,15 +33,17 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     private final AgvAreaDao agvAreaDao;
     private final WaveDao waveDao;
     private final WaveDetailDao waveDetailDao;
+    private final DeliveryTaskService deliveryTaskService;
 
     @Autowired
-    public CallMaterialService(CallMaterialDao callMaterialDao, CallButtonDao callButtonDao, AgvAreaDao agvAreaDao, WaveDao waveDao, WaveDetailDao waveDetailDao) {
+    public CallMaterialService(CallMaterialDao callMaterialDao, CallButtonDao callButtonDao, AgvAreaDao agvAreaDao, WaveDao waveDao, WaveDetailDao waveDetailDao, DeliveryTaskService deliveryTaskService) {
         super(callMaterialDao);
         this.callMaterialDao = callMaterialDao;
         this.callButtonDao = callButtonDao;
         this.agvAreaDao = agvAreaDao;
         this.waveDao = waveDao;
         this.waveDetailDao = waveDetailDao;
+        this.deliveryTaskService = deliveryTaskService;
     }
 
     /**
@@ -53,7 +60,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * 根据条件获取叫料列表（默认获取未完成的）
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
-     * @param state  状态[0：未配送；1：配送中；2：已完成]
+     * @param state  状态[1：未配送；2：配送中；3：已完成；4：已取消]
      * @param teamId 班组唯一标识
      * @param areaId 区域ID（产线ID）
      * @return 叫料列表
@@ -66,7 +73,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * 按条件查询配货任务
      *
      * @param type   叫料类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
-     * @param state  状态[0：未配送；1：配送中；2：已完成]
+     * @param state  状态[1：未配送；2：配送中；3：已完成；4：已取消]
      * @param teamId 班组唯一标识
      * @param areaId 区域ID（产线ID）
      * @return 配货任务列表
@@ -163,6 +170,17 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     }
 
     /**
+     * 更新叫料状态
+     *
+     * @param id    叫料ID
+     * @param state 状态
+     * @return 是否成功
+     */
+    public boolean updateCallMaterialState(long id, int state) {
+        return callMaterialDao.updateCallMaterialState(id, state);
+    }
+
+    /**
      * 按钮叫料 TODO 项目启动时，把按钮信息加载到内存中
      *
      * @param ipAddress
@@ -182,7 +200,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      *
      * @param callButtonModel 按钮对象
      */
-    private void callMaterial(CallButtonModel callButtonModel) {
+    public boolean callMaterial(CallButtonModel callButtonModel) {
         // 获取叫料产线
         AgvAreaModel callLine = agvAreaDao.selectParentAreaById(callButtonModel.getAreaId());
         // 获取叫料区域
@@ -247,10 +265,10 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                     insertDetails.add(callMaterial);
                 });
                 insertBatch(insertDetails);
-                return;
+                return true;
             }
         }
-        throw new BaseException("叫料失败，请重试");
+        return false;
     }
 
     /**
@@ -258,23 +276,20 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      *
      * @param callButtonModel 按钮对象
      */
-    private void backMaterialBox(CallButtonModel callButtonModel) {
+    public boolean backMaterialBox(CallButtonModel callButtonModel) {
         // 获取叫料产线
         AgvAreaModel callLine = agvAreaDao.selectParentAreaById(callButtonModel.getAreaId());
         // 获取叫料区域
         AgvAreaModel callArea = agvAreaDao.selectParentAreaById(callLine.getId());
+        DeliveryTaskModel deliveryTaskModel = new DeliveryTaskModel();
+        deliveryTaskModel.setStartSiteId(callButtonModel.getSiteId());
         if (callArea.getCode().equals("PRODUCT_FILLING")) {
-            // 灌装区：查找消毒间空库位
-            List<SiteDetailModel> siteDetailModels = agvAreaDao.selectSiteDetailsByAreaCode("XD_LOCATION", 0);
-            if (!CollectionUtils.isEmpty(siteDetailModels)) {
-                // TODO 发起点到点的配送任务
-            }
+            deliveryTaskModel.setType(2);
+            return deliveryTaskService.addDeliveryTask(deliveryTaskModel);
         } else if (callArea.getCode().equals("PRODUCT_PACKAGING")) {
-            // 包装区：查找包材仓空库位
-            List<SiteDetailModel> siteDetailModels = agvAreaDao.selectSiteDetailsByAreaCode("BC_BZ_LOCATION", 0);
-            if (!CollectionUtils.isEmpty(siteDetailModels)) {
-                // TODO 发起点到点的配送任务
-            }
+            deliveryTaskModel.setType(6);
+            return deliveryTaskService.addDeliveryTask(deliveryTaskModel);
         }
+        return false;
     }
 }

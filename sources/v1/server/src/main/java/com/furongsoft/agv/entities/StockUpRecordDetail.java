@@ -2,6 +2,7 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,7 @@ import javax.persistence.Id;
  */
 @Entity
 @TableName("t_agv_stock_up_record_detail")
-@Getter
-@Setter
+@Data
 public class StockUpRecordDetail extends BaseEntity {
 
     @Id

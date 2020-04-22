@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,7 @@ import java.util.List;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class SiteModel implements Serializable {
     private long id;
 

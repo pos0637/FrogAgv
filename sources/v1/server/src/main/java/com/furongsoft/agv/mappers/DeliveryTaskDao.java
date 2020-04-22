@@ -50,7 +50,7 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
     boolean deleteDeliveryTask(@Param("id") long id);
 
     class DaoProvider {
-        private static final String DELIVERY_TASK_MATERIAL_TABLE_NAME = DeliveryTask.class.getAnnotation(TableName.class).value();
+        private static final String DELIVERY_TASK_TABLE_NAME = DeliveryTask.class.getAnnotation(TableName.class).value();
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
 
         /**
@@ -61,8 +61,8 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String selectDeliveryTaskById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
-                    FROM(DELIVERY_TASK_MATERIAL_TABLE_NAME + " t1");
+                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
+                    FROM(DELIVERY_TASK_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
             }.toString();
@@ -76,8 +76,8 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String selectDeliveryTasksByConditions(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.task_no,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
-                    FROM(DELIVERY_TASK_MATERIAL_TABLE_NAME + " t1 ");
+                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
+                    FROM(DELIVERY_TASK_TABLE_NAME + " t1 ");
                     WHERE("t1.enabled = 1 ");
                     if (null != param.get("state")) {
                         WHERE("t1.state = #{state}");
@@ -99,7 +99,7 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String deleteDeliveryTask() {
             return new SQL() {
                 {
-                    UPDATE(DELIVERY_TASK_MATERIAL_TABLE_NAME);
+                    UPDATE(DELIVERY_TASK_TABLE_NAME);
                     SET("enable=0");
                     WHERE("id=#{id}");
                 }

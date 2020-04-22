@@ -41,7 +41,12 @@ public class CallMaterial extends BaseEntity {
     private int count;
 
     /**
-     * 状态[0：未配送；1：配送中；2：已完成；3：已取消]
+     * 验收数量
+     */
+    private int acceptanceCount;
+
+    /**
+     * 状态[1：未配送；2：配送中；3：已完成；4：已取消]
      */
     private int state;
 
@@ -89,7 +94,7 @@ public class CallMaterial extends BaseEntity {
     public CallMaterial(WaveDetailModel waveDetailModel) {
         this.materialId = waveDetailModel.getMaterialId();
         this.count = waveDetailModel.getCount();
-        this.state = 0;
+        this.state = 1;
         this.waveDetailCode = waveDetailModel.getCode();
         this.type = waveDetailModel.getAreaType();
         this.enabled = 1;

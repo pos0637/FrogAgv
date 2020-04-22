@@ -2,6 +2,7 @@ package com.furongsoft.base.rbac.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "t_sys_data_auth")
 @TableName("t_sys_data_auth")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 public class DataAuth implements Serializable {
 

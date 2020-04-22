@@ -1,5 +1,6 @@
 package com.furongsoft.agv.controllers;
 
+import com.furongsoft.agv.frog.services.BomService;
 import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.agv.models.WaveModel;
 import com.furongsoft.agv.services.WaveDetailService;
@@ -22,10 +23,12 @@ public class WaveController {
 
     private final WaveService waveService;
     private final WaveDetailService waveDetailService;
+    private final BomService bomService;
 
-    public WaveController(WaveService waveService, WaveDetailService waveDetailService) {
+    public WaveController(WaveService waveService, WaveDetailService waveDetailService, BomService bomService) {
         this.waveService = waveService;
         this.waveDetailService = waveDetailService;
+        this.bomService = bomService;
     }
 
     /**
@@ -166,6 +169,6 @@ public class WaveController {
      */
     @GetMapping("/waves/getBomDetails")
     public RestResponse selectBomDetailsByWave(@RequestParam String materialCode) {
-        return new RestResponse(HttpStatus.OK, null, waveDetailService.selectBomDetailsByWave(materialCode));
+        return new RestResponse(HttpStatus.OK, null, bomService.selectBomDetailsByMaterialUuid(materialCode));
     }
 }

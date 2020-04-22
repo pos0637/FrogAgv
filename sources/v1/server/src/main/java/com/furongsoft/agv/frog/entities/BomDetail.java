@@ -1,28 +1,30 @@
-package com.furongsoft.agv.entities;
+package com.furongsoft.agv.frog.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.furongsoft.agv.models.WaveModel;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Date;
 
 /**
- * BOM信息
+ * BOM清单信息
  *
  * @author linyehai
  */
 @Entity
-@TableName("t_agv_bom")
+@TableName("t_agv_bom_detail")
 @Data
-public class Bom extends BaseEntity {
+public class BomDetail extends BaseEntity {
     @Id
     @GeneratedValue
     private long id;
+
+    /**
+     * BOM主键
+     */
+    private long bomId;
 
     /**
      * 物料编码
@@ -32,12 +34,12 @@ public class Bom extends BaseEntity {
     /**
      * 满料车数量
      */
-    private int fullCount;
+    private int count;
 
     /**
-     * 版本号
+     * 类型[1：内包材；2：外包材；3：其它]
      */
-    private String version;
+    private int type;
 
     /**
      * 是否启用

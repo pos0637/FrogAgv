@@ -26,9 +26,10 @@ public class SiteService extends BaseService<SiteDao, Site> {
     private final MaterialBoxMaterialDao materialBoxMaterialDao;
     private final DeliveryTaskDao deliveryTaskDao;
     private final AgvAreaDao agvAreaDao;
+    private final SiteDetailDao siteDetailDao;
 
     @Autowired
-    public SiteService(SiteDao siteDao, StockUpRecordDao stockUpRecordDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao) {
+    public SiteService(SiteDao siteDao, StockUpRecordDao stockUpRecordDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao, SiteDetailDao siteDetailDao) {
         super(siteDao);
         this.siteDao = siteDao;
         this.stockUpRecordDao = stockUpRecordDao;
@@ -36,6 +37,7 @@ public class SiteService extends BaseService<SiteDao, Site> {
         this.materialBoxMaterialDao = materialBoxMaterialDao;
         this.deliveryTaskDao = deliveryTaskDao;
         this.agvAreaDao = agvAreaDao;
+        this.siteDetailDao = siteDetailDao;
     }
 
     /**
@@ -97,13 +99,75 @@ public class SiteService extends BaseService<SiteDao, Site> {
     }
 
     /**
-     * 查找灌装区生产线
+     * 查找生产区的生产线集合
      *
      * @return 区域信息集合
      */
     public List<AgvAreaModel> selectProductLinesByCode(String code) {
         AgvAreaModel product = agvAreaDao.selectAgvAreaByCodeAndParent("PRODUCT", 0);
-        AgvAreaModel filling = agvAreaDao.selectAgvAreaByCodeAndParent(code, product.getId());
-        return agvAreaDao.selectAreaByParentId(filling.getId(), null);
+        AgvAreaModel productArea = agvAreaDao.selectAgvAreaByCodeAndParent(code, product.getId());
+        return agvAreaDao.selectAreaByParentId(productArea.getId(), null);
+    }
+
+    /**
+     * 通过区域编号以及产线编号查找生产区库位
+     *
+     * @param areaCode 区域编号  "PRODUCT_FILLING"：灌装区；"PRODUCT_PACKAGING"：包装区
+     * @param lineCode 产线编号
+     * @return 指定的库位
+     */
+    public AgvAreaModel selectProductLocationByAreaCodeAndLineCode(String areaCode, String lineCode) {
+        AgvAreaModel product = agvAreaDao.selectAgvAreaByCodeAndParent("PRODUCT", 0);
+        AgvAreaModel productArea = agvAreaDao.selectAgvAreaByCodeAndParent(areaCode, product.getId());
+        return agvAreaDao.selectAgvAreaByCodeAndParent(lineCode, productArea.getId());
+    }
+
+    /**
+     * 通过区域编号查找空闲站点集合
+     *
+     * @param areaCode 区域编号
+     * @return 站点集合
+     */
+    public List<SiteDetailModel> selectIdleSiteDetailsByAreaCode(String areaCode) {
+        return siteDetailDao.selectIdleSiteByAreaCode(areaCode);
+    }
+
+    /**
+     * 通过区域ID查找库位
+     *
+     * @param areaId 区域ID
+     * @return 库位集合
+     */
+    public List<SiteModel> selectLocationsByAreaId(long areaId) {
+        return siteDao.selectLocationsByAreaId(areaId);
+    }
+
+    /**
+     * 通过站点ID和配送任务ID，绑定站点的当前配送任务
+     *
+     * @param siteId         站点ID
+     * @param deliveryTaskId 配送任务ID
+     */
+    public void addDeliveryTask(long siteId, long deliveryTaskId) {
+        siteDetailDao.addDeliveryTask(siteId, deliveryTaskId);
+    }
+
+    /**
+     * 通过站点ID移除配送任务
+     *
+     * @param siteId 站点ID
+     */
+    public void removeDeliveryTask(long siteId) {
+        siteDetailDao.removeDeliveryTask(siteId);
+    }
+
+    /**
+     * 通过站点ID查找料框
+     *
+     * @param siteId 站点ID
+     * @return 料框
+     */
+    public MaterialBoxModel selectMaterialBoxBySiteId(long siteId) {
+        return siteDetailDao.selectMaterialBoxBySiteId(siteId);
     }
 }

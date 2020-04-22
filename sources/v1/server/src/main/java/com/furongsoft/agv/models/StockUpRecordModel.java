@@ -1,7 +1,6 @@
 package com.furongsoft.agv.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,8 +10,7 @@ import java.util.List;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class StockUpRecordModel implements Serializable {
     private long id;
 
@@ -75,4 +73,19 @@ public class StockUpRecordModel implements Serializable {
      * 原料列表
      */
     private List<MaterialModel> materialModels;
+
+    /**
+     * 产品数量
+     */
+    private int count;
+
+    /**
+     * 产品ID
+     */
+    private Long materialId;
+
+    /**
+     * 原料类型
+     */
+    private int materialType;
 }

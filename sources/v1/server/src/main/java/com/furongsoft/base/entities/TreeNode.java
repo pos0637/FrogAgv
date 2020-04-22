@@ -1,6 +1,7 @@
 package com.furongsoft.base.entities;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,7 @@ import java.util.List;
  *
  * @author Alex
  */
-@Getter
-@Setter
+@Data
 public class TreeNode<T> {
     /**
      * 对象

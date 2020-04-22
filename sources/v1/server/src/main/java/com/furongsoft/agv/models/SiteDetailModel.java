@@ -1,8 +1,6 @@
 package com.furongsoft.agv.models;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -64,4 +62,24 @@ public class SiteDetailModel implements Serializable {
      * 区域名称
      */
     private String areaName;
+
+    /**
+     * 站点二维码
+     */
+    private String qrCode;
+
+    /**
+     * 站点类型[1：备货位；2：出货位；3：空车位；]
+     */
+    private Integer siteType;
+
+    /**
+     * 站点名称
+     */
+    private String name;
+
+    /**
+     * 站点编号
+     */
+    private String code;
 }

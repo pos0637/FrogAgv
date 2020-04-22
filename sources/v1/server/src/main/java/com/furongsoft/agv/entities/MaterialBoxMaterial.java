@@ -2,14 +2,11 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
 
 /**
  * 料框-物料信息
@@ -18,8 +15,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Entity
 @TableName("t_agv_material_box_material")
-@Getter
-@Setter
+@Data
 public class MaterialBoxMaterial extends BaseEntity {
 
     @Id
@@ -51,4 +47,11 @@ public class MaterialBoxMaterial extends BaseEntity {
      */
     private Integer enabled;
 
+    public MaterialBoxMaterial(long materialBoxId, long materialId, int count, int state) {
+        this.materialBoxId = materialBoxId;
+        this.materialId = materialId;
+        this.count = count;
+        this.state = state;
+        this.enabled = 1;
+    }
 }

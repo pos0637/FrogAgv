@@ -1,7 +1,6 @@
 package com.furongsoft.agv.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -10,8 +9,7 @@ import java.io.Serializable;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class DeliveryTaskModel implements Serializable {
     private long id;
 
@@ -19,6 +17,11 @@ public class DeliveryTaskModel implements Serializable {
      * 配送任务单号(全系统唯一,自动生成)
      */
     private String taskNo;
+
+    /**
+     * WCS任务索引
+     */
+    private String workflowWorkId;
 
     /**
      * 起始站点ID
@@ -55,4 +58,8 @@ public class DeliveryTaskModel implements Serializable {
      */
     private Integer enabled;
 
+    /**
+     * 生产线
+     */
+    private String productLine;
 }

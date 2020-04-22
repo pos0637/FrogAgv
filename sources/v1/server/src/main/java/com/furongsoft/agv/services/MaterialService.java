@@ -19,6 +19,7 @@ public class MaterialService extends BaseService<MaterialDao, Material> {
 
     private final MaterialDao materialDao;
 
+
     @Autowired
     public MaterialService(MaterialDao materialDao) {
         super(materialDao);

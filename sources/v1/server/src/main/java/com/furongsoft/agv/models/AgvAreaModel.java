@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,7 @@ import java.util.List;
  *
  * @author linyehai
  */
-@Setter
-@Getter
+@Data
 public class AgvAreaModel implements Serializable {
 
     /**
@@ -31,7 +31,7 @@ public class AgvAreaModel implements Serializable {
     private String name;
 
     /**
-     * 青蛙工厂唯一标识
+     * 唯一标识
      */
     private String uuid;
 

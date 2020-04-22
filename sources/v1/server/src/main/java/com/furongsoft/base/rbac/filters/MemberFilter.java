@@ -29,10 +29,7 @@ public class MemberFilter extends AccessControlFilter {
             String time2 = format.format(new Date());
             Date date1 = format.parse(time1);
             Date date2 = format.parse(time2);
-            if (date1.compareTo(date2) == -1) {
-                return false;
-            }
-            return true;
+            return date1.compareTo(date2) != -1;
         }
         return true;
     }

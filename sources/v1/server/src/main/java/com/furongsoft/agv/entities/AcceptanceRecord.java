@@ -32,7 +32,7 @@ public class AcceptanceRecord extends BaseEntity {
     private Date operationTime;
 
     /**
-     * 班组唯一标识（青蛙工厂的uuid）
+     * 班组唯一标识（uuid）
      */
     private String teamId;
 

@@ -3,6 +3,7 @@ package com.furongsoft.agv.entities;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,7 @@ import java.util.Date;
  */
 @Entity
 @TableName("t_agv_sales_return")
-@Getter
-@Setter
+@Data
 public class SalesReturn extends BaseEntity {
 
     @Id
@@ -48,7 +48,7 @@ public class SalesReturn extends BaseEntity {
     private Date returnTime;
 
     /**
-     * 班组唯一标识（青蛙工厂的uuid）
+     * 班组唯一标识（uuid）
      */
     private String teamId;
 

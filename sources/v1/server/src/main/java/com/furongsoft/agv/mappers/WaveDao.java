@@ -54,6 +54,17 @@ public interface WaveDao extends BaseMapper<Wave> {
     List<WaveModel> selectWaveModels(@Param("type") int type, @Param("teamId") String teamId, @Param("state") Integer state);
 
     /**
+     * 通过日期查询波次信息
+     *
+     * @param type      类型[1：灌装区；2：包装区]
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @return 波次信息
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectWaveModelsByDate")
+    List<WaveModel> selectWaveModelsByDate(@Param("type") Integer type, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    /**
      * 通过区域ID查找波次列表
      *
      * @param areaId 区域ID
@@ -116,7 +127,7 @@ public interface WaveDao extends BaseMapper<Wave> {
         }
 
         /**
-         * 通过波次ID获取波次信息
+         * 查找波次信息
          *
          * @return sql
          */
@@ -191,6 +202,28 @@ public interface WaveDao extends BaseMapper<Wave> {
                     UPDATE(WAVE_TABLE_NAME);
                     SET("enabled=0");
                     WHERE("code=#{code}");
+                }
+            }.toString();
+        }
+
+        public String selectWaveModelsByDate(final Map<String, Object> param) {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
+                            "t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                    FROM(WAVE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
+                    WHERE("t1.enabled=1 ");
+                    if (!StringUtils.isNullOrEmpty(param.get("startDate"))) {
+                        WHERE("t1.execution_time > #{startDate}");
+                    }
+                    if (!StringUtils.isNullOrEmpty(param.get("endDate"))) {
+                        WHERE("t1.execution_time < #{endDate}");
+                    }
+                    if (null != param.get("type")) {
+                        WHERE("t1.type=#{type}");
+                    }
                 }
             }.toString();
         }

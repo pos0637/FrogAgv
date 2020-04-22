@@ -1,4 +1,4 @@
-package com.furongsoft.agv.entities;
+package com.furongsoft.agv.devices.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
@@ -31,6 +31,11 @@ public class CallButton extends BaseEntity {
      * IP地址
      */
     private String ipAddress;
+
+    /**
+     * 端口号
+     */
+    private int port;
 
     /**
      * 按钮编号

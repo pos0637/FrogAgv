@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -150,13 +151,9 @@ public class UserController {
     @PostMapping("/users/batch")
     @RequiresAuthentication
     public RestResponse delUsers(@NonNull @RequestParam String delete) {
-        try {
-            delete = URLDecoder.decode(delete, "UTF-8");
-            List<Serializable> ids = JSON.parseArray(delete, Serializable.class);
-            userService.delUsers(ids);
-        } catch (UnsupportedEncodingException e) {
-            throw new BaseException.IllegalArgumentException();
-        }
+        delete = URLDecoder.decode(delete, StandardCharsets.UTF_8);
+        List<Serializable> ids = JSON.parseArray(delete, Serializable.class);
+        userService.delUsers(ids);
         return new RestResponse(HttpStatus.OK);
     }
 

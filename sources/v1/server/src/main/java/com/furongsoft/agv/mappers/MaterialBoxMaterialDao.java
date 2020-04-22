@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.furongsoft.agv.entities.Material;
 import com.furongsoft.agv.entities.MaterialBoxMaterial;
 import com.furongsoft.agv.models.MaterialBoxMaterialModel;
+import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -38,6 +39,24 @@ public interface MaterialBoxMaterialDao extends BaseMapper<MaterialBoxMaterial> 
     @SelectProvider(type = DaoProvider.class, method = "selectMaterialBoxMaterialByMaterialBoxId")
     List<MaterialBoxMaterialModel> selectMaterialBoxMaterialByMaterialBoxId(@Param("materialBoxId") long materialBoxId);
 
+    /**
+     * 通过料框ID删除料框-物料
+     *
+     * @param materialBoxId 料框ID
+     * @return 是否成功
+     */
+    @DeleteProvider(type = DaoProvider.class, method = "deleteMaterialBoxMaterialByMaterialId")
+    boolean deleteMaterialBoxMaterialByMaterialId(@Param("materialBoxId") long materialBoxId);
+
+//    /**
+//     * 批量新增料框-原料 TODO
+//     *
+//     * @param materialModels 原料列表
+//     * @return 是否成功
+//     */
+//    @InsertProvider(type = DaoProvider.class, method = "insertBatch")
+//    boolean insertBatch(@Param("materialModels") List<MaterialModel> materialModels);
+
     class DaoProvider {
         private static final String MATERIAL_BOX_MATERIAL_TABLE_NAME = MaterialBoxMaterial.class.getAnnotation(TableName.class).value();
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
@@ -70,6 +89,21 @@ public interface MaterialBoxMaterialDao extends BaseMapper<MaterialBoxMaterial> 
                     FROM(MATERIAL_BOX_MATERIAL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
                     WHERE("t1.material_box_id = #{materialBoxId} AND t1.enabled=1");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过料车ID删除料车-物料
+         *
+         * @return sql
+         */
+        public String deleteMaterialBoxMaterialByMaterialId() {
+            return new SQL() {
+                {
+                    UPDATE(MATERIAL_BOX_MATERIAL_TABLE_NAME);
+                    SET("enabled=0");
+                    WHERE("material_box_id=#{materialBoxId}");
                 }
             }.toString();
         }

@@ -3,8 +3,6 @@ package com.furongsoft.agv.entities;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,6 +25,11 @@ public class DeliveryTask extends BaseEntity {
      * 配送任务单号(全系统唯一,自动生成)
      */
     private String taskNo;
+
+    /**
+     * WCS任务索引
+     */
+    private String workflowWorkId;
 
     /**
      * 起始站点ID
@@ -62,4 +65,14 @@ public class DeliveryTask extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
+
+    public DeliveryTask(String taskNo, String workflowWorkId, long startSiteId, long endSiteId, long materialBoxId, String agvUuid, int state) {
+        this.taskNo = taskNo;
+        this.workflowWorkId = workflowWorkId;
+        this.startSiteId = startSiteId;
+        this.endSiteId = endSiteId;
+        this.materialBoxId = materialBoxId;
+        this.agvUuid = agvUuid;
+        this.state = state;
+    }
 }

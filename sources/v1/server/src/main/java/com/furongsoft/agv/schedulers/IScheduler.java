@@ -112,8 +112,9 @@ public interface IScheduler {
      * @param containerId 容器索引
      * @param destination 目的站点
      * @param event       事件消息
+     * @return 是否成功
      */
-    void onContainerArrived(String containerId, Site destination, String event);
+    boolean onContainerArrived(String containerId, Site destination, String event);
 
     /**
      * 容器离场事件
@@ -121,6 +122,7 @@ public interface IScheduler {
      * @param containerId 容器索引
      * @param destination 目的站点
      * @param event       事件消息
+     * @return 是否成功
      */
-    void onContainerLeft(String containerId, Site destination, String event);
+    boolean onContainerLeft(String containerId, Site destination, String event);
 }

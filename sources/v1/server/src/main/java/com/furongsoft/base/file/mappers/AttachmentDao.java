@@ -23,7 +23,7 @@ public interface AttachmentDao extends BaseMapper<Attachment> {
      * @return 全路径
      */
     @SelectProvider(type = DaoProvider.class, method = "selectFullPath")
-    public String selectFullPath(Serializable id);
+    String selectFullPath(Serializable id);
 
     class DaoProvider {
         /**

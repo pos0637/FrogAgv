@@ -1,27 +1,19 @@
-package com.furongsoft.agv.entities;
+package com.furongsoft.agv.frog.models;
 
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * BOM清单信息
  *
  * @author linyehai
  */
-@Entity
-@TableName("t_agv_bom_detail")
 @Data
-public class BomDetail extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private long id;
+public class BomDetailModel implements Serializable {
+    private Long id;
 
     /**
      * BOM主键
@@ -34,7 +26,7 @@ public class BomDetail extends BaseEntity {
     private String materialCode;
 
     /**
-     * 满料车数量
+     * 一个产品里几个当前原料
      */
     private int count;
 
@@ -47,4 +39,14 @@ public class BomDetail extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
+
+    /**
+     * 物料名称
+     */
+    private String materialName;
+
+    /**
+     * 物料ID
+     */
+    private Integer materialId;
 }

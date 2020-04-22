@@ -2,14 +2,14 @@ package com.furongsoft.base.misc;
 
 import com.furongsoft.base.rbac.entities.Config;
 import com.furongsoft.base.rbac.entities.Dictionary;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Getter
-@Setter
+@Data
 public class DataMemoryManager extends SingletonFactory {
 
     private static Config config;
@@ -17,7 +17,7 @@ public class DataMemoryManager extends SingletonFactory {
     private static List<Dictionary> dictionaryList;
 
     public static DataMemoryManager getInstance() {
-        return (DataMemoryManager) SingletonFactory.getInstance(DataMemoryManager.class);
+        return SingletonFactory.getInstance(DataMemoryManager.class);
     }
 
     public Config getConfig() {

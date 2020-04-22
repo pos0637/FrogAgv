@@ -1,7 +1,6 @@
-package com.furongsoft.agv.models;
+package com.furongsoft.agv.devices.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -10,8 +9,7 @@ import java.io.Serializable;
  *
  * @author linyehai
  */
-@Setter
-@Getter
+@Data
 public class CallButtonModel implements Serializable {
 
     /**
@@ -28,6 +26,11 @@ public class CallButtonModel implements Serializable {
      * IP地址
      */
     private String ipAddress;
+
+    /**
+     * 端口号
+     */
+    private int port;
 
     /**
      * 按钮编号

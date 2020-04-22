@@ -125,4 +125,8 @@ geekplus:
   language: zh_cn
   version: 1.0.0
 
+qr-code:
+  materialCarCode: LC
+  siteCode: DB
+
 env: dev

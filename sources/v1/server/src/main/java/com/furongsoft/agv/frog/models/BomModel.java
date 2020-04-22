@@ -1,6 +1,7 @@
-package com.furongsoft.agv.models;
+package com.furongsoft.agv.frog.models;
 
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +10,7 @@ import lombok.Setter;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class BomModel extends BaseEntity {
     private Long id;
 

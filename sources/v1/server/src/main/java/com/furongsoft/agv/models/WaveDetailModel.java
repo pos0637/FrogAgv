@@ -1,5 +1,6 @@
 package com.furongsoft.agv.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.io.Serializable;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class WaveDetailModel implements Serializable {
     /**
      * 主键

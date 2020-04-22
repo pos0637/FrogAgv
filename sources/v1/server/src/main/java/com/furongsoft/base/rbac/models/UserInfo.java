@@ -2,6 +2,7 @@ package com.furongsoft.base.rbac.models;
 
 import com.furongsoft.base.rbac.entities.Resource;
 import com.furongsoft.base.rbac.entities.Role;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,8 +15,7 @@ import java.util.List;
  *
  * @author chenfuqian
  */
-@Getter
-@Setter
+@Data
 public class UserInfo implements Serializable {
 
     /**

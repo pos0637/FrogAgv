@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -157,7 +158,7 @@ public class ExcelUtils {
             response.setCharacterEncoding("UTF-8");
             response.setHeader("content-Type", "application/vnd.ms-excel");
             response.setHeader("Content-Disposition",
-                    "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+                    "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
             workbook.write(response.getOutputStream());
         } catch (IOException e) {
             throw new BaseException(e.getMessage());

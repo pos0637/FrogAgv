@@ -1,6 +1,7 @@
 package com.furongsoft.agv.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,7 @@ import java.util.Date;
  *
  * @author linyehai
  */
-@Getter
-@Setter
+@Data
 public class AcceptanceRecordModel implements Serializable {
 
     /**
@@ -23,7 +23,7 @@ public class AcceptanceRecordModel implements Serializable {
     private Date operationTime;
 
     /**
-     * 班组唯一标识（青蛙工厂的uuid）
+     * 班组唯一标识（uuid）
      */
     private String teamId;
 

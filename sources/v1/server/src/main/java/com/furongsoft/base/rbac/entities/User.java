@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -24,8 +25,7 @@ import java.util.List;
 @Entity
 @Table(name = "t_sys_user")
 @TableName("t_sys_user")
-@Getter
-@Setter
+@Data
 public class User extends BaseEntity implements Serializable {
     /**
      * 索引

@@ -97,9 +97,6 @@ public class FileUtils {
             }
         }
 
-        if ((file != null) && (file.exists())) {
-            return true;
-        }
-        return false;
+        return (file != null) && (file.exists());
     }
 }
