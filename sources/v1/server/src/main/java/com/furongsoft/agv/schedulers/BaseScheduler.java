@@ -16,6 +16,11 @@ import java.util.*;
  */
 public abstract class BaseScheduler implements IScheduler {
     /**
+     * AGV调度管理器事件接口
+     */
+    protected ISchedulerNotification notification;
+
+    /**
      * 区域列表
      */
     protected List<Area> areas = new ArrayList<>();
@@ -26,8 +31,9 @@ public abstract class BaseScheduler implements IScheduler {
     protected List<Task> tasks = new LinkedList<>();
 
     @Override
-    synchronized public void initialize(Area[] areas) {
+    synchronized public void initialize(Area[] areas, ISchedulerNotification notification) {
         this.areas = Arrays.asList(areas);
+        this.notification = notification;
     }
 
     @Override

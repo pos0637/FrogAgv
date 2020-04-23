@@ -13,7 +13,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingStarted(String agvId, Task task);
+    void onMovingStarted(String agvId, Task task);
 
     /**
      * 搬运完成事件
@@ -21,7 +21,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingArrived(String agvId, Task task);
+    void onMovingArrived(String agvId, Task task);
 
     /**
      * 搬运暂停事件
@@ -29,7 +29,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingPaused(String agvId, Task task);
+    void onMovingPaused(String agvId, Task task);
 
     /**
      * 搬运等待事件
@@ -37,7 +37,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingWaiting(String agvId, Task task);
+    void onMovingWaiting(String agvId, Task task);
 
     /**
      * 搬运取消事件
@@ -45,7 +45,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingCancelled(String agvId, Task task);
+    void onMovingCancelled(String agvId, Task task);
 
     /**
      * 搬运失败事件
@@ -53,7 +53,7 @@ public interface ISchedulerNotification {
      * @param agvId AGV索引
      * @param task  任务
      */
-    void OnMovingFail(String agvId, Task task);
+    void onMovingFail(String agvId, Task task);
 
     /**
      * 容器进场事件
@@ -61,7 +61,7 @@ public interface ISchedulerNotification {
      * @param containerId 容器索引
      * @param target      目的站点
      */
-    void OnContainerArrived(String containerId, Site target);
+    void onContainerArrived(String containerId, Site target);
 
     /**
      * 容器离场事件
@@ -69,5 +69,5 @@ public interface ISchedulerNotification {
      * @param containerId 容器索引
      * @param target      目的站点
      */
-    void OnContainerLeft(String containerId, Site target);
+    void onContainerLeft(String containerId, Site target);
 }

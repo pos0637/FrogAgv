@@ -36,12 +36,12 @@ class GeekPlusTests {
 
     @Test
     void add_GZ1_To_GZ2_Task() {
-        scheduler.initialize(new Area[]{new Area("1", new ArrayList<>() {
+        scheduler.initialize(new Area[] { new Area("1", new ArrayList<>() {
             {
                 add(new com.furongsoft.agv.schedulers.entities.Site("GZ-1", null));
                 add(new com.furongsoft.agv.schedulers.entities.Site("GZ-2", null));
             }
-        })});
+        }) }, null);
 
         removeAllContainers();
 
@@ -82,6 +82,4 @@ class GeekPlusTests {
     void read_remote_button() {
         com.furongsoft.communication.modbusTcp.ModbusTcp.test();
     }
-
-
 }

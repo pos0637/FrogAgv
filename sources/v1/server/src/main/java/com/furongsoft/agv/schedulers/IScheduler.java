@@ -14,9 +14,10 @@ public interface IScheduler {
     /**
      * 初始化
      *
-     * @param areas 区域列表
+     * @param areas        区域列表
+     * @param notification AGV调度管理器事件接口
      */
-    void initialize(Area[] areas);
+    void initialize(Area[] areas, ISchedulerNotification notification);
 
     /**
      * 添加任务
