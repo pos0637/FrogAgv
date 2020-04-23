@@ -4,35 +4,34 @@ import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
+import com.furongsoft.agv.services.SiteService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 class GeekPlusTests {
     @Autowired
     private IScheduler scheduler;
 
-    @Test
-    void addContainers() {
-        Site site = new Site();
-        site.setCode("185");
-        scheduler.onContainerArrived("A000011", site, null);
+    @Autowired
+    private SiteService siteService;
 
-        site.setCode("412");
-        scheduler.onContainerArrived("A000012", site, null);
+    @BeforeEach
+    void test() {
+        removeAllContainers();
     }
 
-    @Test
-    void removeContainers() {
-        Site site = new Site();
-        site.setCode("185");
-        scheduler.onContainerLeft(null, site, null);
-
-        site.setCode("412");
-        scheduler.onContainerLeft(null, site, null);
+    /**
+     * 移除所有站点内容器
+     */
+    void removeAllContainers() {
+        List<Site> sites = siteService.selectList(null);
+        sites.forEach(site -> scheduler.onContainerLeft(null, site, null));
     }
 
     @Test
@@ -44,7 +43,7 @@ class GeekPlusTests {
             }
         })});
 
-        removeContainers();
+        removeAllContainers();
 
         Site site = new Site();
         site.setCode("185");
@@ -61,7 +60,7 @@ class GeekPlusTests {
 
     @Test
     void cancel_GZ1_To_GZ2_Task() {
-        removeContainers();
+        removeAllContainers();
 
         Site site = new Site();
         site.setCode("185");
@@ -81,9 +80,8 @@ class GeekPlusTests {
 
     @Test
     void read_remote_button() {
-//        IllegalFunctionException
-//        SocketTimeoutException
-//        NullPointerException
         com.furongsoft.communication.modbusTcp.ModbusTcp.test();
     }
+
+
 }
