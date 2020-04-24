@@ -2,6 +2,7 @@ package com.furongsoft.frogagv;
 
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.ISchedulerNotification;
 import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.services.SiteService;
@@ -21,8 +22,44 @@ class GeekPlusTests {
     @Autowired
     private SiteService siteService;
 
+    /**
+     * 初始化
+     */
     @BeforeEach
-    void test() {
+    void initialize() {
+        scheduler.initialize(null, new ISchedulerNotification() {
+            @Override
+            public void onMovingStarted(String agvId, Task task) {
+            }
+
+            @Override
+            public void onMovingArrived(String agvId, Task task) {
+            }
+
+            @Override
+            public void onMovingPaused(String agvId, Task task) {
+            }
+
+            @Override
+            public void onMovingWaiting(String agvId, Task task) {
+            }
+
+            @Override
+            public void onMovingCancelled(String agvId, Task task) {
+            }
+
+            @Override
+            public void onMovingFail(String agvId, Task task) {
+            }
+
+            @Override
+            public void onContainerArrived(String containerId, Site target) {
+            }
+
+            @Override
+            public void onContainerLeft(String containerId, Site target) {
+            }
+        });
         removeAllContainers();
     }
 
@@ -36,15 +73,6 @@ class GeekPlusTests {
 
     @Test
     void add_GZ1_To_GZ2_Task() {
-        scheduler.initialize(new Area[] { new Area("1", new ArrayList<>() {
-            {
-                add(new com.furongsoft.agv.schedulers.entities.Site("GZ-1", null));
-                add(new com.furongsoft.agv.schedulers.entities.Site("GZ-2", null));
-            }
-        }) }, null);
-
-        removeAllContainers();
-
         Site site = new Site();
         site.setCode("185");
         scheduler.onContainerArrived("A000011", site, null);
