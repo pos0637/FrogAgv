@@ -67,7 +67,7 @@ public class Scheduler extends BaseScheduler {
                 new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 2, null, null, 1, 1, 1,
                         new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, "GZ-2", 2, 1) }));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
-        if (response == null) {
+        if ((response == null) || (response.getData() == null)) {
             return null;
         }
 
@@ -83,12 +83,10 @@ public class Scheduler extends BaseScheduler {
                         1, 1, 1,
                         new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1) }));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
-        if (response == null) {
+        if ((response == null) || (response.getData() == null)) {
             return null;
         }
-        if (response.getData() == null) {
-            return null;
-        }
+
         return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
@@ -165,7 +163,7 @@ public class Scheduler extends BaseScheduler {
                         target.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
-        if (!response.getCode().equals("0")) {
+        if ((response == null) || (!response.getCode().equals("0"))) {
             return false;
         }
 
@@ -183,7 +181,7 @@ public class Scheduler extends BaseScheduler {
                         3, target.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
-        if (!response.getCode().equals("0")) {
+        if ((response == null) || (!response.getCode().equals("0"))) {
             return false;
         }
 
