@@ -8,6 +8,7 @@ import com.furongsoft.agv.frog.services.BomService;
 import com.furongsoft.agv.mappers.*;
 import com.furongsoft.agv.models.*;
 import com.furongsoft.base.misc.DateUtils;
+import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.services.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,29 +133,46 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
      * @return 是否成功
      */
     public boolean stockUp(StockUpRecordModel stockUpRecordModel) {
-        materialBoxMaterialDao.deleteMaterialBoxMaterialByMaterialId(stockUpRecordModel.getMaterialBoxId()); // 将料框上的原料移除
-        if (stockUpRecordModel.getMaterialId() != null && stockUpRecordModel.getMaterialId() > 0) {
+        // 料车
+        MaterialBoxModel materialBoxModel = selectMaterialBoxModelByQrCode(stockUpRecordModel.getMaterialCarName());
+        // 站点
+        SiteDetailModel siteDetailModel = selectSiteDetailModelByQrCode(stockUpRecordModel.getLandMaskName());
+        materialBoxMaterialDao.deleteMaterialBoxMaterialByMaterialId(materialBoxModel.getId()); // 将料框上的原料移除
+        if (!StringUtils.isNullOrEmpty(stockUpRecordModel.getMaterialName())) {
+            int materialType;
+            String materialUuid;
+            int endIndex;
+            if (stockUpRecordModel.getMaterialName().indexOf("_GZ") > 0) {
+                materialType = 1;
+                endIndex = stockUpRecordModel.getMaterialName().indexOf("_GZ");
+                materialUuid = stockUpRecordModel.getMaterialName().substring(0, endIndex);
+            } else {
+                materialType = 2;
+                endIndex = stockUpRecordModel.getMaterialName().indexOf("_BZ");
+                materialUuid = stockUpRecordModel.getMaterialName().substring(0, endIndex);
+            }
             // 通过产品查找出产品信息
-            MaterialModel materialModel = materialDao.selectMaterialById(stockUpRecordModel.getMaterialId());
+            MaterialModel materialModel = materialDao.selectMaterialByUuid(materialUuid);
             // 通过UUID查出BOM详情
+            BomModel bomModel = bomService.selectBomByMaterialUuid(materialUuid);
             List<BomDetailModel> bomDetailModels = bomService.selectBomDetailsByMaterialUuid(materialModel.getUuid());
             if (!CollectionUtils.isEmpty(bomDetailModels)) {
                 // 有原料列表
-                materialBoxDao.updateMaterialBoxState(stockUpRecordModel.getMaterialBoxId(), 1); // 设成有货
+                materialBoxDao.updateMaterialBoxState(materialBoxModel.getId(), 1); // 设成有货
                 bomDetailModels.forEach(bomDetailModel -> {
-                    if (bomDetailModel.getType() == stockUpRecordModel.getMaterialType()) {
-                        MaterialBoxMaterial materialBoxMaterial = new MaterialBoxMaterial(stockUpRecordModel.getMaterialBoxId(), bomDetailModel.getMaterialId(), stockUpRecordModel.getCount() * bomDetailModel.getCount(), 0);
+                    if (bomDetailModel.getType() == materialType) {
+                        MaterialBoxMaterial materialBoxMaterial = new MaterialBoxMaterial(materialBoxModel.getId(), bomDetailModel.getMaterialId(), bomModel.getFullCount() * bomDetailModel.getCount(), 0);
                         materialBoxMaterialDao.insert(materialBoxMaterial);
                     }
                 });
             } else {
                 // 无原料列表
-                materialBoxDao.updateMaterialBoxState(stockUpRecordModel.getMaterialBoxId(), 0); // 设成空车
+                materialBoxDao.updateMaterialBoxState(materialBoxModel.getId(), 0); // 设成空车
             }
         } else {
             // 无原料列表
-            materialBoxDao.updateMaterialBoxState(stockUpRecordModel.getMaterialBoxId(), 0); // 设成空车
+            materialBoxDao.updateMaterialBoxState(materialBoxModel.getId(), 0); // 设成空车
         }
-        return siteDetailDao.addMaterialBoxBySiteId(stockUpRecordModel.getSiteId(), stockUpRecordModel.getMaterialBoxId()); // 通过站点添加料框并设置站点为有货
+        return siteDetailDao.addMaterialBoxBySiteId(siteDetailModel.getSiteId(), materialBoxModel.getId()); // 通过站点添加料框并设置站点为有货
     }
 }

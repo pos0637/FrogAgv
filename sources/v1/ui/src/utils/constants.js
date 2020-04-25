@@ -51,10 +51,17 @@ export default {
     { value: 2, label: '有货' }
   ],
   // 配送状态
-  deliveryState: [
+  waveState: [
     { value: 0, label: '未配送' },
     { value: 1, label: '配送中' },
     { value: 2, label: '已完成' }
+  ],
+  // 配送状态
+  deliveryState: [
+    { value: 1, label: '未配送' },
+    { value: 2, label: '配送中' },
+    { value: 3, label: '已完成' },
+    { value: 4, label: '已取消' }
   ],
   // 配送任务状态
   deliveryTaskState: [

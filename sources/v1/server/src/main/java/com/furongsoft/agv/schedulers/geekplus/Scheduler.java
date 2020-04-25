@@ -83,6 +83,8 @@ public class Scheduler extends BaseScheduler {
                         1, 1, 1,
                         new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1) }));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
+        Tracker.info("*******************");
+        Tracker.info(response.toString());
         if ((response == null) || (response.getData() == null)) {
             return null;
         }
@@ -163,6 +165,8 @@ public class Scheduler extends BaseScheduler {
                         target.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
+        Tracker.info("*****=========*****");
+        Tracker.info(response.toString());
         if ((response == null) || (!response.getCode().equals("0"))) {
             return false;
         }
@@ -178,7 +182,7 @@ public class Scheduler extends BaseScheduler {
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId,
-                        3, target.getCode()));
+                        2, target.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
         if ((response == null) || (!response.getCode().equals("0"))) {

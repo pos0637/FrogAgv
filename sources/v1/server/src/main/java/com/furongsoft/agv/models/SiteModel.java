@@ -67,6 +67,11 @@ public class SiteModel implements Serializable {
     private String areaCode;
 
     /**
+     * 料车编号
+     */
+    private String materialBoxCode;
+
+    /**
      * 区域ID
      */
     private Long areaId;

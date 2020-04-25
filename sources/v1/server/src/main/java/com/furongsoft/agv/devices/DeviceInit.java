@@ -1,8 +1,13 @@
 package com.furongsoft.agv.devices;
 
+import com.furongsoft.agv.devices.listeners.ButtonBoxRead;
+import com.furongsoft.agv.devices.listeners.ButtonBoxWrite;
+import com.furongsoft.agv.devices.listeners.LightOff;
 import com.furongsoft.agv.devices.model.ButtonBoxModel;
 import com.furongsoft.agv.devices.services.CallButtonService;
+import com.furongsoft.agv.services.CallMaterialService;
 import com.furongsoft.base.exceptions.BaseException;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -19,10 +24,12 @@ import java.util.concurrent.Executors;
 @Component
 public class DeviceInit implements CommandLineRunner {
     private final CallButtonService callButtonService;
+    private final CallMaterialService callMaterialService;
 
     @Autowired
-    public DeviceInit(CallButtonService callButtonService) {
+    public DeviceInit(CallButtonService callButtonService, CallMaterialService callMaterialService) {
         this.callButtonService = callButtonService;
+        this.callMaterialService = callMaterialService;
     }
 
     @Override
@@ -39,13 +46,13 @@ public class DeviceInit implements CommandLineRunner {
         DeviceManager.getInstance().addButtonBoxes(buttonBoxes);
         //
         ExecutorService pool = Executors.newFixedThreadPool(10);
-//        if (!CollectionUtils.isEmpty(buttonBoxes)) {
-//            buttonBoxes.forEach(buttonBoxModel -> {
-//                pool.submit(new ButtonBoxRead(buttonBoxModel));
-//            });
-//        }
-//        pool.submit(new ButtonBoxWrite());
-//        pool.submit(new LightOff());
+        if (!CollectionUtils.isEmpty(buttonBoxes)) {
+            buttonBoxes.forEach(buttonBoxModel -> {
+                pool.submit(new ButtonBoxRead(buttonBoxModel));
+            });
+        }
+        pool.submit(new ButtonBoxWrite(callMaterialService));
+        pool.submit(new LightOff());
 
     }
 }

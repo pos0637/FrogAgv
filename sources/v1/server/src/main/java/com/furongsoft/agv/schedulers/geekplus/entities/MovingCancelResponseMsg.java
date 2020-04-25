@@ -30,4 +30,17 @@ public class MovingCancelResponseMsg {
      * 回调应答代码，成功：0，失败：非0
      */
     private String code;
+    /**
+     * 返回失败和成功
+     */
+    private ResponseData[] data;
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ResponseData {
+        /**
+         * 搬运系统任务id
+         */
+        private String workflowWorkId;
+    }
 }

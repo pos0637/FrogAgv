@@ -70,4 +70,20 @@ public interface ISchedulerNotification {
      * @param target      目的站点
      */
     void onContainerLeft(String containerId, Site target);
+
+    /**
+     * 小车接单回调
+     *
+     * @param workflowWorkId 搬运系统任务ID
+     * @param robotId        小车唯一标识
+     */
+    void onAcceptTask(String workflowWorkId, String robotId);
+
+    /**
+     * 取走容器回调
+     *
+     * @param workflowWorkId 搬运系统任务ID
+     * @param robotId        小车唯一标识
+     */
+    void onTakeAway(String workflowWorkId, String robotId);
 }

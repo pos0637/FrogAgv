@@ -96,6 +96,15 @@ public interface SiteDetailDao extends BaseMapper<SiteDetail> {
     @UpdateProvider(type = DaoProvider.class, method = "addMaterialBoxBySiteId")
     boolean addMaterialBoxBySiteId(@Param("siteId") long siteId, @Param("materialBoxId") long materialBoxId);
 
+    /**
+     * 通过站点ID移除料框，并设置为空闲
+     *
+     * @param siteId 站点ID
+     * @return 是否成功
+     */
+    @UpdateProvider(type = DaoProvider.class, method = "removeMaterialBox")
+    boolean removeMaterialBox(@Param("siteId") long siteId);
+
     class DaoProvider {
         private static final String SITE_DETAIL_TABLE_NAME = SiteDetail.class.getAnnotation(TableName.class).value();
         private static final String AREA_SITE_TABLE_NAME = "t_agv_area_site";
@@ -223,6 +232,21 @@ public interface SiteDetailDao extends BaseMapper<SiteDetail> {
                 {
                     UPDATE(SITE_DETAIL_TABLE_NAME);
                     SET("material_box_id=#{materialBoxId}", "state=2");
+                    WHERE("site_id=#{siteId}");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过站点ID移除料框，并设置为空闲
+         *
+         * @return sql
+         */
+        public String removeMaterialBox() {
+            return new SQL() {
+                {
+                    UPDATE(SITE_DETAIL_TABLE_NAME);
+                    SET("material_box_id=null", "state=0");
                     WHERE("site_id=#{siteId}");
                 }
             }.toString();

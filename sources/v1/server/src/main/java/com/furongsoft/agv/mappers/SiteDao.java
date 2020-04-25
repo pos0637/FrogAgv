@@ -3,6 +3,7 @@ package com.furongsoft.agv.mappers;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.furongsoft.agv.entities.AgvArea;
+import com.furongsoft.agv.entities.MaterialBox;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.entities.SiteDetail;
 import com.furongsoft.agv.models.SiteModel;
@@ -48,10 +49,29 @@ public interface SiteDao extends BaseMapper<Site> {
     @SelectProvider(type = DaoProvider.class, method = "selectLocationsByAreaId")
     List<SiteModel> selectLocationsByAreaId(@Param("areaId") Long areaId);
 
+    /**
+     * 通过编码查找站点信息
+     *
+     * @param code 站点编码
+     * @return 站点信息
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectSiteModelByCode")
+    SiteModel selectSiteModelByCode(String code);
+
+    /**
+     * 通过类型查找区域
+     *
+     * @param type 区域类型
+     * @return 区域列表
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectAreaByType")
+    List<AgvArea> selectAreaByType(@Param("type") int type);
+
     class DaoProvider {
         private static final String SITE_TABLE_NAME = Site.class.getAnnotation(TableName.class).value();
         private static final String AGV_AREA_TABLE_NAME = AgvArea.class.getAnnotation(TableName.class).value();
         private static final String SITE_DETAIL_TABLE_NAME = SiteDetail.class.getAnnotation(TableName.class).value();
+        private static final String MATERIAL_BOX_TABLE_NAME = MaterialBox.class.getAnnotation(TableName.class).value();
         private static final String AGV_AREA_SITE_TABLE_NAME = "t_agv_area_site";
 
         /**
@@ -99,14 +119,40 @@ public interface SiteDao extends BaseMapper<Site> {
         public String selectLocationsByAreaId() {
             return new SQL() {
                 {
-                    SELECT("T1.id,T1.qr_code,T1.location_x,T1.location_y,T1.location_z,T1.type,T1.name,T1.code");
-                    FROM(SITE_TABLE_NAME + " T1");
-                    LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " T2 ON T1.id = T2.site_id ");
-                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " T3 ON T3.id = T2.area_id");
-                    WHERE("T1.enabled=1 AND T3.id=#{areaId}");
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t5.code AS materialBoxCode");
+                    FROM(SITE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.site_id ");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t3.id = t2.area_id");
+                    LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t4 ON t4.site_id = t1.id");
+                    RIGHT_OUTER_JOIN(MATERIAL_BOX_TABLE_NAME + " t5 ON t5.id = t4.material_box_id");
+                    WHERE("t1.enabled=1 AND t3.id=#{areaId}");
                 }
             }.toString();
         }
 
+        public String selectSiteModelByCode() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code");
+                    FROM(SITE_TABLE_NAME + " t1");
+                    WHERE("");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过类型查找区域
+         *
+         * @return sql
+         */
+        public String selectAreaByType() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.parent_id,t1.type,t1.name,t1.code");
+                    FROM(AGV_AREA_TABLE_NAME + " t1");
+                    WHERE("t1.enabled=1 AND t1.type=#{type}");
+                }
+            }.toString();
+        }
     }
 }

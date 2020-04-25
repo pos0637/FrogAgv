@@ -199,6 +199,7 @@ export default {
     cancel: '取 消',
     confirm: '确 定',
     send: '配 送',
+    turnBack: '退 回',
     roleTransfer: '分配角色',
     permissionTransfer: '分配权限',
     resourceTransfer: '分配资源',

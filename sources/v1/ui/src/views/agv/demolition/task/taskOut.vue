@@ -60,7 +60,18 @@
 
     <div slot="footer" class="dialog-footer" align="center">
       <el-button @click="toggleShow" class="dialog-cancel-btn">{{$t('table.cancel')}}</el-button>
-      <el-button type="primary" @click="updateData" class="dialog-update-btn">{{$t('table.send')}}</el-button>
+      <el-button
+        :disabled="this.formmatDeliverGoodsState()"
+        type="primary"
+        @click="deliverGoods"
+        class="dialog-update-btn"
+      >{{$t('table.send')}}</el-button>
+      <el-button
+        :disabled="this.formmatTurnBackState()"
+        type="primary"
+        @click="turnBack"
+        class="dialog-update-btn"
+      >{{$t('table.turnBack')}}</el-button>
     </div>
   </div>
 </template>
@@ -100,10 +111,86 @@ export default {
       toggleShow() {
         this.$emit('toggleShow')
       },
-      // 修改信息
-      updateData() {
-        console.log('updateData>>>>>>>>>>>')
-        this.$emit('toggleShow')
+      // 发货
+      deliverGoods() {
+        const info = this.info
+        if (isEmpty(info.materialBoxId) || isEmpty(info.materialBoxModel)) {
+          return
+        }
+        if (info.materialBoxModel.state != Constants.materialBoxState[1].value) {
+          return
+        }
+        const sendItem = {
+          startSiteId: info.id,
+          materialBoxId: info.materialBoxId,
+          type: 7
+        }
+        request({
+          url: '/agv/delivery/addDeliveryTask',
+          method: 'POST',
+          data: sendItem
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.getSiteInfo()
+              this.reloadParent()
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close()
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
+      },
+      formmatDeliverGoodsState() {
+        const info = this.info
+        if (isEmpty(info.materialBoxId) || isEmpty(info.materialBoxModel)) {
+          return true
+        }
+        // 如果有料框，并且料框有货
+        if (info.materialBoxModel.state != Constants.materialBoxState[1].value) {
+          return true
+        }
+        return false
+      },
+      // 退回
+      turnBack() {
+        const info = this.info
+        if (isEmpty(info.materialBoxId) || isEmpty(info.materialBoxModel)) {
+          return
+        }
+        const sendItem = {
+          startSiteId: info.id,
+          materialBoxId: info.materialBoxId,
+          type: 4
+        }
+        request({
+          url: '/agv/delivery/addDeliveryTask',
+          method: 'POST',
+          data: sendItem
+        })
+          .then(response => {
+            if (response.errno === 0) {
+              this.getSiteInfo()
+              this.reloadParent()
+              // 如果遮罩层存在
+              if (!isEmpty(this.load)) {
+                this.load.close()
+              }
+            }
+          })
+          .catch(_ => {
+            this.load = this.showErrorMessage('服务器请求失败')
+          })
+      },
+      formmatTurnBackState() {
+        const info = this.info
+        if (isEmpty(info.materialBoxId)) {
+          return true
+        }
+        return false
       },
       getSiteInfo() {
         request({
@@ -111,7 +198,6 @@ export default {
           method: 'GET'
         })
           .then(response => {
-            console.log('*******:', response)
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
                 this.info = response.data
@@ -162,6 +248,10 @@ export default {
         } else {
           this.datas = []
         }
+      },
+      // 刷新父级
+      reloadParent() {
+        this.$emit('reloadParent')
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {

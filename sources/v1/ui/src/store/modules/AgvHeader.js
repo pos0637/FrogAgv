@@ -9,7 +9,6 @@ const AgvHeader = {
   },
   actions: {
     updateTitle({ commit, state }, title) {
-      console.log('updateTitle>>>>>>>>>>>>>>>>>>>>>>')
       commit('UPDATE_TITLE', title)
     }
   }

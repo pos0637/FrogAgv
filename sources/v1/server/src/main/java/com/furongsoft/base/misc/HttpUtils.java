@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,6 +77,66 @@ public class HttpUtils {
             return null;
         } catch (IOException e) {
             Tracker.error(e);
+            return null;
+        }
+    }
+
+    /**
+     * GET请求
+     *
+     * @param url     资源地址
+     * @param headers 头部数据
+     * @param params  请求参数
+     * @param clazz   类型
+     * @return 结果
+     */
+    public static <T> T getJson(String url, Map<String, String> headers, String params, Class<T> clazz) {
+        if (headers == null) {
+            headers = new LinkedHashMap<>();
+        }
+
+        headers.put("Accept", "application/json");
+        headers.put("Content-type", "application/json");
+        headers.put("charset", "utf-8");
+
+        return get(url, headers, params, clazz);
+    }
+
+    /**
+     * GET请求
+     *
+     * @param url     资源地址
+     * @param headers 头部数据
+     * @param params  请求参数
+     * @param clazz   类型
+     * @return 结果
+     */
+    public static <T> T get(String url, Map<String, String> headers, String params, Class<T> clazz) {
+        try {
+            URL url1 = new URL(url + "?" + params);
+            URI uri = new URI(url1.getProtocol(), url1.getHost()+":"+url1.getPort(), url1.getPath(), url1.getQuery(), null);
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(uri);
+//        HttpGet httpGet = new HttpGet(url + "?" + params);
+            if (headers != null) {
+                Set<String> keySet = headers.keySet();
+                for (String s : keySet) {
+                    httpGet.addHeader(s, headers.get(s));
+                }
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            HttpEntity httpEntity = httpResponse.getEntity();
+            if (httpEntity != null) {
+                String result = EntityUtils.toString(httpEntity, "utf-8");
+                return mapper.readValue(result, clazz);
+            }
+
+            return null;
+        } catch (IOException | URISyntaxException e) {
+            Tracker.error(e);
+            e.printStackTrace();
             return null;
         }
     }

@@ -52,7 +52,7 @@ public class ButtonBoxWrite implements Runnable {
                                 CallButtonModel callButtonModel = buttonBoxModel.getCallButtonModelByButtonCode(taskModel.getButtonNo());
                                 boolean executeSuccess = false;
                                 if (callButtonModel.getCode().indexOf("CALL") > 0) {
-                                    // 执行叫料
+                                    // 执行叫料 TODO Could not open JPA EntityManager for transaction; nested exception is java.lang.IllegalStateException: EntityManagerFactory is closed
                                     executeSuccess = callMaterialService.callMaterial(callButtonModel);
                                     Tracker.warn("执行" + callButtonModel.getName() + "的逻辑,并将编号" + callButtonModel.getButtonCode() + "设置为false。");
                                 } else if (callButtonModel.getCode().indexOf("BACK") > 0) {
@@ -89,7 +89,9 @@ public class ButtonBoxWrite implements Runnable {
 
                 });
             } catch (Exception e) {
+                Tracker.error(e.getCause());
                 Tracker.error("========ButtonBoxWrite==========");
+                e.printStackTrace();
             }
         }
     }

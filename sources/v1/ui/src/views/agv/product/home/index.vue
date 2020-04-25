@@ -286,7 +286,7 @@ export default {
       // 格式化状态
       formateState(waveState) {
         let stateName = ''
-        Constants.deliveryState.forEach(item => {
+        Constants.waveState.forEach(item => {
           if (item.value === waveState) {
             stateName = item.label
           }

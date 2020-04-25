@@ -310,4 +310,35 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
             callMaterialDao.updateCallMaterialState(callMaterialModel.getId(), state);
         });
     }
+
+    /**
+     * 通过WCS的任务ID查找配送任务
+     *
+     * @param workflowWorkId wcs任务ID
+     * @return 配送任务
+     */
+    public DeliveryTaskModel selectDeliveryTaskModelByWorkflowWorkId(String workflowWorkId) {
+        return deliveryTaskDao.selectDeliveryTaskModelByWorkflowWorkId(workflowWorkId);
+    }
+
+    /**
+     * 通过ID对任务状态进行修改
+     *
+     * @param id    任务ID
+     * @param state 任务状态
+     * @return 是否成功
+     */
+    public void updateStateById(long id, int state) {
+        deliveryTaskDao.updateStateById(id, state);
+    }
+
+    /**
+     * 通过WCS任务ID修改机器人
+     *
+     * @param workflowWorkId WCS任务ID
+     * @param robotId        机器人
+     */
+    public void updateRobotByWorkflowWorkId(String workflowWorkId, String robotId) {
+        deliveryTaskDao.updateRobotByWorkflowWorkId(workflowWorkId, robotId);
+    }
 }

@@ -58,7 +58,7 @@
       :title="taskOutPositionName"
       class="dialog-transfer"
     >
-      <TaskOut :bom="taskOutBom" @toggleShow="toggleShow"></TaskOut>
+      <TaskOut :bom="taskOutBom" @toggleShow="toggleShow" @reloadParent="loadingInfo"></TaskOut>
     </el-dialog>
   </div>
 </template>
@@ -118,7 +118,6 @@ export default {
           }
         })
           .then(response => {
-            console.log(response, '------')
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
                 this.sites = response.data
@@ -138,7 +137,8 @@ export default {
           url: '/agv/callMaterials/distributionTasks',
           method: 'GET',
           params: {
-            type: 3
+            type: 3,
+            state: 0
           }
         })
           .then(response => {

@@ -88,4 +88,19 @@ public class StockUpRecordModel implements Serializable {
      * 原料类型
      */
     private int materialType;
+
+    /**
+     * 产品码
+     */
+    private String materialName;
+
+    /**
+     * 料车码
+     */
+    private String materialCarName;
+
+    /**
+     * 地标码
+     */
+    private String landMaskName;
 }

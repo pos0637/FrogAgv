@@ -222,10 +222,15 @@
             <version>4.5.12</version>
         </dependency>
 
+        <!--    ModBus    -->
         <dependency>
             <groupId>com.infiniteautomation</groupId>
             <artifactId>modbus4j</artifactId>
             <version>3.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 

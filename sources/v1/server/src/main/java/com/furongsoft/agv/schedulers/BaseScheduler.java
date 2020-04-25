@@ -32,7 +32,11 @@ public abstract class BaseScheduler implements IScheduler {
 
     @Override
     synchronized public void initialize(Area[] areas, ISchedulerNotification notification) {
-        this.areas = Arrays.asList(areas);
+        if (null == areas) {
+            this.areas = new ArrayList<>();
+        } else {
+            this.areas = Arrays.asList(areas);
+        }
         this.notification = notification;
     }
 

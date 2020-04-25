@@ -1,5 +1,6 @@
 package com.furongsoft.agv.services;
 
+import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.mappers.*;
 import com.furongsoft.agv.models.*;
@@ -162,6 +163,26 @@ public class SiteService extends BaseService<SiteDao, Site> {
     }
 
     /**
+     * 通过站点添加料框,并将站点设置为有货状态
+     *
+     * @param siteId        站点ID
+     * @param materialBoxId 料框ID
+     * @return 是否成功
+     */
+    public void addMaterialBox(long siteId, long materialBoxId) {
+        siteDetailDao.addMaterialBoxBySiteId(siteId, materialBoxId);
+    }
+
+    /**
+     * 通过站点ID移除料框，并设置为空闲
+     *
+     * @param siteId 站点ID
+     */
+    public void removeMaterialBox(long siteId) {
+        siteDetailDao.removeMaterialBox(siteId);
+    }
+
+    /**
      * 通过站点ID查找料框
      *
      * @param siteId 站点ID
@@ -169,5 +190,25 @@ public class SiteService extends BaseService<SiteDao, Site> {
      */
     public MaterialBoxModel selectMaterialBoxBySiteId(long siteId) {
         return siteDetailDao.selectMaterialBoxBySiteId(siteId);
+    }
+
+    /**
+     * 通过编码查找站点信息
+     *
+     * @param code 站点编码
+     * @return 站点信息
+     */
+    public SiteModel selectSiteModelByCode(String code) {
+        return siteDao.selectSiteModelByCode(code);
+    }
+
+    /**
+     * 通过类型查找区域
+     *
+     * @param type 区域类型 8：库位区
+     * @return 区域列表
+     */
+    public List<AgvArea> selectAgvAreasByType(int type) {
+        return siteDao.selectAreaByType(type);
     }
 }
