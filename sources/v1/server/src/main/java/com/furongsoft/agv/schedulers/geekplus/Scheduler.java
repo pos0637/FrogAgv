@@ -1,8 +1,13 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.agv.schedulers.BaseScheduler;
+import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
@@ -11,15 +16,16 @@ import com.furongsoft.agv.schedulers.geekplus.entities.MovingRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingResponseMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
+import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.entities.RestResponse;
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/agv")
 public class Scheduler extends BaseScheduler {
+    @Autowired
+    private SiteService siteService;
+
     @Value("${geekplus.url}")
     private String url;
 
@@ -57,6 +66,23 @@ public class Scheduler extends BaseScheduler {
 
     @Value("${geekplus.version}")
     private String version;
+
+    @Override
+    synchronized public void initialize() {
+        List<AgvArea> agvAreas = siteService.selectAgvAreasByType(8);
+        List<Area> areas = new ArrayList<Area>();
+        agvAreas.forEach(agvArea -> {
+            List<SiteModel> sites = siteService.selectLocationsByAreaId(agvArea.getId());
+            List<com.furongsoft.agv.schedulers.entities.Site> siteList = new ArrayList<com.furongsoft.agv.schedulers.entities.Site>();
+            sites.forEach(siteModel -> {
+                siteList.add(new com.furongsoft.agv.schedulers.entities.Site(siteModel.getCode(),
+                        siteModel.getMaterialBoxCode()));
+            });
+            areas.add(new Area(agvArea.getCode(), siteList));
+        });
+
+        super.initialize(areas, null);
+    }
 
     @Override
     public Task addTask(Site source, AgvArea destination) {
@@ -109,14 +135,14 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
-    public boolean onContainerArrived(String containerId, Site destination, String event) {
+    public boolean onContainerArrived(String containerId, String destination, String event) {
         // 不允许在已有容器的站点内添加容器
-        if (hasContainer(destination.getCode())) {
+        if (hasContainer(destination)) {
             return false;
         }
 
         // 不允许在已有任务的目的站点内添加容器
-        if (getTaskByDestination(destination.getCode()).isPresent()) {
+        if (getTaskByDestination(destination).isPresent()) {
             return false;
         }
 
@@ -124,7 +150,7 @@ public class Scheduler extends BaseScheduler {
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 2,
-                        destination.getCode()));
+                        destination));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
         if ((response == null) || (!response.getCode().equals("0"))) {
@@ -135,12 +161,12 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
-    public boolean onContainerLeft(String containerId, Site destination, String event) {
+    public boolean onContainerLeft(String containerId, String destination, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId,
-                        2, destination.getCode()));
+                        2, destination));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
         if ((response == null) || (!response.getCode().equals("0"))) {
@@ -148,11 +174,6 @@ public class Scheduler extends BaseScheduler {
         }
 
         return super.onContainerLeft(containerId, destination, event);
-    }
-
-    @GetMapping("/test")
-    public String foo() {
-        return "Hello, world!";
     }
 
     /**

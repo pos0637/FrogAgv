@@ -2,19 +2,10 @@ package com.furongsoft.frogagv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.agv.schedulers.IScheduler;
-import com.furongsoft.agv.schedulers.ISchedulerNotification;
-import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
-import com.furongsoft.agv.services.SiteService;
-import com.furongsoft.base.misc.Tracker;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GeekPlusTests {
+public class GeekPlusTests {
     @Autowired
     private IScheduler scheduler;
-
-    @Autowired
-    private SiteService siteService;
 
     private Site site1;
     private Site site2;
@@ -42,69 +30,8 @@ class GeekPlusTests {
      */
     @BeforeEach
     void initialize() {
-        List<AgvArea> agvAreas = siteService.selectAgvAreasByType(8);
-        List<Area> areas = new ArrayList<Area>();
-        agvAreas.forEach(agvArea -> {
-            List<SiteModel> sites = siteService.selectLocationsByAreaId(agvArea.getId());
-            List<com.furongsoft.agv.schedulers.entities.Site> siteList = new ArrayList<com.furongsoft.agv.schedulers.entities.Site>();
-            sites.forEach(siteModel -> {
-                siteList.add(new com.furongsoft.agv.schedulers.entities.Site(siteModel.getCode(),
-                        siteModel.getMaterialBoxCode()));
-            });
-            areas.add(new Area(agvArea.getCode(), siteList));
-        });
-
-        scheduler.initialize((Area[]) areas.toArray(new Area[areas.size()]), new ISchedulerNotification() {
-            @Override
-            public void onMovingStarted(String agvId, Task task) {
-                Tracker.agv("onMovingStarted: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onMovingArrived(String agvId, Task task) {
-                Tracker.agv("onMovingArrived: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onMovingPaused(String agvId, Task task) {
-                Tracker.agv("onMovingPaused: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onMovingWaiting(String agvId, Task task) {
-                Tracker.agv("onMovingWaiting: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onMovingCancelled(String agvId, Task task) {
-                Tracker.agv("onMovingCancelled: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onMovingFail(String agvId, Task task) {
-                Tracker.agv("onMovingFail: " + agvId + ", " + task.toString());
-            }
-
-            @Override
-            public void onContainerArrived(String containerId, Site target) {
-                Tracker.agv("onContainerArrived: " + containerId + ", " + target.toString());
-            }
-
-            @Override
-            public void onContainerLeft(String containerId, Site target) {
-                Tracker.agv("onContainerLeft: " + containerId + ", " + target.toString());
-            }
-
-            @Override
-            public void onAcceptTask(String workflowWorkId, String robotId) {
-            }
-
-            @Override
-            public void onTakeAway(String workflowWorkId, String robotId) {
-            }
-        });
-
-        removeAllContainers();
+        scheduler.initialize();
+        scheduler.removeAllContainers();
 
         site1 = new Site();
         site1.setCode("2");
@@ -119,16 +46,10 @@ class GeekPlusTests {
         site4.setCode("7");
     }
 
-    /**
-     * 移除所有站点内容器
-     */
-    void removeAllContainers() {
-        List<Site> sites = siteService.selectList(null);
-        sites.forEach(site -> scheduler.onContainerLeft(null, site, null));
-    }
-
     @Test
-    void Test0() {
+    public void Test0() {
+        initialize();
+        test4();
     }
 
     /**
@@ -139,7 +60,7 @@ class GeekPlusTests {
      */
     @Test
     void test1() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task = scheduler.addTask(site1, site3);
@@ -154,10 +75,10 @@ class GeekPlusTests {
      */
     @Test
     void test2() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
-        result = scheduler.onContainerArrived(containerId2, site2, null);
+        result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
         assertEquals(true, result);
 
         Task task = scheduler.addTask(site1, site2);
@@ -172,13 +93,13 @@ class GeekPlusTests {
      */
     @Test
     void test3() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId2, site2, null);
+        result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(site2, site1);
@@ -194,7 +115,7 @@ class GeekPlusTests {
      */
     @Test
     void test4() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -208,7 +129,7 @@ class GeekPlusTests {
             }
         }
 
-        result = scheduler.onContainerArrived(containerId2, site2, null);
+        result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(site2, site1);
@@ -223,27 +144,17 @@ class GeekPlusTests {
      */
     @Test
     void test5() {
-
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("5");
-
-        Boolean result = scheduler.onContainerArrived(containerId1, site3, null);
-        // assertEquals(true, result);
+        Boolean result = scheduler.onContainerArrived(containerId1, site3.getCode(), null);
+        assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site3, site1);
-        // assertEquals(true, task1 != null);
+        assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId3, site2, null);
-        // assertEquals(true, result);
+        result = scheduler.onContainerArrived(containerId3, site2.getCode(), null);
+        assertEquals(true, result);
 
         Task task2 = scheduler.addTask(site2, site3);
-        // assertEquals(false, task2 != null);
+        assertEquals(false, task2 != null);
     }
 
     /**
@@ -255,50 +166,25 @@ class GeekPlusTests {
      */
     @Test
     void test6() {
-
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("5");
-
-        // Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
-        // assertEquals(true, result);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
-        // assertEquals(true, task1 != null);
+        assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
-        // while (task1.getStatus() != Status.Moving) {
-        // try {
-        // Thread.sleep(1000);
-        // } catch (InterruptedException e) {
-        // }
-        // }
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
 
-        // result = scheduler.onContainerArrived(containerId3, site3, null);
-        // assertEquals(true, result);
+        result = scheduler.onContainerArrived(containerId3, site3.getCode(), null);
+        assertEquals(true, result);
 
-        // Task task2 = scheduler.addTask(site3, site1);
-        // assertEquals(true, task2 != null);
-    }
-
-    @Test
-    void test66() {
-
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("5");
-
-        Task task1 = scheduler.addTask(site3, site1);
+        Task task2 = scheduler.addTask(site3, site1);
+        assertEquals(true, task2 != null);
     }
 
     /**
@@ -309,27 +195,17 @@ class GeekPlusTests {
      */
     @Test
     void test7() {
-
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("5");
-
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
-        // assertEquals(true, result);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
-        // assertEquals(true, task1 != null);
+        assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId2, site2, null);
-        // assertEquals(false, result);
+        result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
+        assertEquals(false, result);
 
         Task task2 = scheduler.addTask(site2, site3);
-        // assertEquals(false, task2 != null);
+        assertEquals(false, task2 != null);
     }
 
     /**
@@ -340,29 +216,17 @@ class GeekPlusTests {
      */
     @Test
     void test8() {
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("5");
-
-        site4 = new Site();
-        site4.setCode("7");
-
-        Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
-        // assertEquals(true, result);
+        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
-        // assertEquals(true, task1 != null);
+        assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId3, site3, null);
-        // assertEquals(true, result);
+        result = scheduler.onContainerArrived(containerId3, site3.getCode(), null);
+        assertEquals(true, result);
 
         Task task2 = scheduler.addTask(site3, site4);
-        // assertEquals(true, task2 != null);
+        assertEquals(true, task2 != null);
     }
 
     /**
@@ -373,26 +237,17 @@ class GeekPlusTests {
      */
     @Test
     void test9() {
-        site1 = new Site();
-        site1.setCode("1");
-
-        site2 = new Site();
-        site2.setCode("4");
-
-        site3 = new Site();
-        site3.setCode("7");
-
-        // Boolean result = scheduler.onContainerArrived(containerId2, site2, null);
-        // assertEquals(true, result);
+        Boolean result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
+        assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site2, site1);
-        // assertEquals(true, task1 != null);
+        assertEquals(true, task1 != null);
 
-        // result = scheduler.onContainerArrived(containerId3, site3, null);
-        // assertEquals(true, result);
+        result = scheduler.onContainerArrived(containerId3, site3.getCode(), null);
+        assertEquals(true, result);
 
         Task task2 = scheduler.addTask(site3, site1);
-        // assertEquals(true, task2 != null);
+        assertEquals(true, task2 != null);
     }
 
     @Test

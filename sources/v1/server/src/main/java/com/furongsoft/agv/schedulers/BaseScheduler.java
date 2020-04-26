@@ -1,7 +1,6 @@
 package com.furongsoft.agv.schedulers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,7 @@ public abstract class BaseScheduler implements IScheduler {
     /**
      * AGV调度管理器事件接口
      */
-    protected ISchedulerNotification notification;
+    protected Optional<ISchedulerNotification> notification = Optional.empty();
 
     /**
      * 区域列表
@@ -36,13 +35,18 @@ public abstract class BaseScheduler implements IScheduler {
     protected List<Task> tasks = new LinkedList<>();
 
     @Override
-    synchronized public void initialize(Area[] areas, ISchedulerNotification notification) {
-        if (null == areas) {
-            this.areas = new ArrayList<>();
-        } else {
-            this.areas = Arrays.asList(areas);
-        }
-        this.notification = notification;
+    synchronized public void initialize() {
+    }
+
+    @Override
+    synchronized public void initialize(List<Area> areas, ISchedulerNotification notification) {
+        this.areas = areas;
+        this.notification = Optional.ofNullable(notification);
+    }
+
+    @Override
+    synchronized public void removeAllContainers() {
+        areas.forEach(area -> area.getSites().forEach(site -> onContainerLeft(null, site.getCode(), null)));
     }
 
     @Override
@@ -61,7 +65,7 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingStarted(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Moving);
-            notification.onMovingStarted(agvId, task);
+            notification.ifPresent(n -> n.onMovingStarted(agvId, task));
             Tracker.agv(String.format("OnMovingStarted: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -70,7 +74,7 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingArrived(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
-            notification.onMovingArrived(agvId, task);
+            notification.ifPresent(n -> n.onMovingArrived(agvId, task));
             Tracker.agv(String.format("OnMovingArrived: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -79,7 +83,7 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingPaused(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
-            notification.onMovingPaused(agvId, task);
+            notification.ifPresent(n -> n.onMovingPaused(agvId, task));
             Tracker.agv(String.format("OnMovingPaused: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -88,7 +92,7 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingWaiting(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
-            notification.onMovingWaiting(agvId, task);
+            notification.ifPresent(n -> n.onMovingWaiting(agvId, task));
             Tracker.agv(String.format("OnMovingWaiting: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -97,7 +101,7 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingCancelled(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
-            notification.onMovingCancelled(agvId, task);
+            notification.ifPresent(n -> n.onMovingCancelled(agvId, task));
             Tracker.agv(
                     String.format("OnMovingCancelled: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
@@ -107,14 +111,14 @@ public abstract class BaseScheduler implements IScheduler {
     synchronized public void onMovingFail(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
-            notification.onMovingFail(agvId, task);
+            notification.ifPresent(n -> n.onMovingFail(agvId, task));
             Tracker.agv(String.format("OnMovingFail: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
 
     @Override
-    synchronized public boolean onContainerArrived(String containerId, Site destination, String event) {
-        com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
+    synchronized public boolean onContainerArrived(String containerId, String destination, String event) {
+        com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
         if (site == null) {
             return false;
         }
@@ -124,15 +128,15 @@ public abstract class BaseScheduler implements IScheduler {
         }
 
         site.setContainerId(containerId);
-        notification.onContainerArrived(containerId, destination);
+        notification.ifPresent(n -> n.onContainerArrived(containerId, destination));
         Tracker.agv(String.format("OnContainerArrived: container: %s, event: %s", containerId, event));
 
         return true;
     }
 
     @Override
-    synchronized public boolean onContainerLeft(String containerId, Site destination, String event) {
-        com.furongsoft.agv.schedulers.entities.Site site = getSite(destination.getCode());
+    synchronized public boolean onContainerLeft(String containerId, String destination, String event) {
+        com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
         if (site == null) {
             return false;
         }
@@ -142,7 +146,7 @@ public abstract class BaseScheduler implements IScheduler {
         }
 
         site.setContainerId(null);
-        notification.onContainerLeft(containerId, destination);
+        notification.ifPresent(n -> n.onContainerLeft(containerId, destination));
         Tracker.agv(String.format("OnContainerLeft: container: %s, event: %s", containerId, event));
 
         return true;

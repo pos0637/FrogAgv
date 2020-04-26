@@ -275,7 +275,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
         // 如果需要则执行容器入场
         if (containerArrivedFlag) {
             // 目标点容器入场失败则无法执行下发任务
-            if (!scheduler.onContainerArrived(materialBox.getCode(), source, null)) {
+            if (!scheduler.onContainerArrived(materialBox.getCode(), source.getCode(), null)) {
                 Tracker.error("容器入场失败");
                 Tracker.error(errorMessage);
                 return null;
@@ -285,7 +285,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
         if (ObjectUtils.isEmpty(task)) {
             if (containerArrivedFlag) {
                 // 入场成功后出现错误，执行容器离场
-                scheduler.onContainerLeft(materialBox.getCode(), source, null);
+                scheduler.onContainerLeft(materialBox.getCode(), source.getCode(), null);
             }
             Tracker.error(errorMessage);
             return null;

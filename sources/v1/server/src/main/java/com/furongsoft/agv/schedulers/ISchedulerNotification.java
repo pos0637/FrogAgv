@@ -1,6 +1,5 @@
 package com.furongsoft.agv.schedulers;
 
-import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
@@ -59,17 +58,17 @@ public interface ISchedulerNotification {
      * 容器进场事件
      *
      * @param containerId 容器索引
-     * @param target      目的站点
+     * @param target      目的站点编码
      */
-    void onContainerArrived(String containerId, Site target);
+    void onContainerArrived(String containerId, String destination);
 
     /**
      * 容器离场事件
      *
      * @param containerId 容器索引
-     * @param target      目的站点
+     * @param target      目的站点编码
      */
-    void onContainerLeft(String containerId, Site target);
+    void onContainerLeft(String containerId, String destination);
 
     /**
      * 小车接单回调

@@ -1,6 +1,5 @@
 package com.furongsoft.agv.schedulers.geekplus.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -64,9 +63,6 @@ public class MovingCallbackMsg {
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Body {
-        @JsonIgnore
-        private Long id;
-
         /**
          * 流程任务Id
          */
@@ -130,7 +126,6 @@ public class MovingCallbackMsg {
         /**
          * 数据状态(1.正常；0.已删除)
          */
-        @JsonIgnore
         private Integer status;
     }
 }
