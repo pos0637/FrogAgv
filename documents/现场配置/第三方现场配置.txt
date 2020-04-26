@@ -1,0 +1,9 @@
+RMS系统：
+http://192.168.2.90/static/rms
+用户名：guest
+密码：111111
+
+ARK系统：
+http://192.168.2.90/static/ark
+用户名：admin
+密码：111111

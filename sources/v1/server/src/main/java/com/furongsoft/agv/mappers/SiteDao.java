@@ -1,5 +1,7 @@
 package com.furongsoft.agv.mappers;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.furongsoft.agv.entities.AgvArea;
@@ -7,12 +9,11 @@ import com.furongsoft.agv.entities.MaterialBox;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.entities.SiteDetail;
 import com.furongsoft.agv.models.SiteModel;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.jdbc.SQL;
-
-import java.util.List;
 
 /**
  * 站点表数据库操作
@@ -39,6 +40,15 @@ public interface SiteDao extends BaseMapper<Site> {
      */
     @SelectProvider(type = DaoProvider.class, method = "selectLocationByAreaType")
     List<SiteModel> selectLocationByAreaType(@Param("type") int type);
+
+    /**
+     * 通过区域ID查找库位
+     *
+     * @param areaId 区域ID
+     * @return 库位集合
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectLocationsByAreaIdWithMaterialBox")
+    List<SiteModel> selectLocationsByAreaIdWithMaterialBox(@Param("areaId") Long areaId);
 
     /**
      * 通过区域ID查找库位
@@ -82,8 +92,8 @@ public interface SiteDao extends BaseMapper<Site> {
         public String selectSiteById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t2.material_box_id," +
-                            "t2.state AS siteDetailState,t2.delivery_task_id, t3.area_id AS areaId");
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t2.material_box_id,"
+                            + "t2.state AS siteDetailState,t2.delivery_task_id, t3.area_id AS areaId");
                     FROM(SITE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t2 ON t1.id = t2.site_id");
                     LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t3 ON t3.site_id = t1.id ");
@@ -100,8 +110,8 @@ public interface SiteDao extends BaseMapper<Site> {
         public String selectLocationByAreaType() {
             return new SQL() {
                 {
-                    SELECT("t3.id AS id,t1.name AS areaName, t1.id AS areaId, t1.code AS areaCode, t1.parent_id AS parentArea, t3.qr_code, t3.location_x, t3.location_y, " +
-                            "t3.location_z, t3.type, t3.name, t3.code, t5.material_box_id, t5.state AS siteDetailState, t5.delivery_task_id");
+                    SELECT("t3.id AS id,t1.name AS areaName, t1.id AS areaId, t1.code AS areaCode, t1.parent_id AS parentArea, t3.qr_code, t3.location_x, t3.location_y, "
+                            + "t3.location_z, t3.type, t3.name, t3.code, t5.material_box_id, t5.state AS siteDetailState, t5.delivery_task_id");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.area_id");
                     LEFT_OUTER_JOIN(SITE_TABLE_NAME + " t3 ON t2.site_id = t3.id");
@@ -116,15 +126,33 @@ public interface SiteDao extends BaseMapper<Site> {
          *
          * @return sql
          */
-        public String selectLocationsByAreaId() {
+        public String selectLocationsByAreaIdWithMaterialBox() {
             return new SQL() {
                 {
                     SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t5.code AS materialBoxCode");
                     FROM(SITE_TABLE_NAME + " t1");
-                    LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.site_id ");
+                    LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.site_id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t3.id = t2.area_id");
                     LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t4 ON t4.site_id = t1.id");
                     RIGHT_OUTER_JOIN(MATERIAL_BOX_TABLE_NAME + " t5 ON t5.id = t4.material_box_id");
+                    WHERE("t1.enabled=1 AND t3.id=#{areaId}");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过区域ID查找库位
+         *
+         * @return sql
+         */
+        public String selectLocationsByAreaId() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code");
+                    FROM(SITE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.site_id");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t3.id = t2.area_id");
+                    LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t4 ON t4.site_id = t1.id");
                     WHERE("t1.enabled=1 AND t3.id=#{areaId}");
                 }
             }.toString();

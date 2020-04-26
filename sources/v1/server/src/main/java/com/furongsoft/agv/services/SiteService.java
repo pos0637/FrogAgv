@@ -1,16 +1,28 @@
 package com.furongsoft.agv.services;
 
+import java.util.List;
+
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.mappers.*;
-import com.furongsoft.agv.models.*;
+import com.furongsoft.agv.mappers.AgvAreaDao;
+import com.furongsoft.agv.mappers.DeliveryTaskDao;
+import com.furongsoft.agv.mappers.MaterialBoxDao;
+import com.furongsoft.agv.mappers.MaterialBoxMaterialDao;
+import com.furongsoft.agv.mappers.SiteDao;
+import com.furongsoft.agv.mappers.SiteDetailDao;
+import com.furongsoft.agv.mappers.StockUpRecordDao;
+import com.furongsoft.agv.models.AgvAreaModel;
+import com.furongsoft.agv.models.DeliveryTaskModel;
+import com.furongsoft.agv.models.MaterialBoxMaterialModel;
+import com.furongsoft.agv.models.MaterialBoxModel;
+import com.furongsoft.agv.models.SiteDetailModel;
+import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.base.services.BaseService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
-import java.util.List;
 
 /**
  * 站点服务
@@ -30,7 +42,9 @@ public class SiteService extends BaseService<SiteDao, Site> {
     private final SiteDetailDao siteDetailDao;
 
     @Autowired
-    public SiteService(SiteDao siteDao, StockUpRecordDao stockUpRecordDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao, SiteDetailDao siteDetailDao) {
+    public SiteService(SiteDao siteDao, StockUpRecordDao stockUpRecordDao, MaterialBoxDao materialBoxDao,
+            MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao,
+            SiteDetailDao siteDetailDao) {
         super(siteDao);
         this.siteDao = siteDao;
         this.stockUpRecordDao = stockUpRecordDao;
@@ -54,7 +68,8 @@ public class SiteService extends BaseService<SiteDao, Site> {
         }
         if (null != siteModel.getMaterialBoxId()) {
             MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(siteModel.getMaterialBoxId());
-            List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
+            List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao
+                    .selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
             materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
             siteModel.setMaterialBoxModel(materialBoxModel);
         }
@@ -73,14 +88,17 @@ public class SiteService extends BaseService<SiteDao, Site> {
             siteModels.forEach(siteModel -> {
                 if (null != siteModel.getMaterialBoxId()) {
                     // 获取备货信息
-                    MaterialBoxModel materialBoxModel = materialBoxDao.selectMaterialBoxById(siteModel.getMaterialBoxId());
-                    List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao.selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
+                    MaterialBoxModel materialBoxModel = materialBoxDao
+                            .selectMaterialBoxById(siteModel.getMaterialBoxId());
+                    List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao
+                            .selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
                     materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
                     siteModel.setMaterialBoxModel(materialBoxModel);
                 }
                 if (null != siteModel.getDeliveryTaskId()) {
                     // 获取配送任务信息
-                    DeliveryTaskModel deliveryTaskModel = deliveryTaskDao.selectDeliveryTaskById(siteModel.getDeliveryTaskId());
+                    DeliveryTaskModel deliveryTaskModel = deliveryTaskDao
+                            .selectDeliveryTaskById(siteModel.getDeliveryTaskId());
                     siteModel.setDeliveryTaskModel(deliveryTaskModel);
                 }
             });
@@ -113,7 +131,7 @@ public class SiteService extends BaseService<SiteDao, Site> {
     /**
      * 通过区域编号以及产线编号查找生产区库位
      *
-     * @param areaCode 区域编号  "PRODUCT_FILLING"：灌装区；"PRODUCT_PACKAGING"：包装区
+     * @param areaCode 区域编号 "PRODUCT_FILLING"：灌装区；"PRODUCT_PACKAGING"：包装区
      * @param lineCode 产线编号
      * @return 指定的库位
      */
@@ -131,6 +149,16 @@ public class SiteService extends BaseService<SiteDao, Site> {
      */
     public List<SiteDetailModel> selectIdleSiteDetailsByAreaCode(String areaCode) {
         return siteDetailDao.selectIdleSiteByAreaCode(areaCode);
+    }
+
+    /**
+     * 通过区域ID查找库位
+     *
+     * @param areaId 区域ID
+     * @return 库位集合
+     */
+    public List<SiteModel> selectLocationsByAreaIdWithMaterialBox(long areaId) {
+        return siteDao.selectLocationsByAreaIdWithMaterialBox(areaId);
     }
 
     /**

@@ -82,7 +82,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 }
                 // 获取灌装区指定生产线的库位列表
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_FILLING", deliveryTaskModel.getProductLine());
-                List<SiteModel> siteModels = siteService.selectLocationsByAreaId(location.getId());
+                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(location.getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
                     // 站点未配送的叫料集合
@@ -179,7 +179,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
             case 5: { // 包材-包装；TODO
                 taskNo = "PS" + currentTime;
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_PACKAGING", deliveryTaskModel.getProductLine());
-                List<SiteModel> siteModels = siteService.selectLocationsByAreaId(location.getId());
+                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(location.getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
                     // 站点未配送的叫料集合

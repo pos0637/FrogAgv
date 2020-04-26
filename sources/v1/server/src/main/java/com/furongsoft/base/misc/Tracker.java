@@ -1,10 +1,10 @@
 package com.furongsoft.base.misc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 日志类
@@ -13,6 +13,8 @@ import java.io.StringWriter;
  */
 public class Tracker {
     private static Logger logger = LoggerFactory.getLogger(Tracker.class);
+    private static Logger networkLogger = LoggerFactory.getLogger("networklog");
+    private static Logger agvLogger = LoggerFactory.getLogger("agvlog");
 
     /**
      * 输出debug信息
@@ -66,6 +68,24 @@ public class Tracker {
      */
     public static void file(Object content) {
         logger.info(makeLog(content));
+    }
+
+    /**
+     * 输出网络信息
+     *
+     * @param content 信息
+     */
+    public static void network(Object content) {
+        networkLogger.info(makeLog(content));
+    }
+
+    /**
+     * 输出AGV信息
+     *
+     * @param content 信息
+     */
+    public static void agv(Object content) {
+        agvLogger.info(makeLog(content));
     }
 
     /**

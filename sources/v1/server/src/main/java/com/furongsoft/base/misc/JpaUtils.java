@@ -1,11 +1,5 @@
 package com.furongsoft.base.misc;
 
-import com.querydsl.core.types.EntityPath;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.core.types.dsl.StringPath;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,6 +9,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
+
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
+
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 /**
  * JPA工具
