@@ -7,3 +7,6 @@ ARK系统：
 http://192.168.2.90/static/ark
 用户名：admin
 密码：111111
+
+回调服务器地址：
+http://192.168.114.89:9090/api/v1/agv/callback

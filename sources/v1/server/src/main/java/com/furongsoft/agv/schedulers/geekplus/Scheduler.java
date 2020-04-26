@@ -19,6 +19,7 @@ import com.furongsoft.base.misc.UUIDUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -114,6 +115,11 @@ public class Scheduler extends BaseScheduler {
             return false;
         }
 
+        // 不允许在已有任务的目的站点内添加容器
+        if (getTaskByDestination(destination.getCode()).isPresent()) {
+            return false;
+        }
+
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
@@ -144,6 +150,11 @@ public class Scheduler extends BaseScheduler {
         return super.onContainerLeft(containerId, destination, event);
     }
 
+    @GetMapping("/test")
+    public String foo() {
+        return "Hello, world!";
+    }
+
     /**
      * AGV回调消息
      *
@@ -152,7 +163,7 @@ public class Scheduler extends BaseScheduler {
      */
     @PostMapping("/callback")
     public RestResponse movingCallbackMsg(@RequestBody MovingCallbackMsg movingCallbackMsg) {
-        Tracker.info(movingCallbackMsg);
+        Tracker.agv(movingCallbackMsg);
         MovingCallbackMsg.Body body = movingCallbackMsg.getBody();
         switch (body.getWorkflowPhase()) {
             case 20:
