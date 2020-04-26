@@ -128,8 +128,7 @@ class GeekPlusTests {
     }
 
     @Test
-    void Test0()
-    {
+    void Test0() {
     }
 
     /**
@@ -155,15 +154,11 @@ class GeekPlusTests {
      */
     @Test
     void test2() {
-        site1 = new Site();
-        site1.setCode("5");
-        site2 = new Site();
-        site2.setCode("4");
         Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
-        // assertEquals(true, result);
-        //
-        // result = scheduler.onContainerArrived(containerId2, site2, null);
-        // assertEquals(true, result);
+        assertEquals(true, result);
+
+        result = scheduler.onContainerArrived(containerId2, site2, null);
+        assertEquals(true, result);
 
         Task task = scheduler.addTask(site1, site2);
         assertEquals(false, task != null);
@@ -177,14 +172,6 @@ class GeekPlusTests {
      */
     @Test
     void test3() {
-        site1 = new Site();
-        site1.setCode("1");
-        scheduler.onContainerLeft(null, site1, null);
-
-        site2 = new Site();
-        site2.setCode("4");
-        scheduler.onContainerLeft(null, site2, null);
-
         Boolean result = scheduler.onContainerArrived(containerId1, site1, null);
         // assertEquals(true, result);
 

@@ -1,7 +1,5 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
-import java.util.Optional;
-
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.BaseScheduler;
@@ -76,6 +74,11 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public Task addTask(Site source, Site destination) {
+        // 不允许向已有容器的站点内发送容器
+        if (hasContainer(destination.getCode())) {
+            return null;
+        }
+
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
@@ -97,97 +100,48 @@ public class Scheduler extends BaseScheduler {
                         userKey, language, version),
                 new MovingCancelRequestMsg.Body("MovingCancelMsg", task.getWcsTaskId()));
         MovingCancelResponseMsg response = HttpUtils.postJson(url, null, request, MovingCancelResponseMsg.class);
-        return response != null;
+        if ((response == null) || (!response.getCode().equals("0"))) {
+            return false;
+        }
+
+        return super.cancel(task);
     }
 
     @Override
-    public boolean cancel(Site source) {
-        Optional<Task> task = getTaskBySource(source.getCode());
-        return task.isPresent() && cancel(task.get());
-    }
+    public boolean onContainerArrived(String containerId, Site destination, String event) {
+        // 不允许在已有容器的站点内添加容器
+        if (hasContainer(destination.getCode())) {
+            return false;
+        }
 
-    @Override
-    public void onMovingStarted(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Moving);
-            notification.onMovingStarted(agvId, task);
-        });
-    }
-
-    @Override
-    public void onMovingArrived(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Arrived);
-            notification.onMovingArrived(agvId, task);
-        });
-    }
-
-    @Override
-    public void onMovingPaused(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Paused);
-            notification.onMovingPaused(agvId, task);
-        });
-    }
-
-    @Override
-    public void onMovingWaiting(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Paused);
-            notification.onMovingWaiting(agvId, task);
-        });
-    }
-
-    @Override
-    public void onMovingCancelled(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Cancelled);
-            notification.onMovingCancelled(agvId, task);
-        });
-    }
-
-    @Override
-    public void onMovingFail(String agvId, String taskId, String event) {
-        getTaskByWcsTaskId(taskId).ifPresent(task -> {
-            task.setStatus(Task.Status.Fail);
-            notification.onMovingFail(agvId, task);
-        });
-    }
-
-    @Override
-    public boolean onContainerArrived(String containerId, Site target, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "ADD_CONTAINER", "2", containerId, 2,
-                        target.getCode()));
+                        destination.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
         if ((response == null) || (!response.getCode().equals("0"))) {
             return false;
         }
 
-        notification.onContainerArrived(containerId, target);
-
-        return true;
+        return super.onContainerArrived(containerId, destination, event);
     }
 
     @Override
-    public boolean onContainerLeft(String containerId, Site target, String event) {
+    public boolean onContainerLeft(String containerId, Site destination, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
                 new WarehouseControlRequestMsg.Body("WarehouseControlRequestMsg", "REMOVE_CONTAINER", "2", containerId,
-                        2, target.getCode()));
+                        2, destination.getCode()));
         WarehouseControlResponseMsg response = HttpUtils.postJson(url, null, request,
                 WarehouseControlResponseMsg.class);
         if ((response == null) || (!response.getCode().equals("0"))) {
             return false;
         }
 
-        notification.onContainerLeft(containerId, target);
-
-        return true;
+        return super.onContainerLeft(containerId, destination, event);
     }
 
     /**
