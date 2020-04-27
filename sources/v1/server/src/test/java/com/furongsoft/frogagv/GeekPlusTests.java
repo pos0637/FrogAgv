@@ -60,7 +60,7 @@ public class GeekPlusTests {
      */
     @Test
     void test1() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task = scheduler.addTask(site1, site3);
@@ -75,7 +75,7 @@ public class GeekPlusTests {
      */
     @Test
     void test2() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
@@ -93,7 +93,7 @@ public class GeekPlusTests {
      */
     @Test
     void test3() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -115,7 +115,7 @@ public class GeekPlusTests {
      */
     @Test
     void test4() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -144,7 +144,7 @@ public class GeekPlusTests {
      */
     @Test
     void test5() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site3.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site3.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site3, site1);
@@ -166,7 +166,7 @@ public class GeekPlusTests {
      */
     @Test
     void test6() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -195,7 +195,7 @@ public class GeekPlusTests {
      */
     @Test
     void test7() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -216,7 +216,7 @@ public class GeekPlusTests {
      */
     @Test
     void test8() {
-        Boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site1, site2);
@@ -237,7 +237,7 @@ public class GeekPlusTests {
      */
     @Test
     void test9() {
-        Boolean result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
+        boolean result = scheduler.onContainerArrived(containerId2, site2.getCode(), null);
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(site2, site1);

@@ -294,7 +294,7 @@ public abstract class BaseScheduler implements IScheduler {
      * @param code 站点编码
      * @return 是否有容器
      */
-    synchronized protected Boolean hasContainer(String code) {
+    synchronized protected boolean hasContainer(String code) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(code);
         if (site == null) {
             return false;

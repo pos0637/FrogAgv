@@ -1,14 +1,21 @@
 package com.furongsoft.communication.modbusTcp;
 
+import java.nio.ByteBuffer;
+
 import com.furongsoft.base.misc.Tracker;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
-import com.serotonin.modbus4j.msg.*;
-
-import java.nio.ByteBuffer;
+import com.serotonin.modbus4j.msg.ReadCoilsRequest;
+import com.serotonin.modbus4j.msg.ReadCoilsResponse;
+import com.serotonin.modbus4j.msg.ReadInputRegistersRequest;
+import com.serotonin.modbus4j.msg.ReadInputRegistersResponse;
+import com.serotonin.modbus4j.msg.WriteCoilRequest;
+import com.serotonin.modbus4j.msg.WriteCoilResponse;
+import com.serotonin.modbus4j.msg.WriteRegistersRequest;
+import com.serotonin.modbus4j.msg.WriteRegistersResponse;
 
 /**
  * ModbusTCP工具类
@@ -35,7 +42,8 @@ public class ModbusTcp {
                 sb.append(i + ": " + result[i] + ", ");
                 if (result[i]) {
                     Tracker.error(i + ":" + result[i]);
-                    writeCoil(master, 254, i, result[i]);
+                    // writeCoil(master, 254, i, result[i]);
+                    writeRegisters(master, 254, i, new short[] { 0x02 });
                 }
             }
             Tracker.info(sb.toString());
@@ -75,15 +83,18 @@ public class ModbusTcp {
     }
 
     /**
-     * 通过IP和端口创建master
-     *
-     * @return 创建的master
+     * 创建主站
+     * 
+     * @param ipAddress IP地址
+     * @param port      端口
+     * @return 主站
      */
     public static ModbusMaster createMaster(String ipAddress, int port) {
         IpParameters params = new IpParameters();
         params.setHost(ipAddress);
         params.setPort(port);
         params.setEncapsulated(true);
+
         try {
             ModbusMaster master = new ModbusFactory().createTcpMaster(params, true);
             master.setTimeout(1000);
@@ -92,7 +103,6 @@ public class ModbusTcp {
             return master;
         } catch (ModbusInitException e) {
             Tracker.error("连接失败的设备：" + ipAddress);
-//            Tracker.error(e);
             return null;
         }
     }
@@ -162,12 +172,32 @@ public class ModbusTcp {
     }
 
     /**
+     * 写入寄存器
+     *
+     * @param master  主站
+     * @param slaveId 从站索引
+     * @param offset  偏移
+     * @param value   值
+     * @return 是否成功
+     */
+    public static boolean writeRegisters(ModbusMaster master, int slaveId, int offset, short[] value) {
+        try {
+            WriteRegistersRequest request = new WriteRegistersRequest(slaveId, offset, value);
+            WriteRegistersResponse response = (WriteRegistersResponse) master.send(request);
+            return !response.isException();
+        } catch (ModbusTransportException e) {
+            Tracker.error(e);
+            return false;
+        }
+    }
+
+    /**
      * 将字节数组转换为位数组
      *
      * @param bb 字节数组
      * @return 位数组
      */
-    public static boolean[] convert(ByteBuffer bb) {
+    private static boolean[] convert(ByteBuffer bb) {
         byte[] ba = bb.array();
         boolean[] result = new boolean[Byte.SIZE * ba.length];
         int offset = 0;
