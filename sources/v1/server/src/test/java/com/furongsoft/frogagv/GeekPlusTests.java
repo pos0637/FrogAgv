@@ -22,6 +22,7 @@ public class GeekPlusTests {
     private Site site2;
     private Site site3;
     private Site site4;
+    private Site[] sites = new Site[35];
     private String containerId1 = "PA000001";
     private String containerId2 = "PA000002";
     private String containerId3 = "PA000003";
@@ -33,7 +34,6 @@ public class GeekPlusTests {
     void initialize() {
         scheduler.initialize();
         scheduler.removeAllContainers();
-
         site1 = new Site();
         site1.setCode("2");
 
@@ -43,8 +43,10 @@ public class GeekPlusTests {
         site3 = new Site();
         site3.setCode("4");
 
-        site4 = new Site();
-        site4.setCode("7");
+        for (int i = 0; i < sites.length; ++i) {
+            sites[i] = new Site();
+            sites[i].setCode(String.valueOf(i));
+        }
     }
 
     @Test
@@ -248,6 +250,32 @@ public class GeekPlusTests {
 
         Task task2 = scheduler.addTask(site3, site1);
         assertEquals(true, task2 != null);
+    }
+
+    /**
+     * 下发一个A点到B点的任务后,AGV小车把货架取走后,取消任务</br>
+     * 前置条件: A点上无容器,B点上无容器</br>
+     * 测试步骤: 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->取消任务</br>
+     * 预计结果: A点容器入场成功,A到B任务下发成功,取消任务成功</br>
+     */
+    @Test
+    public void test10() {
+        boolean result = scheduler.onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
+
+        Task task1 = scheduler.addTask(site1, site2);
+        assertEquals(true, task1 != null);
+
+        // 等待AGV小车取走A点的货架
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        result = scheduler.cancel(task1);
+        assertEquals(true, result);
     }
 
     @Test

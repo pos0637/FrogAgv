@@ -2,6 +2,7 @@ package com.furongsoft.agv.schedulers.entities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,26 +18,32 @@ public class Task {
      * 源站点编码
      */
     private String source;
+
     /**
      * 目的站点编码
      */
     private String destination;
+
     /**
      * 目的区域编码
      */
     private String destinationArea;
+
     /**
      * WCS任务索引
      */
     private String wcsTaskId;
+
     /**
      * 可替换目的站点
      */
     private boolean replaceable;
+
     /**
      * 可取消
      */
     private boolean cancelable;
+
     /**
      * 状态
      */

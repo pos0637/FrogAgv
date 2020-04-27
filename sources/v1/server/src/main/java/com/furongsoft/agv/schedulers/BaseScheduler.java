@@ -13,11 +13,19 @@ import com.furongsoft.agv.schedulers.entities.Task.Status;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 /**
  * AGV调度管理器
  *
  * @author Alex
  */
+@CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/v1/agv")
 public abstract class BaseScheduler implements IScheduler {
     /**
      * AGV调度管理器事件接口
@@ -75,6 +83,7 @@ public abstract class BaseScheduler implements IScheduler {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
             notification.ifPresent(n -> n.onMovingArrived(agvId, task));
+            tasks.remove(task);
             Tracker.agv(String.format("OnMovingArrived: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -102,6 +111,7 @@ public abstract class BaseScheduler implements IScheduler {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
             notification.ifPresent(n -> n.onMovingCancelled(agvId, task));
+            tasks.remove(task);
             Tracker.agv(
                     String.format("OnMovingCancelled: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
@@ -112,6 +122,7 @@ public abstract class BaseScheduler implements IScheduler {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
             notification.ifPresent(n -> n.onMovingFail(agvId, task));
+            tasks.remove(task);
             Tracker.agv(String.format("OnMovingFail: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
@@ -281,6 +292,16 @@ public abstract class BaseScheduler implements IScheduler {
     /**
      * 获取任务
      *
+     * @param code 站点编码
+     * @return 任务
+     */
+    synchronized protected Optional<Task> getTaskBySite(String code) {
+        return tasks.stream().filter(t -> t.getSource().equals(code) || t.getDestination().equals(code)).findFirst();
+    }
+
+    /**
+     * 获取任务
+     *
      * @param wcsTaskId WCS任务索引
      * @return 任务
      */
@@ -301,5 +322,17 @@ public abstract class BaseScheduler implements IScheduler {
         }
 
         return !StringUtils.isNullOrEmpty(site.getContainerId());
+    }
+
+    /**
+     * 获取任务信息
+     * 
+     * @return 任务信息
+     */
+    @GetMapping("/tasks")
+    public String getTasks() {
+        StringBuffer sb = new StringBuffer();
+        tasks.forEach(task -> sb.append(task.toString()).append("\n"));
+        return sb.toString();
     }
 }

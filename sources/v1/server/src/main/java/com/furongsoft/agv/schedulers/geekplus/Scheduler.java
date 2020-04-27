@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -107,6 +109,19 @@ public class Scheduler extends BaseScheduler {
     public Task addTask(Site source, Site destination) {
         // 不允许向已有容器的站点内发送容器
         if (hasContainer(destination.getCode())) {
+            Tracker.agv("不允许向已有容器的站点内发送容器:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        // 不允许在已有任务的源站点发送任务
+        if (getTaskBySite(source.getCode()).isPresent()) {
+            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        // 不允许在已有任务的目的站点发送任务
+        if (getTaskBySite(destination.getCode()).isPresent()) {
+            Tracker.agv("不允许在已有任务的目的站点发送任务:" + source.toString() + ", " + destination.toString());
             return null;
         }
 
@@ -142,11 +157,13 @@ public class Scheduler extends BaseScheduler {
     public boolean onContainerArrived(String containerId, String destination, String event) {
         // 不允许在已有容器的站点内添加容器
         if (hasContainer(destination)) {
+            Tracker.agv("不允许在已有容器的站点内添加容器:" + containerId + ", " + destination);
             return false;
         }
 
         // 不允许在已有任务的目的站点内添加容器
         if (getTaskByDestination(destination).isPresent()) {
+            Tracker.agv("不允许在已有任务的目的站点内添加容器:" + containerId + ", " + destination);
             return false;
         }
 
@@ -215,6 +232,25 @@ public class Scheduler extends BaseScheduler {
         return new RestResponse(HttpStatus.OK);
     }
 
+    /**
+     * 取消任务
+     * 
+     * @param wcsTaskId WCS任务索引
+     * @return 是否成功
+     */
+    @GetMapping("/cancelTask")
+    public boolean cancelTask(@RequestParam(value = "taskId") String wcsTaskId) {
+        Optional<Task> task = getTaskByWcsTaskId(wcsTaskId);
+        return task.isPresent() && cancel(task.get());
+    }
+
+    /**
+     * 下发一个A点到B点的任务后,AGV小车把货架取走后,下发一个B点到A点的任务</br>
+     * 前置条件: A点上无容器,B点上无容器</br>
+     * 测试步骤:
+     * 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->在B点容器入场->下发一个B点到A点的任务</br>
+     * 预计结果: A点容器入场成功,A到B任务下发成功,B点容器入场失败,B到A任务下发失败</br>
+     */
     @GetMapping("/test4")
     public void test4() {
         initialize();
@@ -248,5 +284,184 @@ public class Scheduler extends BaseScheduler {
 
         Task task2 = addTask(site2, site1);
         assertEquals(false, task2 != null);
+    }
+
+    /**
+     * 下发一个A点到B点的任务后,AGV小车把货架取走后,取消任务</br>
+     * 前置条件: A点上无容器,B点上无容器</br>
+     * 测试步骤: 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->取消任务</br>
+     * 预计结果: A点容器入场成功,A到B任务下发成功,取消任务成功</br>
+     */
+    @GetMapping("/test10")
+    public void test10() {
+        initialize();
+        removeAllContainers();
+
+        Site site1 = new Site();
+        site1.setCode("2");
+
+        Site site2 = new Site();
+        site2.setCode("5");
+
+        String containerId1 = "PA000001";
+
+        boolean result = onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
+
+        Task task1 = addTask(site1, site2);
+        assertEquals(true, task1 != null);
+
+        // 等待AGV小车取走A点的货架
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        result = cancel(task1);
+        assertEquals(true, result);
+    }
+
+    /**
+     * 包装区逐个站点搬运任务测试
+     */
+    @GetMapping("/test11")
+    public void test11() {
+        initialize();
+        removeAllContainers();
+
+        Site[] sites = new Site[35];
+        for (int i = 0; i < sites.length; ++i) {
+            sites[i] = new Site();
+            sites[i].setCode(String.valueOf(i));
+        }
+
+        String containerId1 = "PA000001";
+
+        boolean result = onContainerArrived(containerId1, sites[8].getCode(), null);
+        assertEquals(true, result);
+
+        Task task = addTask(sites[8], sites[14]);
+        assertEquals(true, task != null);
+
+        for (int i = 14; i < 21; ++i) {
+            // 等待AGV小车取走A点的货架
+            while (task.getStatus() != Status.Arrived) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            task = addTask(sites[i], sites[i + 1]);
+            assertEquals(true, task != null);
+        }
+    }
+
+    /**
+     * 拆包间逐个站点搬运任务测试
+     */
+    @GetMapping("/test12")
+    public void test12() {
+        initialize();
+        removeAllContainers();
+
+        Site[] sites = new Site[35];
+        for (int i = 0; i < sites.length; ++i) {
+            sites[i] = new Site();
+            sites[i].setCode(String.valueOf(i));
+        }
+
+        String containerId1 = "PA000001";
+
+        boolean result = onContainerArrived(containerId1, sites[21].getCode(), null);
+        assertEquals(true, result);
+
+        Task task = addTask(sites[21], sites[8]);
+        assertEquals(true, task != null);
+
+        int[] dests = new int[] { 8, 9, 11, 12, 13 };
+        for (int i = 0; i < dests.length - 1; ++i) {
+            // 等待AGV小车取走A点的货架
+            while (task.getStatus() != Status.Arrived) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            task = addTask(sites[dests[i]], sites[dests[i + 1]]);
+            assertEquals(true, task != null);
+        }
+    }
+
+    /**
+     * 消毒间逐个站点搬运任务测试
+     */
+    @GetMapping("/test13")
+    void test13() {
+        initialize();
+        removeAllContainers();
+
+        Site[] sites = new Site[35];
+        for (int i = 0; i < sites.length; ++i) {
+            sites[i] = new Site();
+            sites[i].setCode(String.valueOf(i));
+        }
+
+        String containerId1 = "PA000001";
+
+        boolean result = onContainerArrived(containerId1, sites[22].getCode(), null);
+        assertEquals(true, result);
+
+        for (int i = 22; i < 26; ++i) {
+            Task task = addTask(sites[i], sites[i + 1]);
+            assertEquals(true, task != null);
+
+            // 等待AGV小车取走A点的货架
+            while (task.getStatus() != Status.Arrived) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+
+    /**
+     * 灌装区逐个站点搬运任务测试
+     */
+    @GetMapping("/test14")
+    void test14() {
+        initialize();
+        removeAllContainers();
+
+        Site[] sites = new Site[35];
+        for (int i = 0; i < sites.length; ++i) {
+            sites[i] = new Site();
+            sites[i].setCode(String.valueOf(i));
+        }
+
+        String containerId1 = "PA000001";
+
+        boolean result = onContainerArrived(containerId1, sites[26].getCode(), null);
+        assertEquals(true, result);
+
+        Task task = addTask(sites[26], sites[27]);
+        assertEquals(true, task != null);
+
+        for (int i = 27; i < 34; ++i) {
+            // 等待AGV小车取走A点的货架
+            while (task.getStatus() != Status.Arrived) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            task = addTask(sites[i], sites[i + 1]);
+            assertEquals(true, task != null);
+        }
     }
 }
