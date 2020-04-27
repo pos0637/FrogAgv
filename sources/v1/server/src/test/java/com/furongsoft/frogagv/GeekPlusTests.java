@@ -6,6 +6,7 @@ import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
+import com.furongsoft.communication.modbusTcp.ModbusTcp;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +49,7 @@ public class GeekPlusTests {
 
     @Test
     public void Test0() {
-        initialize();
-        test4();
+        ModbusTcp.test();
     }
 
     /**

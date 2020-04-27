@@ -1,5 +1,7 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.agv.schedulers.BaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
+import com.furongsoft.agv.schedulers.entities.Task.Status;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelResponseMsg;
@@ -26,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -188,7 +192,9 @@ public class Scheduler extends BaseScheduler {
         MovingCallbackMsg.Body body = movingCallbackMsg.getBody();
         switch (body.getWorkflowPhase()) {
             case 20:
-                onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                if (body.getTaskPhase().equalsIgnoreCase("GO_FETCHING")) {
+                    onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                }
                 break;
             case 25:
                 onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
@@ -207,5 +213,40 @@ public class Scheduler extends BaseScheduler {
         }
 
         return new RestResponse(HttpStatus.OK);
+    }
+
+    @GetMapping("/test4")
+    public void test4() {
+        initialize();
+        removeAllContainers();
+
+        Site site1 = new Site();
+        site1.setCode("2");
+
+        Site site2 = new Site();
+        site2.setCode("5");
+
+        String containerId1 = "PA000001";
+        String containerId2 = "PA000002";
+
+        boolean result = onContainerArrived(containerId1, site1.getCode(), null);
+        assertEquals(true, result);
+
+        Task task1 = addTask(site1, site2);
+        assertEquals(true, task1 != null);
+
+        // 等待AGV小车取走A点的货架
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        result = onContainerArrived(containerId2, site2.getCode(), null);
+        assertEquals(false, result);
+
+        Task task2 = addTask(site2, site1);
+        assertEquals(false, task2 != null);
     }
 }

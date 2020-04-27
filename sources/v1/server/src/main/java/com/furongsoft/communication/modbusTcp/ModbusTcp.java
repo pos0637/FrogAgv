@@ -24,8 +24,8 @@ import com.serotonin.modbus4j.msg.WriteRegistersResponse;
  */
 public class ModbusTcp {
     public static void test() {
-        ModbusMaster master = createMaster();
-        // writeCoil(master, 254, 1, false);
+        ModbusMaster master = createMaster("192.168.115.157", 10000);
+        int[] registersOffset = { 3, 8, 13, 18 }; // 闪开寄存器偏移
         while (true) {
             short[] data = readInputRegisters(master, 254, 1000 + 4, 2);
             if (null == data) {
@@ -42,43 +42,15 @@ public class ModbusTcp {
                 sb.append(i + ": " + result[i] + ", ");
                 if (result[i]) {
                     Tracker.error(i + ":" + result[i]);
-                    // writeCoil(master, 254, i, result[i]);
-                    writeRegisters(master, 254, i, new short[] { 0x02 });
+                    writeRegisters(master, 254, registersOffset[i], new short[] { 0x0004, 0x0014 });
                 }
             }
             Tracker.info(sb.toString());
 
             try {
                 Thread.sleep(1000);
-                writeCoil(master, 254, 0, false);
-                writeCoil(master, 254, 1, false);
-                writeCoil(master, 254, 2, false);
-                writeCoil(master, 254, 3, false);
             } catch (InterruptedException e) {
             }
-        }
-    }
-
-    /**
-     * 创建主站
-     *
-     * @return 主站
-     */
-    public static ModbusMaster createMaster() {
-        IpParameters params = new IpParameters();
-        params.setHost("192.168.8.227");
-        params.setPort(10000);
-        params.setEncapsulated(true);
-
-        try {
-            ModbusMaster master = new ModbusFactory().createTcpMaster(params, true);
-            master.setTimeout(1000);
-            master.setRetries(3);
-            master.init();
-            return master;
-        } catch (ModbusInitException e) {
-            Tracker.error(e);
-            return null;
         }
     }
 
@@ -197,7 +169,7 @@ public class ModbusTcp {
      * @param bb 字节数组
      * @return 位数组
      */
-    private static boolean[] convert(ByteBuffer bb) {
+    public static boolean[] convert(ByteBuffer bb) {
         byte[] ba = bb.array();
         boolean[] result = new boolean[Byte.SIZE * ba.length];
         int offset = 0;
