@@ -96,7 +96,7 @@ public class Scheduler extends BaseScheduler {
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
                 new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 2, null, null, 1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, "GZ-2", 2, 1) }));
+                        new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, "GZ-2", 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if ((response == null) || (response.getData() == null)) {
             return null;
@@ -130,7 +130,7 @@ public class Scheduler extends BaseScheduler {
                         language, version),
                 new MovingRequestMsg.Body("MovingRequestMsg", source.getOrderNo(), "", source.getCode(), 2, null, null,
                         1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1) }));
+                        new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if ((response == null) || (response.getData() == null)) {
             return null;
@@ -234,7 +234,7 @@ public class Scheduler extends BaseScheduler {
 
     /**
      * 取消任务
-     * 
+     *
      * @param wcsTaskId WCS任务索引
      * @return 是否成功
      */
@@ -381,7 +381,7 @@ public class Scheduler extends BaseScheduler {
         Task task = addTask(sites[21], sites[8]);
         assertEquals(true, task != null);
 
-        int[] dests = new int[] { 8, 9, 11, 12, 13 };
+        int[] dests = new int[]{8, 9, 11, 12, 13};
         for (int i = 0; i < dests.length - 1; ++i) {
             // 等待AGV小车取走A点的货架
             while (task.getStatus() != Status.Arrived) {
@@ -463,5 +463,58 @@ public class Scheduler extends BaseScheduler {
             task = addTask(sites[i], sites[i + 1]);
             assertEquals(true, task != null);
         }
+    }
+
+    /**
+     * AGV避让测试
+     */
+    @GetMapping("/test15")
+    void test15() {
+        initialize();
+        removeAllContainers();
+
+        Site site4 = new Site();
+        site4.setCode("4");
+
+        Site site5 = new Site();
+        site5.setCode("5");
+        //  拆包间
+        Site site9 = new Site();
+        site9.setCode("9");
+        // 包装区
+        Site site20 = new Site();
+        site20.setCode("20");
+
+        String containerId1 = "PA000001";
+        boolean result = onContainerArrived(containerId1, site4.getCode(), null);
+        assertEquals(true, result);
+        // 仓库-包装
+        Task task1 = addTask(site4, site20);
+        assertEquals(true, task1 != null);
+
+        // 等待AGV小车取走A点的货架
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        String containerId2 = "PA000002";
+
+        boolean result2 = onContainerArrived(containerId2, site20.getCode(), null);
+        assertEquals(true, result2);
+        // 包装-仓库
+        Task task2 = addTask(site20, site4);
+        assertEquals(true, task2 != null);
+
+        String containerId3 = "PA000003";
+
+        boolean result3 = onContainerArrived(containerId3, site9.getCode(), null);
+        assertEquals(true, result3);
+        //  包材-仓库
+        Task task3 = addTask(site9, site5);
+        assertEquals(true, task3 != null);
+
     }
 }
