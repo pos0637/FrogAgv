@@ -12,7 +12,7 @@ import com.furongsoft.agv.schedulers.entities.Task;
  *
  * @author Alex
  */
-public interface IScheduler {
+public interface IBaseScheduler {
     /**
      * 初始化
      */

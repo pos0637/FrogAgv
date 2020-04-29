@@ -7,7 +7,7 @@ import com.furongsoft.agv.mappers.DeliveryTaskDao;
 import com.furongsoft.agv.mappers.MaterialBoxDao;
 import com.furongsoft.agv.mappers.MaterialBoxMaterialDao;
 import com.furongsoft.agv.models.*;
-import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.IBaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.misc.Tracker;
@@ -37,10 +37,10 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
     private final DeliveryTaskDao deliveryTaskDao;
     private final MaterialBoxDao materialBoxDao;
     private final MaterialBoxMaterialDao materialBoxMaterialDao;
-    private final IScheduler scheduler;
+    private final IBaseScheduler scheduler;
 
     @Autowired
-    public DeliveryTaskService(SiteService siteService, CallMaterialDao callMaterialDao, DeliveryTaskDao deliveryTaskDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, IScheduler scheduler) {
+    public DeliveryTaskService(SiteService siteService, CallMaterialDao callMaterialDao, DeliveryTaskDao deliveryTaskDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, IBaseScheduler scheduler) {
         super(deliveryTaskDao);
         this.siteService = siteService;
         this.callMaterialDao = callMaterialDao;

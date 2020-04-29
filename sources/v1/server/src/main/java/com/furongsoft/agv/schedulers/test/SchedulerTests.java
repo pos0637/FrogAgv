@@ -3,7 +3,7 @@ package com.furongsoft.agv.schedulers.test;
 import static org.junit.Assert.assertEquals;
 
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.schedulers.IScheduler;
+import com.furongsoft.agv.schedulers.IBaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
 
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/agv/test")
 public class SchedulerTests {
     @Autowired
-    private IScheduler scheduler;
+    private IBaseScheduler scheduler;
 
     private Site[] sites = new Site[35];
     private String containerId1 = "PA000001";

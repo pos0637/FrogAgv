@@ -1,23 +1,18 @@
 package com.furongsoft.frogagv;
 
-import com.furongsoft.agv.entities.Site;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.furongsoft.agv.frog.entities.GetBillFullInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetBomInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetMoResponseMsg;
 import com.furongsoft.agv.frog.schedulers.ProductionPlanScheduler;
-import com.furongsoft.agv.schedulers.IScheduler;
-import com.furongsoft.agv.schedulers.entities.Area;
-import com.furongsoft.agv.schedulers.entities.Task;
-import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.misc.StringUtils;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 class FrogTests {

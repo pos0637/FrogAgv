@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/agv")
-public abstract class BaseScheduler implements IScheduler {
+public abstract class BaseScheduler implements IBaseScheduler {
     /**
      * AGV调度管理器事件接口
      */
