@@ -32,6 +32,13 @@ public interface IScheduler {
     void removeAllContainers();
 
     /**
+     * 获取任务列表
+     * 
+     * @return 任务列表
+     */
+    List<Task> getTasks();
+
+    /**
      * 添加任务
      *
      * @param source      源站点

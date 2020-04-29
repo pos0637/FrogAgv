@@ -14,7 +14,6 @@ import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +54,11 @@ public abstract class BaseScheduler implements IScheduler {
     @Override
     synchronized public void removeAllContainers() {
         areas.forEach(area -> area.getSites().forEach(site -> onContainerLeft(null, site.getCode(), null)));
+    }
+
+    @Override
+    synchronized public List<Task> getTasks() {
+        return new ArrayList<Task>(tasks);
     }
 
     @Override
@@ -322,17 +326,5 @@ public abstract class BaseScheduler implements IScheduler {
         }
 
         return !StringUtils.isNullOrEmpty(site.getContainerId());
-    }
-
-    /**
-     * 获取任务信息
-     * 
-     * @return 任务信息
-     */
-    @GetMapping("/tasks")
-    public String getTasks() {
-        StringBuffer sb = new StringBuffer();
-        tasks.forEach(task -> sb.append(task.toString()).append("\n"));
-        return sb.toString();
     }
 }
