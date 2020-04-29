@@ -35,6 +35,11 @@ public class Task {
     private String wcsTaskId;
 
     /**
+     * AGV索引
+     */
+    private String agvId;
+
+    /**
      * 可替换目的站点
      */
     private boolean replaceable;

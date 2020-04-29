@@ -76,6 +76,7 @@ public abstract class BaseScheduler implements IScheduler {
     @Override
     synchronized public void onMovingStarted(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
+            task.setAgvId(agvId);
             task.setStatus(Status.Moving);
             notification.ifPresent(n -> n.onMovingStarted(agvId, task));
             Tracker.agv(String.format("OnMovingStarted: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
@@ -169,44 +170,14 @@ public abstract class BaseScheduler implements IScheduler {
 
     /**
      * 添加任务
-     *
-     * @param source      源站点
-     * @param destination 目的区域
+     * 
+     * @param source      源站点编码
+     * @param destination 目的站点编码
      * @param wcsTaskId   WCS任务索引
      * @return 任务
      */
-    synchronized protected Task addTask(Site source, AgvArea destination, String wcsTaskId) {
-        Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destination.getCode());
-        if (site.isEmpty()) {
-            Tracker.agv(String.format("AddTask destinationArea is full: %s, %s", destination.getName(),
-                    destination.getCode()));
-            site = getDefaultSite(destination.getCode());
-        }
-
-        if (site.isEmpty()) {
-            return null;
-        }
-
-        Task task = new Task(source.getCode(), site.get().getCode(), null, wcsTaskId, true, true, Status.Initialized);
-        tasks.add(task);
-
-        return task;
-    }
-
-    /**
-     * 添加任务
-     *
-     * @param source      源站点
-     * @param destination 目的站点
-     * @param wcsTaskId   WCS任务索引
-     * @return 任务
-     */
-    synchronized protected Task addTask(Site source, Site destination, String wcsTaskId) {
-        if ((getSite(source.getCode()) == null) || (getSite(destination.getCode()) == null)) {
-            return null;
-        }
-
-        Task task = new Task(source.getCode(), destination.getCode(), null, wcsTaskId, false, true, Status.Initialized);
+    synchronized protected Task addTask(String source, String destination, String wcsTaskId) {
+        Task task = new Task(source, destination, null, wcsTaskId, null, true, true, Status.Initialized);
         tasks.add(task);
 
         return task;
@@ -247,8 +218,7 @@ public abstract class BaseScheduler implements IScheduler {
      * @return 空闲站点
      */
     synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(Area area) {
-        return area.getSites().stream()
-                .filter(s -> (s.getContainerId() == null) && getTaskByDestination(s.getCode()).isEmpty()).findFirst();
+        return area.getSites().stream().filter(s -> isFreeSite(s)).findFirst();
     }
 
     /**
@@ -271,6 +241,31 @@ public abstract class BaseScheduler implements IScheduler {
      */
     synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(Area area) {
         return area.getSites().stream().findFirst();
+    }
+
+    /**
+     * 是否为空闲站点
+     * 
+     * @param code 站点编码
+     * @return 是否为空闲站点
+     */
+    synchronized protected boolean isFreeSite(String code) {
+        com.furongsoft.agv.schedulers.entities.Site site = getSite(code);
+        if (site == null) {
+            return false;
+        }
+
+        return isFreeSite(site);
+    }
+
+    /**
+     * 是否为空闲站点
+     * 
+     * @param site 站点
+     * @return 是否为空闲站点
+     */
+    synchronized protected boolean isFreeSite(com.furongsoft.agv.schedulers.entities.Site site) {
+        return StringUtils.isNullOrEmpty(site.getContainerId()) && getTaskBySite(site.getCode()).isEmpty();
     }
 
     /**

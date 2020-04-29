@@ -89,36 +89,43 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public Task addTask(Site source, AgvArea destination) {
+        Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destination.getCode());
+        if (site.isEmpty()) {
+            Tracker.agv("区域内没有空闲站点:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        // 不允许在已有任务的源站点发送任务
+        if (getTaskBySite(source.getCode()).isPresent()) {
+            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + site.toString());
+            return null;
+        }
+
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", "11", null, "GZ-1", 2, null, null, 1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, "GZ-2", 2, 1) }));
+                new MovingRequestMsg.Body("MovingRequestMsg", source.getOrderNo(), "", source.getCode(), 2, null, null,
+                        1, 1, 1,
+                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, site.get().getCode(), 2, 1) }));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if ((response == null) || (response.getData() == null)) {
             return null;
         }
 
-        return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
+        return super.addTask(source.getCode(), site.get().getCode(), response.getData()[0].getWorkflowWorkId());
     }
 
     @Override
     public Task addTask(Site source, Site destination) {
-        // 不允许向已有容器的站点内发送容器
-        if (hasContainer(destination.getCode())) {
-            Tracker.agv("不允许向已有容器的站点内发送容器:" + source.toString() + ", " + destination.toString());
+        // 不允许向已有容器或已有任务的站点内发送容器
+        if (!isFreeSite(destination.getCode())) {
+            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + source.toString() + ", " + destination.toString());
             return null;
         }
 
         // 不允许在已有任务的源站点发送任务
         if (getTaskBySite(source.getCode()).isPresent()) {
             Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + destination.toString());
-            return null;
-        }
-
-        // 不允许在已有任务的目的站点发送任务
-        if (getTaskBySite(destination.getCode()).isPresent()) {
-            Tracker.agv("不允许在已有任务的目的站点发送任务:" + source.toString() + ", " + destination.toString());
             return null;
         }
 
@@ -133,7 +140,7 @@ public class Scheduler extends BaseScheduler {
             return null;
         }
 
-        return super.addTask(source, destination, response.getData()[0].getWorkflowWorkId());
+        return super.addTask(source.getCode(), destination.getCode(), response.getData()[0].getWorkflowWorkId());
     }
 
     @Override
@@ -152,15 +159,9 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public boolean onContainerArrived(String containerId, String destination, String event) {
-        // 不允许在已有容器的站点内添加容器
-        if (hasContainer(destination)) {
-            Tracker.agv("不允许在已有容器的站点内添加容器:" + containerId + ", " + destination);
-            return false;
-        }
-
-        // 不允许在已有任务的目的站点内添加容器
-        if (getTaskByDestination(destination).isPresent()) {
-            Tracker.agv("不允许在已有任务的目的站点内添加容器:" + containerId + ", " + destination);
+        // 不允许向已有容器或已有任务的站点内发送容器
+        if (!isFreeSite(destination)) {
+            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + containerId + ", " + destination);
             return false;
         }
 
