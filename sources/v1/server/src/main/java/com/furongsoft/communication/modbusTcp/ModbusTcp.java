@@ -20,7 +20,7 @@ import com.serotonin.modbus4j.msg.WriteRegistersResponse;
 /**
  * ModbusTCP工具类
  *
- * @author alex
+ * @author Alex
  */
 public class ModbusTcp {
     public static void test() {

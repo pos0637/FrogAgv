@@ -3,7 +3,7 @@ package com.furongsoft.frogagv;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.schedulers.IBaseScheduler;
+import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
 import com.furongsoft.communication.modbusTcp.ModbusTcp;
@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class GeekPlusTests {
     @Autowired
-    private IBaseScheduler scheduler;
+    private IScheduler scheduler;
 
     private Site[] sites = new Site[35];
     private String containerId1 = "PA000001";
@@ -28,7 +28,6 @@ public class GeekPlusTests {
      */
     @BeforeEach
     void initialize() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         for (int i = 0; i < sites.length; ++i) {

@@ -3,10 +3,11 @@ package com.furongsoft.agv.schedulers.test;
 import static org.junit.Assert.assertEquals;
 
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.schedulers.IBaseScheduler;
+import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,21 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 调度器测试用例
  * 
- * @author alex
+ * @author Alex
  */
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/agv/test")
-public class SchedulerTests {
+public class SchedulerTests implements InitializingBean {
     @Autowired
-    private IBaseScheduler scheduler;
+    private IScheduler scheduler;
 
     private Site[] sites = new Site[35];
     private String containerId1 = "PA000001";
     private String containerId2 = "PA000002";
     private String containerId3 = "PA000003";
 
-    public SchedulerTests() {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         for (int i = 0; i < sites.length; ++i) {
             sites[i] = new Site();
             sites[i].setCode(String.valueOf(i));
@@ -58,7 +60,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test4")
     public void test4() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
@@ -120,7 +121,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test10")
     public void test10() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
@@ -146,7 +146,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test11")
     public void test11() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[8].getCode(), null);
@@ -174,7 +173,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test12")
     public void test12() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[21].getCode(), null);
@@ -203,7 +201,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test13")
     void test13() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[22].getCode(), null);
@@ -228,7 +225,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test14")
     void test14() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[26].getCode(), null);
@@ -256,7 +252,6 @@ public class SchedulerTests {
      */
     @GetMapping("/test15")
     void test15() {
-        scheduler.initialize();
         scheduler.removeAllContainers();
 
         boolean result = scheduler.onContainerArrived(containerId1, sites[4].getCode(), null);

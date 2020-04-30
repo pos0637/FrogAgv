@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
@@ -12,20 +11,7 @@ import com.furongsoft.agv.schedulers.entities.Task;
  *
  * @author Alex
  */
-public interface IBaseScheduler {
-    /**
-     * 初始化
-     */
-    void initialize();
-
-    /**
-     * 初始化
-     *
-     * @param areas        区域列表
-     * @param notification AGV调度管理器事件接口
-     */
-    void initialize(List<Area> areas, ISchedulerNotification notification);
-
+public interface IScheduler {
     /**
      * 移除所有站点内容器
      */
@@ -71,6 +57,43 @@ public interface IBaseScheduler {
      * @return 是否成功
      */
     boolean cancel(Site source);
+
+    /**
+     * 容器进场
+     *
+     * @param containerId 容器索引
+     * @param destination 目的站点编码
+     * @param event       事件消息
+     * @return 是否成功
+     */
+    boolean addContainer(String containerId, String destination, String event);
+
+    /**
+     * 容器离场
+     *
+     * @param containerId 容器索引
+     * @param destination 目的站点编码
+     * @param event       事件消息
+     * @return 是否成功
+     */
+    boolean removeContainer(String containerId, String destination, String event);
+
+    /**
+     * 添加任务事件
+     *
+     * @param source      源站点编码
+     * @param destination 目的站点编码
+     * @return 任务
+     */
+    Task onAddTask(String source, String destination);
+
+    /**
+     * 取消任务事件
+     *
+     * @param task 任务
+     * @return 是否成功
+     */
+    boolean onCancel(Task task);
 
     /**
      * 搬运开始事件

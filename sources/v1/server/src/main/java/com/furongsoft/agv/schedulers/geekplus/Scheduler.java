@@ -1,14 +1,8 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import com.furongsoft.agv.entities.AgvArea;
-import com.furongsoft.agv.entities.Site;
-import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.agv.schedulers.BaseScheduler;
-import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
@@ -17,13 +11,11 @@ import com.furongsoft.agv.schedulers.geekplus.entities.MovingRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingResponseMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
-import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.entities.RestResponse;
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,9 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/agv")
 public class Scheduler extends BaseScheduler {
-    @Autowired
-    private SiteService siteService;
-
     @Value("${geekplus.url}")
     private String url;
 
@@ -71,80 +60,22 @@ public class Scheduler extends BaseScheduler {
     private String version;
 
     @Override
-    synchronized public void initialize() {
-        List<AgvArea> agvAreas = siteService.selectAgvAreasByType(8);
-        List<Area> areas = new ArrayList<Area>();
-        agvAreas.forEach(agvArea -> {
-            List<SiteModel> sites = siteService.selectLocationsByAreaId(agvArea.getId());
-            List<com.furongsoft.agv.schedulers.entities.Site> siteList = new ArrayList<com.furongsoft.agv.schedulers.entities.Site>();
-            sites.forEach(siteModel -> {
-                siteList.add(new com.furongsoft.agv.schedulers.entities.Site(siteModel.getCode(),
-                        siteModel.getMaterialBoxCode()));
-            });
-            areas.add(new Area(agvArea.getCode(), siteList));
-        });
-
-        super.initialize(areas, null);
-    }
-
-    @Override
-    public Task addTask(Site source, AgvArea destination) {
-        Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destination.getCode());
-        if (site.isEmpty()) {
-            Tracker.agv("区域内没有空闲站点:" + source.toString() + ", " + destination.toString());
-            return null;
-        }
-
-        // 不允许在已有任务的源站点发送任务
-        if (getTaskBySite(source.getCode()).isPresent()) {
-            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + site.toString());
-            return null;
-        }
-
+    public synchronized Task onAddTask(String source, String destination) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", source.getOrderNo(), "", source.getCode(), 2, null, null,
-                        1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, site.get().getCode(), 2, 1) }));
+                new MovingRequestMsg.Body("MovingRequestMsg", "", "", source, 2, null, null, 1, 1, 1,
+                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination, 2, 1) }));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if ((response == null) || (response.getData() == null)) {
             return null;
         }
 
-        return super.addTask(source.getCode(), site.get().getCode(), response.getData()[0].getWorkflowWorkId());
+        return super.onAddTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
     @Override
-    public Task addTask(Site source, Site destination) {
-        // 不允许向已有容器或已有任务的站点内发送容器
-        if (!isFreeSite(destination.getCode())) {
-            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + source.toString() + ", " + destination.toString());
-            return null;
-        }
-
-        // 不允许在已有任务的源站点发送任务
-        if (getTaskBySite(source.getCode()).isPresent()) {
-            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + destination.toString());
-            return null;
-        }
-
-        MovingRequestMsg request = new MovingRequestMsg(
-                new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
-                        language, version),
-                new MovingRequestMsg.Body("MovingRequestMsg", source.getOrderNo(), "", source.getCode(), 2, null, null,
-                        1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination.getCode(), 2, 1) }));
-        MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
-        if ((response == null) || (response.getData() == null)) {
-            return null;
-        }
-
-        return super.addTask(source.getCode(), destination.getCode(), response.getData()[0].getWorkflowWorkId());
-    }
-
-    @Override
-    public boolean cancel(Task task) {
+    public synchronized boolean onCancel(Task task) {
         MovingCancelRequestMsg request = new MovingCancelRequestMsg(
                 new MovingCancelRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
@@ -154,17 +85,11 @@ public class Scheduler extends BaseScheduler {
             return false;
         }
 
-        return super.cancel(task);
+        return super.onCancel(task);
     }
 
     @Override
-    public boolean onContainerArrived(String containerId, String destination, String event) {
-        // 不允许向已有容器或已有任务的站点内发送容器
-        if (!isFreeSite(destination)) {
-            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + containerId + ", " + destination);
-            return false;
-        }
-
+    public synchronized boolean onContainerArrived(String containerId, String destination, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
@@ -180,7 +105,7 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
-    public boolean onContainerLeft(String containerId, String destination, String event) {
+    public synchronized boolean onContainerLeft(String containerId, String destination, String event) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),

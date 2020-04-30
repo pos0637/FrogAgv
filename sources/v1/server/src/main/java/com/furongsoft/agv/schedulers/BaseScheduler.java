@@ -5,26 +5,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.models.SiteModel;
 import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
+import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * AGV调度管理器
  *
  * @author Alex
  */
-@CrossOrigin(origins = "*")
-@RestController
-@RequestMapping("/api/v1/agv")
-public abstract class BaseScheduler implements IBaseScheduler {
+public abstract class BaseScheduler implements IScheduler, InitializingBean {
+    @Autowired
+    private SiteService siteService;
+
     /**
      * AGV调度管理器事件接口
      */
@@ -40,50 +42,117 @@ public abstract class BaseScheduler implements IBaseScheduler {
      */
     protected List<Task> tasks = new LinkedList<>();
 
+    /**
+     * 待执行任务列表
+     */
+    protected List<Task> pendingTasks = new LinkedList<>();
+
     @Override
-    synchronized public void initialize() {
+    public void afterPropertiesSet() throws Exception {
+        List<AgvArea> agvAreas = siteService.selectAgvAreasByType(8);
+        areas = new ArrayList<Area>();
+        agvAreas.forEach(agvArea -> {
+            List<SiteModel> sites = siteService.selectLocationsByAreaId(agvArea.getId());
+            List<com.furongsoft.agv.schedulers.entities.Site> siteList = new ArrayList<com.furongsoft.agv.schedulers.entities.Site>();
+            sites.forEach(siteModel -> {
+                siteList.add(new com.furongsoft.agv.schedulers.entities.Site(siteModel.getCode(),
+                        siteModel.getMaterialBoxCode()));
+            });
+            areas.add(new Area(agvArea.getCode(), siteList));
+        });
     }
 
     @Override
-    synchronized public void initialize(List<Area> areas, ISchedulerNotification notification) {
-        this.areas = areas;
-        this.notification = Optional.ofNullable(notification);
-    }
-
-    @Override
-    synchronized public void removeAllContainers() {
+    public synchronized void removeAllContainers() {
         areas.forEach(area -> area.getSites().forEach(site -> onContainerLeft(null, site.getCode(), null)));
     }
 
     @Override
-    synchronized public List<Task> getTasks() {
+    public synchronized List<Task> getTasks() {
         return new ArrayList<Task>(tasks);
     }
 
     @Override
-    synchronized public boolean cancel(Task task) {
+    public synchronized Task addTask(Site source, AgvArea destination) {
+        Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destination.getCode());
+        if (site.isEmpty()) {
+            Tracker.agv("区域内没有空闲站点:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        // 不允许在已有任务的源站点发送任务
+        if (getTaskBySite(source.getCode()).isPresent()) {
+            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + site.toString());
+            return null;
+        }
+
+        return onAddTask(source.getCode(), site.get().getCode());
+    }
+
+    @Override
+    public synchronized Task addTask(Site source, Site destination) {
+        // 不允许向已有容器或已有任务的站点内发送容器
+        if (!isFreeSite(destination.getCode())) {
+            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        // 不允许在已有任务的源站点发送任务
+        if (getTaskBySite(source.getCode()).isPresent()) {
+            Tracker.agv("不允许在已有任务的源站点发送任务:" + source.toString() + ", " + destination.toString());
+            return null;
+        }
+
+        return onAddTask(source.getCode(), destination.getCode());
+    }
+
+    @Override
+    public synchronized boolean cancel(Task task) {
+        return onCancel(task);
+    }
+
+    @Override
+    public synchronized boolean cancel(Site source) {
+        tasks.stream().filter(t -> t.getSource().equals(source.getCode())).map(this::cancel);
+        return true;
+    }
+
+    @Override
+    public synchronized boolean addContainer(String containerId, String destination, String event) {
+        // 不允许向已有容器或已有任务的站点内发送容器
+        if (!isFreeSite(destination)) {
+            Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + containerId + ", " + destination);
+            return false;
+        }
+
+        return onContainerArrived(containerId, destination, event);
+    }
+
+    @Override
+    public synchronized boolean removeContainer(String containerId, String destination, String event) {
+        return onContainerLeft(containerId, destination, event);
+    }
+
+    @Override
+    public synchronized boolean onCancel(Task task) {
         tasks.remove(task);
         return true;
     }
 
     @Override
-    synchronized public boolean cancel(Site source) {
-        Optional<Task> task = getTaskBySource(source.getCode());
-        return task.isPresent() && cancel(task.get());
-    }
-
-    @Override
-    synchronized public void onMovingStarted(String agvId, String taskId, String event) {
+    public synchronized void onMovingStarted(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setAgvId(agvId);
             task.setStatus(Status.Moving);
+            task.setReplaceable(false);
+            task.setCancelable(false);
             notification.ifPresent(n -> n.onMovingStarted(agvId, task));
             Tracker.agv(String.format("OnMovingStarted: task: %s, agv: %s, event: %s", task.toString(), agvId, event));
         });
     }
 
     @Override
-    synchronized public void onMovingArrived(String agvId, String taskId, String event) {
+    public synchronized void onMovingArrived(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
             notification.ifPresent(n -> n.onMovingArrived(agvId, task));
@@ -93,7 +162,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public void onMovingPaused(String agvId, String taskId, String event) {
+    public synchronized void onMovingPaused(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
             notification.ifPresent(n -> n.onMovingPaused(agvId, task));
@@ -102,7 +171,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public void onMovingWaiting(String agvId, String taskId, String event) {
+    public synchronized void onMovingWaiting(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
             notification.ifPresent(n -> n.onMovingWaiting(agvId, task));
@@ -111,7 +180,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public void onMovingCancelled(String agvId, String taskId, String event) {
+    public synchronized void onMovingCancelled(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
             notification.ifPresent(n -> n.onMovingCancelled(agvId, task));
@@ -122,7 +191,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public void onMovingFail(String agvId, String taskId, String event) {
+    public synchronized void onMovingFail(String agvId, String taskId, String event) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
             notification.ifPresent(n -> n.onMovingFail(agvId, task));
@@ -132,7 +201,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public boolean onContainerArrived(String containerId, String destination, String event) {
+    public synchronized boolean onContainerArrived(String containerId, String destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
         if (site == null) {
             return false;
@@ -150,7 +219,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
     }
 
     @Override
-    synchronized public boolean onContainerLeft(String containerId, String destination, String event) {
+    public synchronized boolean onContainerLeft(String containerId, String destination, String event) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
         if (site == null) {
             return false;
@@ -175,7 +244,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param wcsTaskId   WCS任务索引
      * @return 任务
      */
-    synchronized protected Task addTask(String source, String destination, String wcsTaskId) {
+    protected synchronized Task onAddTask(String source, String destination, String wcsTaskId) {
         Task task = new Task(source, destination, null, wcsTaskId, null, true, true, Status.Initialized);
         tasks.add(task);
 
@@ -188,7 +257,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param code 站点编码
      * @return 站点
      */
-    synchronized protected com.furongsoft.agv.schedulers.entities.Site getSite(String code) {
+    protected synchronized com.furongsoft.agv.schedulers.entities.Site getSite(String code) {
         for (Area area : areas) {
             for (com.furongsoft.agv.schedulers.entities.Site s : area.getSites()) {
                 if (s.getCode().equals(code)) {
@@ -206,7 +275,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param destinationArea 目的区域编码
      * @return 空闲站点
      */
-    synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(String destinationArea) {
+    protected synchronized Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(String destinationArea) {
         return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst().flatMap(this::getFreeSite);
     }
 
@@ -216,7 +285,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param area 区域
      * @return 空闲站点
      */
-    synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(Area area) {
+    protected synchronized Optional<com.furongsoft.agv.schedulers.entities.Site> getFreeSite(Area area) {
         return area.getSites().stream().filter(s -> isFreeSite(s)).findFirst();
     }
 
@@ -226,7 +295,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param destinationArea 目的区域编码
      * @return 站点
      */
-    synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(
+    protected synchronized Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(
             String destinationArea) {
         return areas.stream().filter(a -> a.getCode().equals(destinationArea)).findFirst()
                 .flatMap(this::getDefaultSite);
@@ -238,7 +307,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param area 区域
      * @return 站点
      */
-    synchronized protected Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(Area area) {
+    protected synchronized Optional<com.furongsoft.agv.schedulers.entities.Site> getDefaultSite(Area area) {
         return area.getSites().stream().findFirst();
     }
 
@@ -248,7 +317,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param code 站点编码
      * @return 是否为空闲站点
      */
-    synchronized protected boolean isFreeSite(String code) {
+    protected synchronized boolean isFreeSite(String code) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(code);
         if (site == null) {
             return false;
@@ -263,7 +332,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param site 站点
      * @return 是否为空闲站点
      */
-    synchronized protected boolean isFreeSite(com.furongsoft.agv.schedulers.entities.Site site) {
+    protected synchronized boolean isFreeSite(com.furongsoft.agv.schedulers.entities.Site site) {
         return StringUtils.isNullOrEmpty(site.getContainerId()) && getTaskBySite(site.getCode()).isEmpty();
     }
 
@@ -273,7 +342,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param source 源站点编码
      * @return 任务
      */
-    synchronized protected Optional<Task> getTaskBySource(String source) {
+    protected synchronized Optional<Task> getTaskBySource(String source) {
         return tasks.stream().filter(t -> t.getSource().equals(source)).findFirst();
     }
 
@@ -283,7 +352,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param destination 目的站点编码
      * @return 任务
      */
-    synchronized protected Optional<Task> getTaskByDestination(String destination) {
+    protected synchronized Optional<Task> getTaskByDestination(String destination) {
         return tasks.stream().filter(t -> t.getDestination().equals(destination)).findFirst();
     }
 
@@ -293,7 +362,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param code 站点编码
      * @return 任务
      */
-    synchronized protected Optional<Task> getTaskBySite(String code) {
+    protected synchronized Optional<Task> getTaskBySite(String code) {
         return tasks.stream().filter(t -> t.getSource().equals(code) || t.getDestination().equals(code)).findFirst();
     }
 
@@ -303,7 +372,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param wcsTaskId WCS任务索引
      * @return 任务
      */
-    synchronized protected Optional<Task> getTaskByWcsTaskId(String wcsTaskId) {
+    protected synchronized Optional<Task> getTaskByWcsTaskId(String wcsTaskId) {
         return tasks.stream().filter(t -> t.getWcsTaskId().equals(wcsTaskId)).findFirst();
     }
 
@@ -313,7 +382,7 @@ public abstract class BaseScheduler implements IBaseScheduler {
      * @param code 站点编码
      * @return 是否有容器
      */
-    synchronized protected boolean hasContainer(String code) {
+    protected synchronized boolean hasContainer(String code) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(code);
         if (site == null) {
             return false;

@@ -1,27 +1,34 @@
 package com.furongsoft.agv.services;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import com.furongsoft.agv.entities.DeliveryTask;
 import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.mappers.CallMaterialDao;
 import com.furongsoft.agv.mappers.DeliveryTaskDao;
 import com.furongsoft.agv.mappers.MaterialBoxDao;
 import com.furongsoft.agv.mappers.MaterialBoxMaterialDao;
-import com.furongsoft.agv.models.*;
-import com.furongsoft.agv.schedulers.IBaseScheduler;
+import com.furongsoft.agv.models.AgvAreaModel;
+import com.furongsoft.agv.models.CallMaterialModel;
+import com.furongsoft.agv.models.DeliveryTaskModel;
+import com.furongsoft.agv.models.MaterialBoxMaterialModel;
+import com.furongsoft.agv.models.MaterialBoxModel;
+import com.furongsoft.agv.models.SiteDetailModel;
+import com.furongsoft.agv.models.SiteModel;
+import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.services.BaseService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 配送管理服务
@@ -37,10 +44,10 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
     private final DeliveryTaskDao deliveryTaskDao;
     private final MaterialBoxDao materialBoxDao;
     private final MaterialBoxMaterialDao materialBoxMaterialDao;
-    private final IBaseScheduler scheduler;
+    private final IScheduler scheduler;
 
     @Autowired
-    public DeliveryTaskService(SiteService siteService, CallMaterialDao callMaterialDao, DeliveryTaskDao deliveryTaskDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, IBaseScheduler scheduler) {
+    public DeliveryTaskService(SiteService siteService, CallMaterialDao callMaterialDao, DeliveryTaskDao deliveryTaskDao, MaterialBoxDao materialBoxDao, MaterialBoxMaterialDao materialBoxMaterialDao, IScheduler scheduler) {
         super(deliveryTaskDao);
         this.siteService = siteService;
         this.callMaterialDao = callMaterialDao;
