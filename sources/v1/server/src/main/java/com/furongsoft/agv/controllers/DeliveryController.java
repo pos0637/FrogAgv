@@ -29,9 +29,10 @@ public class DeliveryController {
      *
      * @param deliveryTaskModel 配送任务对象
      * @return 响应内容
+     * @throws Exception
      */
     @PostMapping("/delivery/addDeliveryTask")
-    public RestResponse addDeliveryTask(@RequestBody DeliveryTaskModel deliveryTaskModel) {
+    public RestResponse addDeliveryTask(@RequestBody DeliveryTaskModel deliveryTaskModel) throws Exception {
         return new RestResponse(HttpStatus.OK, null, deliveryTaskService.addDeliveryTask(deliveryTaskModel));
     }
 }

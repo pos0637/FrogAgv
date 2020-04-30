@@ -71,7 +71,7 @@ public class Scheduler extends BaseScheduler {
             return null;
         }
 
-        return super.onAddTask(source, destination, response.getData()[0].getWorkflowWorkId());
+        return super.addRunningTask(source, destination, response.getData()[0].getWorkflowWorkId());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
-    public synchronized boolean onContainerArrived(String containerId, String destination, String event) {
+    public synchronized boolean onContainerArrived(String containerId, String destination) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
@@ -101,11 +101,11 @@ public class Scheduler extends BaseScheduler {
             return false;
         }
 
-        return super.onContainerArrived(containerId, destination, event);
+        return super.onContainerArrived(containerId, destination);
     }
 
     @Override
-    public synchronized boolean onContainerLeft(String containerId, String destination, String event) {
+    public synchronized boolean onContainerLeft(String containerId, String destination) {
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
@@ -117,7 +117,7 @@ public class Scheduler extends BaseScheduler {
             return false;
         }
 
-        return super.onContainerLeft(containerId, destination, event);
+        return super.onContainerLeft(containerId, destination);
     }
 
     /**
@@ -133,20 +133,20 @@ public class Scheduler extends BaseScheduler {
         switch (body.getWorkflowPhase()) {
             case 20:
                 if (body.getTaskPhase().equalsIgnoreCase("GO_FETCHING")) {
-                    onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                    onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 }
                 break;
             case 25:
-                onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 26:
-                onMovingPaused(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                onMovingPaused(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 30:
-                onMovingArrived(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                onMovingArrived(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 31:
-                onMovingFail(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()), null);
+                onMovingFail(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             default:
                 break;

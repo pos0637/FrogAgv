@@ -30,8 +30,9 @@ public interface IScheduler {
      * @param source      源站点
      * @param destination 目的区域
      * @return 任务
+     * @throws Exception 异常
      */
-    Task addTask(Site source, AgvArea destination);
+    Task addTask(Site source, AgvArea destination) throws Exception;
 
     /**
      * 添加任务
@@ -39,8 +40,9 @@ public interface IScheduler {
      * @param source      源站点
      * @param destination 目的站点
      * @return 任务
+     * @throws Exception 异常
      */
-    Task addTask(Site source, Site destination);
+    Task addTask(Site source, Site destination) throws Exception;
 
     /**
      * 取消任务
@@ -63,20 +65,19 @@ public interface IScheduler {
      *
      * @param containerId 容器索引
      * @param destination 目的站点编码
-     * @param event       事件消息
      * @return 是否成功
+     * @throws Exception 异常
      */
-    boolean addContainer(String containerId, String destination, String event);
+    boolean addContainer(String containerId, String destination) throws Exception;
 
     /**
      * 容器离场
      *
      * @param containerId 容器索引
      * @param destination 目的站点编码
-     * @param event       事件消息
      * @return 是否成功
      */
-    boolean removeContainer(String containerId, String destination, String event);
+    boolean removeContainer(String containerId, String destination);
 
     /**
      * 添加任务事件
@@ -100,72 +101,64 @@ public interface IScheduler {
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingStarted(String agvId, String taskId, String event);
+    void onMovingStarted(String agvId, String taskId);
 
     /**
      * 搬运完成事件
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingArrived(String agvId, String taskId, String event);
+    void onMovingArrived(String agvId, String taskId);
 
     /**
      * 搬运暂停事件
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingPaused(String agvId, String taskId, String event);
+    void onMovingPaused(String agvId, String taskId);
 
     /**
      * 搬运等待事件
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingWaiting(String agvId, String taskId, String event);
+    void onMovingWaiting(String agvId, String taskId);
 
     /**
      * 搬运取消事件
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingCancelled(String agvId, String taskId, String event);
+    void onMovingCancelled(String agvId, String taskId);
 
     /**
      * 搬运失败事件
      *
      * @param agvId  AGV索引
      * @param taskId 任务索引
-     * @param event  事件消息
      */
-    void onMovingFail(String agvId, String taskId, String event);
+    void onMovingFail(String agvId, String taskId);
 
     /**
      * 容器进场事件
      *
      * @param containerId 容器索引
      * @param destination 目的站点编码
-     * @param event       事件消息
      * @return 是否成功
      */
-    boolean onContainerArrived(String containerId, String destination, String event);
+    boolean onContainerArrived(String containerId, String destination);
 
     /**
      * 容器离场事件
      *
      * @param containerId 容器索引
      * @param destination 目的站点编码
-     * @param event       事件消息
      * @return 是否成功
      */
-    boolean onContainerLeft(String containerId, String destination, String event);
+    boolean onContainerLeft(String containerId, String destination);
 }

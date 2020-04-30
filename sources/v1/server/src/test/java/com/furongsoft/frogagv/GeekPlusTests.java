@@ -46,10 +46,12 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器</br>
      * 测试步骤: 在A点执行容器入场->下发一个A点到B点的任务</br>
      * 预计结果: A点容器入场成功,下发任务成功</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test1() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test1() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task = scheduler.addTask(sites[2], sites[4]);
@@ -61,13 +63,15 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上有容器</br>
      * 测试步骤: 清空A、B两点容器,在B上入场一个容器,在A点执行容器入场->下发一个A点到B点的任务</br>
      * 预计结果: B点容器入场成功,A点容器入场成功,下发任务失败</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test2() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test2() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        result = scheduler.onContainerArrived(containerId2, sites[5].getCode(), null);
+        result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(true, result);
 
         Task task = scheduler.addTask(sites[2], sites[5]);
@@ -79,16 +83,18 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器</br>
      * 测试步骤: 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->B点容器入场->下发一个B点到A点的任务</br>
      * 预计结果: A点容器入场成功,B点容器入场失败,A到B任务下发成功,B到A任务下发失败</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test3() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test3() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId2, sites[5].getCode(), null);
+        result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(sites[5], sites[2]);
@@ -101,10 +107,12 @@ public class GeekPlusTests {
      * 测试步骤:
      * 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->在B点容器入场->下发一个B点到A点的任务</br>
      * 预计结果: A点容器入场成功,A到B任务下发成功,B点容器入场失败,B到A任务下发失败</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test4() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test4() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
@@ -118,7 +126,7 @@ public class GeekPlusTests {
             }
         }
 
-        result = scheduler.onContainerArrived(containerId2, sites[5].getCode(), null);
+        result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(sites[5], sites[2]);
@@ -130,16 +138,18 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器,C点无容器</br>
      * 测试步骤: 清空A、B、C三点容器.在A点容器入场->下发一个A点到B点的任务->在C点容器入场->下发一个C到A的任务</br>
      * 预计结果: A点容器入场成功、A到B任务下发成功,C点容器入场成功,C到A下发任务失败</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test5() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[4].getCode(), null);
+    void test5() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[4].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[4], sites[2]);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId3, sites[5].getCode(), null);
+        result = scheduler.addContainer(containerId3, sites[5].getCode());
         assertEquals(true, result);
 
         Task task2 = scheduler.addTask(sites[5], sites[4]);
@@ -151,16 +161,18 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器,D点无容器</br>
      * 测试步骤: 清空A、B、D三点容器.在A点容器入场->下发一个A点到B点的任务->B点容器入场->下发一个B点到D点的任务</br>
      * 预计结果: A点容器入场成功、A到B任务下发成功,B点容器入场失败,下发B点到D点的任务失败</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test7() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test7() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId2, sites[5].getCode(), null);
+        result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(sites[5], sites[4]);
@@ -172,16 +184,18 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器,C点无容器,D点无容器</br>
      * 测试步骤: 清空A、B、C、D四点容器.在A点容器入场->下发一个A点到B点的任务->在C点容器入场->下发一个C点到D点的任务</br>
      * 预计结果: A点容器入场成功、A到B任务下发成功.C点容器入场成功、C到D任务下发成功</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test8() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    void test8() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId3, sites[4].getCode(), null);
+        result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
         Task task2 = scheduler.addTask(sites[4], sites[7]);
@@ -193,16 +207,18 @@ public class GeekPlusTests {
      * 前置条件: A点上无容器,B点上无容器,C点无容器</br>
      * 测试步骤: 清空A、B、C三点容器.在B点容器入场->下发一个B点到A点的任务->C点容器入场->下发一个C点到A点的任务</br>
      * 预计结果: B点容器入场成功、B到A任务下发成功.C点容器入场成功、C到A任务下发成功</br>
+     * 
+     * @throws Exception
      */
     @Test
-    void test9() {
-        boolean result = scheduler.onContainerArrived(containerId2, sites[5].getCode(), null);
+    void test9() throws Exception {
+        boolean result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[5], sites[2]);
         assertEquals(true, task1 != null);
 
-        result = scheduler.onContainerArrived(containerId3, sites[4].getCode(), null);
+        result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
         Task task2 = scheduler.addTask(sites[4], sites[2]);

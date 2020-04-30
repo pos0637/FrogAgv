@@ -1,5 +1,11 @@
 package com.furongsoft.agv.services;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.furongsoft.agv.devices.mappers.CallButtonDao;
 import com.furongsoft.agv.devices.model.CallButtonModel;
 import com.furongsoft.agv.entities.CallMaterial;
@@ -7,17 +13,21 @@ import com.furongsoft.agv.mappers.AgvAreaDao;
 import com.furongsoft.agv.mappers.CallMaterialDao;
 import com.furongsoft.agv.mappers.WaveDao;
 import com.furongsoft.agv.mappers.WaveDetailDao;
-import com.furongsoft.agv.models.*;
+import com.furongsoft.agv.models.AgvAreaModel;
+import com.furongsoft.agv.models.CallMaterialModel;
+import com.furongsoft.agv.models.DeliveryTaskModel;
+import com.furongsoft.agv.models.DistributionTaskModel;
+import com.furongsoft.agv.models.WaveDetailModel;
+import com.furongsoft.agv.models.WaveModel;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.services.BaseService;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
-import java.util.*;
 
 /**
  * 叫料服务
@@ -36,7 +46,8 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     private final DeliveryTaskService deliveryTaskService;
 
     @Autowired
-    public CallMaterialService(CallMaterialDao callMaterialDao, CallButtonDao callButtonDao, AgvAreaDao agvAreaDao, WaveDao waveDao, WaveDetailDao waveDetailDao, DeliveryTaskService deliveryTaskService) {
+    public CallMaterialService(CallMaterialDao callMaterialDao, CallButtonDao callButtonDao, AgvAreaDao agvAreaDao,
+            WaveDao waveDao, WaveDetailDao waveDetailDao, DeliveryTaskService deliveryTaskService) {
         super(callMaterialDao);
         this.callMaterialDao = callMaterialDao;
         this.callButtonDao = callButtonDao;
@@ -65,7 +76,8 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @param areaId 区域ID（产线ID）
      * @return 叫料列表
      */
-    public List<CallMaterialModel> selectCallMaterialsByConditions(int type, Integer state, String teamId, Long areaId) {
+    public List<CallMaterialModel> selectCallMaterialsByConditions(int type, Integer state, String teamId,
+            Long areaId) {
         return callMaterialDao.selectCallMaterialsByConditions(type, state, teamId, areaId);
     }
 
@@ -78,14 +90,20 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @param areaId 区域ID（产线ID）
      * @return 配货任务列表
      */
-    public List<DistributionTaskModel> selectDistributionTaskByConditions(int type, Integer state, String teamId, Long areaId) {
-        List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(type, state, teamId, areaId);
+    public List<DistributionTaskModel> selectDistributionTaskByConditions(int type, Integer state, String teamId,
+            Long areaId) {
+        List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(type, state,
+                teamId, areaId);
         Map<String, DistributionTaskModel> distributionTaskModelMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(callMaterialModels)) {
             callMaterialModels.forEach(callMaterialModel -> {
-                DistributionTaskModel distributionTaskModel = distributionTaskModelMap.get(callMaterialModel.getWaveCode());
+                DistributionTaskModel distributionTaskModel = distributionTaskModelMap
+                        .get(callMaterialModel.getWaveCode());
                 if (ObjectUtils.isEmpty(distributionTaskModel)) {
-                    DistributionTaskModel newDistributionTask = new DistributionTaskModel(callMaterialModel.getWaveCode(), callMaterialModel.getProductId(), callMaterialModel.getProductName(), callMaterialModel.getProductUuid(), callMaterialModel.getProductLineCode(), callMaterialModel.getCallTime(), new ArrayList<>());
+                    DistributionTaskModel newDistributionTask = new DistributionTaskModel(
+                            callMaterialModel.getWaveCode(), callMaterialModel.getProductId(),
+                            callMaterialModel.getProductName(), callMaterialModel.getProductUuid(),
+                            callMaterialModel.getProductLineCode(), callMaterialModel.getCallTime(), new ArrayList<>());
                     newDistributionTask.getCallMaterialModels().add(callMaterialModel);
                     distributionTaskModelMap.put(callMaterialModel.getWaveCode(), newDistributionTask);
                 } else {
@@ -141,7 +159,8 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                 CallMaterial callMaterial = new CallMaterial(waveDetailModel);
                 Date newDate = new Date();
                 callMaterial.setCallTime(newDate);
-                CallMaterialModel callMaterialModel = callMaterialDao.selectCallMaterialByWaveDetailCodeAndAreaType(waveDetailModel.getCode(), waveDetailModel.getAreaType());
+                CallMaterialModel callMaterialModel = callMaterialDao.selectCallMaterialByWaveDetailCodeAndAreaType(
+                        waveDetailModel.getCode(), waveDetailModel.getAreaType());
                 if (ObjectUtils.isEmpty(callMaterialModel)) {
                     insertCalls.add(callMaterial);
                 }
@@ -155,8 +174,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     }
 
     /**
-     * 通过叫料ID取消叫料。
-     * 先判断这个叫料的状态是否处于未配送状态，不是未配送不可取消
+     * 通过叫料ID取消叫料。 先判断这个叫料的状态是否处于未配送状态，不是未配送不可取消
      *
      * @param id 叫料ID
      */
@@ -184,8 +202,9 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * 按钮叫料 TODO 项目启动时，把按钮信息加载到内存中
      *
      * @param ipAddress
+     * @throws Exception
      */
-    public void buttonCallMaterial(String ipAddress, String buttonCode) {
+    public void buttonCallMaterial(String ipAddress, String buttonCode) throws Exception {
         CallButtonModel callButtonModel = callButtonDao.selectCallButtonAreaByIpAddress(ipAddress, buttonCode);
         if (callButtonModel.getCode().indexOf("CALL") > 0) {
             callMaterial(callButtonModel);
@@ -213,7 +232,8 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                 // 所有波次详情
                 List<WaveDetailModel> waveDetailModels = waveDetailDao.selectWaveDetails(waveModel.getCode());
                 // 指定区域已叫料的波次详情
-                List<WaveDetailModel> callWaveDetailModels = waveDetailDao.selectWaveDetailsByWaveCodeAndAreaId(waveModel.getCode(), callLine.getId());
+                List<WaveDetailModel> callWaveDetailModels = waveDetailDao
+                        .selectWaveDetailsByWaveCodeAndAreaId(waveModel.getCode(), callLine.getId());
                 if (!CollectionUtils.isEmpty(callWaveDetailModels)) {
                     Map<String, WaveDetailModel> waveDetailModelMap = new HashMap<>();
                     // 将已叫料的波次详情放入Map种
@@ -275,8 +295,9 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * 按钮退货
      *
      * @param callButtonModel 按钮对象
+     * @throws Exception
      */
-    public boolean backMaterialBox(CallButtonModel callButtonModel) {
+    public boolean backMaterialBox(CallButtonModel callButtonModel) throws Exception {
         // 获取叫料产线
         AgvAreaModel callLine = agvAreaDao.selectParentAreaById(callButtonModel.getAreaId());
         // 获取叫料区域

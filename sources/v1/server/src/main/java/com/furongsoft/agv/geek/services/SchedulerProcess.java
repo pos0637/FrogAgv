@@ -38,7 +38,7 @@ public class SchedulerProcess implements ISchedulerNotification {
         deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 3); // 任务改成已完成
         siteService.addMaterialBox(deliveryTaskModel.getEndSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在目标点添加料框，并设为有货
         // 容器离场 TODO
-        scheduler.onContainerLeft(null, siteService.get(deliveryTaskModel.getEndSiteId()).getCode(), null);
+        scheduler.removeContainer(null, siteService.get(deliveryTaskModel.getEndSiteId()).getCode());
     }
 
     @Override

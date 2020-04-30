@@ -57,12 +57,14 @@ public class SchedulerTests implements InitializingBean {
      * 测试步骤:
      * 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->在B点容器入场->下发一个B点到A点的任务</br>
      * 预计结果: A点容器入场成功,A到B任务下发成功,B点容器入场失败,B到A任务下发失败</br>
+     * 
+     * @throws Exception
      */
     @GetMapping("/test4")
-    public void test4() {
+    public void test4() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
@@ -76,7 +78,7 @@ public class SchedulerTests implements InitializingBean {
             }
         }
 
-        result = scheduler.onContainerArrived(containerId2, sites[2].getCode(), null);
+        result = scheduler.addContainer(containerId2, sites[2].getCode());
         assertEquals(false, result);
 
         Task task2 = scheduler.addTask(sites[5], sites[2]);
@@ -89,10 +91,12 @@ public class SchedulerTests implements InitializingBean {
      * 测试步骤:
      * 清空A、B、C三点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->C点容器入场->下发一个C到A的任务</br>
      * 预计结果: A点容器入场成功、A到B任务下发成功,C点容器入场成功,C到A下发任务成功</br>
+     * 
+     * @throws Exception
      */
     @GetMapping("/test6")
-    public void test6() {
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+    public void test6() throws Exception {
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
@@ -106,7 +110,7 @@ public class SchedulerTests implements InitializingBean {
             }
         }
 
-        result = scheduler.onContainerArrived(containerId3, sites[4].getCode(), null);
+        result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
         Task task2 = scheduler.addTask(sites[4], sites[2]);
@@ -118,12 +122,14 @@ public class SchedulerTests implements InitializingBean {
      * 前置条件: A点上无容器,B点上无容器</br>
      * 测试步骤: 清空A、B两点容器.在A点容器入场->下发一个A点到B点的任务->AGV小车取走A点的货架->取消任务</br>
      * 预计结果: A点容器入场成功,A到B任务下发成功,取消任务成功</br>
+     * 
+     * @throws Exception
      */
     @GetMapping("/test10")
-    public void test10() {
+    public void test10() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[2].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
         Task task1 = scheduler.addTask(sites[2], sites[5]);
@@ -143,12 +149,14 @@ public class SchedulerTests implements InitializingBean {
 
     /**
      * 包装区逐个站点搬运任务测试
+     * 
+     * @throws Exception
      */
     @GetMapping("/test11")
-    public void test11() {
+    public void test11() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[8].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[8].getCode());
         assertEquals(true, result);
 
         Task task = scheduler.addTask(sites[8], sites[14]);
@@ -170,12 +178,14 @@ public class SchedulerTests implements InitializingBean {
 
     /**
      * 拆包间逐个站点搬运任务测试
+     * 
+     * @throws Exception
      */
     @GetMapping("/test12")
-    public void test12() {
+    public void test12() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[21].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[21].getCode());
         assertEquals(true, result);
 
         Task task = scheduler.addTask(sites[21], sites[8]);
@@ -198,12 +208,14 @@ public class SchedulerTests implements InitializingBean {
 
     /**
      * 消毒间逐个站点搬运任务测试
+     * 
+     * @throws Exception
      */
     @GetMapping("/test13")
-    void test13() {
+    void test13() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[22].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[22].getCode());
         assertEquals(true, result);
 
         for (int i = 22; i < 26; ++i) {
@@ -222,12 +234,14 @@ public class SchedulerTests implements InitializingBean {
 
     /**
      * 灌装区逐个站点搬运任务测试
+     * 
+     * @throws Exception
      */
     @GetMapping("/test14")
-    void test14() {
+    void test14() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[26].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[26].getCode());
         assertEquals(true, result);
 
         Task task = scheduler.addTask(sites[26], sites[27]);
@@ -249,12 +263,14 @@ public class SchedulerTests implements InitializingBean {
 
     /**
      * AGV避让测试
+     * 
+     * @throws Exception
      */
     @GetMapping("/test15")
-    void test15() {
+    void test15() throws Exception {
         scheduler.removeAllContainers();
 
-        boolean result = scheduler.onContainerArrived(containerId1, sites[4].getCode(), null);
+        boolean result = scheduler.addContainer(containerId1, sites[4].getCode());
         assertEquals(true, result);
 
         // 仓库-包装
@@ -269,14 +285,14 @@ public class SchedulerTests implements InitializingBean {
             }
         }
 
-        boolean result2 = scheduler.onContainerArrived(containerId2, sites[20].getCode(), null);
+        boolean result2 = scheduler.addContainer(containerId2, sites[20].getCode());
         assertEquals(true, result2);
 
         // 包装-仓库
         Task task2 = scheduler.addTask(sites[20], sites[4]);
         assertEquals(true, task2 != null);
 
-        boolean result3 = scheduler.onContainerArrived(containerId3, sites[9].getCode(), null);
+        boolean result3 = scheduler.addContainer(containerId3, sites[9].getCode());
         assertEquals(true, result3);
 
         // 包材-仓库

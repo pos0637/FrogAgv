@@ -33,51 +33,69 @@ public class ButtonBoxWrite implements Runnable {
                 buttonBoxes.forEach(buttonBoxModel -> {
                     // 未连接则创建连接,已连接则执行写入
                     ModbusMaster currentMaster = buttonBoxModel.getModbusMaster();
-//                    CopyOnWriteArrayList<Boolean> callState = buttonBoxModel.getCallState();
-//                    if (null != currentMaster && !CollectionUtils.isEmpty(callState)) {
-//                        for (int i = 0; i < callState.size(); ++i) {
-//                            if (callState.get(i)) {
-//                                // 执行成功后亮灯、
-//                                Tracker.warn("执行" + buttonBoxModel.getCallButtonModelByButtonCode(i).getName() + "的逻辑,并将编号" + buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode() + "设置为false。第" + i);
-//                                if (ModbusTcp.writeCoil(currentMaster, 254, i, true)) {
-//                                    callState.set(Integer.valueOf(buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode()), false);
-//                                }
-//                            }
-//                        }
-//                    }
+                    // CopyOnWriteArrayList<Boolean> callState = buttonBoxModel.getCallState();
+                    // if (null != currentMaster && !CollectionUtils.isEmpty(callState)) {
+                    // for (int i = 0; i < callState.size(); ++i) {
+                    // if (callState.get(i)) {
+                    // // 执行成功后亮灯、
+                    // Tracker.warn("执行" +
+                    // buttonBoxModel.getCallButtonModelByButtonCode(i).getName() + "的逻辑,并将编号" +
+                    // buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode() +
+                    // "设置为false。第" + i);
+                    // if (ModbusTcp.writeCoil(currentMaster, 254, i, true)) {
+                    // callState.set(Integer.valueOf(buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode()),
+                    // false);
+                    // }
+                    // }
+                    // }
+                    // }
                     synchronized (buttonBoxModel.getCallTaskModels()) {
                         List<TaskModel> taskModels = buttonBoxModel.getCallTaskModels();
                         if (null != currentMaster && !CollectionUtils.isEmpty(taskModels)) {
                             taskModels.forEach(taskModel -> {
-                                CallButtonModel callButtonModel = buttonBoxModel.getCallButtonModelByButtonCode(taskModel.getButtonNo());
+                                CallButtonModel callButtonModel = buttonBoxModel
+                                        .getCallButtonModelByButtonCode(taskModel.getButtonNo());
                                 boolean executeSuccess = false;
                                 if (callButtonModel.getCode().indexOf("CALL") > 0) {
-                                    // 执行叫料 TODO Could not open JPA EntityManager for transaction; nested exception is java.lang.IllegalStateException: EntityManagerFactory is closed
+                                    // 执行叫料 TODO Could not open JPA EntityManager for transaction; nested exception
+                                    // is java.lang.IllegalStateException: EntityManagerFactory is closed
                                     executeSuccess = callMaterialService.callMaterial(callButtonModel);
-                                    Tracker.warn("执行" + callButtonModel.getName() + "的逻辑,并将编号" + callButtonModel.getButtonCode() + "设置为false。");
+                                    Tracker.warn("执行" + callButtonModel.getName() + "的逻辑,并将编号"
+                                            + callButtonModel.getButtonCode() + "设置为false。");
                                 } else if (callButtonModel.getCode().indexOf("BACK") > 0) {
-                                    // 执行退货
-                                    executeSuccess = callMaterialService.backMaterialBox(callButtonModel);
-                                    Tracker.warn("执行退货");
+                                    try {
+                                        // 执行退货
+                                        executeSuccess = callMaterialService.backMaterialBox(callButtonModel);
+                                        Tracker.warn("执行退货");
+                                    } catch (Exception e) {
+                                        Tracker.error(e);
+                                    }
                                 }
                                 if (executeSuccess) {
                                     // 执行成功则亮灯、添加灭灯任务
-//                                    ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), true);
+                                    // ModbusTcp.writeCoil(currentMaster, 254,
+                                    // Integer.valueOf(callButtonModel.getButtonCode()), true);
                                     addLightOffTask(buttonBoxModel, taskModel);
                                     taskModels.remove(taskModel);
                                 } else {
                                     try {
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), true);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), true);
                                         Thread.sleep(5);
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), false);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), false);
                                         Thread.sleep(5);
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), true);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), true);
                                         Thread.sleep(5);
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), false);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), false);
                                         Thread.sleep(5);
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), true);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), true);
                                         Thread.sleep(5);
-                                        ModbusTcp.writeCoil(currentMaster, 254, Integer.valueOf(callButtonModel.getButtonCode()), false);
+                                        ModbusTcp.writeCoil(currentMaster, 254,
+                                                Integer.valueOf(callButtonModel.getButtonCode()), false);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -103,7 +121,8 @@ public class ButtonBoxWrite implements Runnable {
      * @param taskModel      呼叫任务对象
      */
     public void addLightOffTask(ButtonBoxModel buttonBoxModel, TaskModel taskModel) {
-        TaskModel lightOff = new TaskModel(taskModel.getButtonNo(), taskModel.getIpAddress(), System.currentTimeMillis());
+        TaskModel lightOff = new TaskModel(taskModel.getButtonNo(), taskModel.getIpAddress(),
+                System.currentTimeMillis());
         synchronized (buttonBoxModel.getLightOffTaskModels()) {
             if (buttonBoxModel.getLightOffTaskModels().contains(lightOff)) {
                 Tracker.error("不添加灭灯任务");
