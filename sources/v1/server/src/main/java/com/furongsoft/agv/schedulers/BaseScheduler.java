@@ -70,7 +70,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public synchronized void removeAllContainers() {
-        areas.forEach(area -> area.getSites().forEach(site -> onContainerLeft(null, site.getCode())));
+        areas.forEach(area -> area.getSites().forEach(site -> removeContainer(null, site.getCode())));
     }
 
     @Override
@@ -138,6 +138,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
             tasks.remove(task);
+            removeContainer(null, task.getDestination());
             notification.ifPresent(n -> n.onMovingArrived(agvId, task));
             Tracker.agv(String.format("OnMovingArrived: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -165,8 +166,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingCancelled(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
-            notification.ifPresent(n -> n.onMovingCancelled(agvId, task));
             tasks.remove(task);
+            removeContainer(null, task.getSource());
+            removeContainer(null, task.getDestination());
+            notification.ifPresent(n -> n.onMovingCancelled(agvId, task));
             Tracker.agv(String.format("OnMovingCancelled: task: %s, agv: %s", task.toString(), agvId));
         });
     }
@@ -175,8 +178,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingFail(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
-            notification.ifPresent(n -> n.onMovingFail(agvId, task));
             tasks.remove(task);
+            removeContainer(null, task.getSource());
+            removeContainer(null, task.getDestination());
+            notification.ifPresent(n -> n.onMovingFail(agvId, task));
             Tracker.agv(String.format("OnMovingFail: task: %s, agv: %s", task.toString(), agvId));
         });
     }

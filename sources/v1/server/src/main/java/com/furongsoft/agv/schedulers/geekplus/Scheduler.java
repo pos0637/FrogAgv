@@ -15,6 +15,7 @@ import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMs
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
 import com.furongsoft.base.entities.RestResponse;
 import com.furongsoft.base.misc.HttpUtils;
+import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
 
@@ -61,6 +62,11 @@ public class Scheduler extends BaseScheduler {
     @Value("${geekplus.version}")
     private String version;
 
+    /**
+     * 容器索引
+     */
+    private int containerIndex = 0;
+
     @Override
     public synchronized Task onAddTask(String source, String destination, List<Material> materials) {
         MovingRequestMsg request = new MovingRequestMsg(
@@ -92,6 +98,15 @@ public class Scheduler extends BaseScheduler {
 
     @Override
     public synchronized boolean onContainerArrived(String containerId, String destination) {
+        // 自动生成容器索引
+        if (StringUtils.isNullOrEmpty(containerId)) {
+            if (++containerIndex < 0) {
+                containerIndex = 0;
+            }
+
+            containerId = String.format("PA%06d", containerIndex);
+        }
+
         WarehouseControlRequestMsg request = new WarehouseControlRequestMsg(
                 new WarehouseControlRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId,
                         userKey, language, version),
