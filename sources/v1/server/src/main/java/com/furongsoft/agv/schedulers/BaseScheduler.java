@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Alex
  */
-public abstract class BaseScheduler implements IScheduler, InitializingBean {
+public abstract class BaseScheduler implements IScheduler, InitializingBean, Runnable {
     @Autowired
     private SiteService siteService;
 
@@ -62,6 +62,9 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean {
             });
             areas.add(new Area(agvArea.getCode(), siteList));
         });
+
+        // 启动守护线程
+        new Thread(this).start();
     }
 
     @Override
@@ -211,6 +214,31 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean {
         Tracker.agv(String.format("OnContainerLeft: container: %s", containerId));
 
         return true;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (this) {
+                // 尝试添加待执行任务
+                new ArrayList<>(pendingTasks).forEach(t -> {
+                    try {
+                        Task task = addTask(t.getSource(), t.getDestination(), t.getDestinationArea());
+                        if (task != null) {
+                            pendingTasks.remove(t);
+                        }
+                    } catch (Exception e) {
+                        Tracker.error(e);
+                    }
+                });
+            }
+
+            try {
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                Tracker.error(e);
+            }
+        }
     }
 
     /**
