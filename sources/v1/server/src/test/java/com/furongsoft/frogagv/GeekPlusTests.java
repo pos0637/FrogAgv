@@ -54,7 +54,7 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task = scheduler.addTask(sites[2], sites[4]);
+        Task task = scheduler.addTask(sites[2], sites[4], null);
         assertEquals(true, task != null);
     }
 
@@ -74,7 +74,7 @@ public class GeekPlusTests {
         result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(true, result);
 
-        Task task = scheduler.addTask(sites[2], sites[5]);
+        Task task = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(false, task != null);
     }
 
@@ -91,13 +91,13 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
-        Task task2 = scheduler.addTask(sites[5], sites[2]);
+        Task task2 = scheduler.addTask(sites[5], sites[2], null);
         assertEquals(false, task2 != null);
     }
 
@@ -115,7 +115,7 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
@@ -129,7 +129,7 @@ public class GeekPlusTests {
         result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
-        Task task2 = scheduler.addTask(sites[5], sites[2]);
+        Task task2 = scheduler.addTask(sites[5], sites[2], null);
         assertEquals(false, task2 != null);
     }
 
@@ -146,13 +146,13 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[4].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[4], sites[2]);
+        Task task1 = scheduler.addTask(sites[4], sites[2], null);
         assertEquals(true, task1 != null);
 
         result = scheduler.addContainer(containerId3, sites[5].getCode());
         assertEquals(true, result);
 
-        Task task2 = scheduler.addTask(sites[5], sites[4]);
+        Task task2 = scheduler.addTask(sites[5], sites[4], null);
         assertEquals(false, task2 != null);
     }
 
@@ -169,13 +169,13 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(false, result);
 
-        Task task2 = scheduler.addTask(sites[5], sites[4]);
+        Task task2 = scheduler.addTask(sites[5], sites[4], null);
         assertEquals(false, task2 != null);
     }
 
@@ -192,13 +192,13 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
-        Task task2 = scheduler.addTask(sites[4], sites[7]);
+        Task task2 = scheduler.addTask(sites[4], sites[7], null);
         assertEquals(true, task2 != null);
     }
 
@@ -215,13 +215,13 @@ public class GeekPlusTests {
         boolean result = scheduler.addContainer(containerId2, sites[5].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[5], sites[2]);
+        Task task1 = scheduler.addTask(sites[5], sites[2], null);
         assertEquals(true, task1 != null);
 
         result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
-        Task task2 = scheduler.addTask(sites[4], sites[2]);
+        Task task2 = scheduler.addTask(sites[4], sites[2], null);
         assertEquals(true, task2 != null);
     }
 

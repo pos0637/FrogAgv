@@ -316,7 +316,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 return null;
             }
         }
-        Task task = scheduler.addTask(source, destination);
+        Task task = scheduler.addTask(source, destination, null);
         if (ObjectUtils.isEmpty(task)) {
             if (containerArrivedFlag) {
                 // 入场成功后出现错误，执行容器离场

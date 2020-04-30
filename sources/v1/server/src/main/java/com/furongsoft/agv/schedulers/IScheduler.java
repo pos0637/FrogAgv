@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
 
 /**
@@ -29,20 +30,22 @@ public interface IScheduler {
      *
      * @param source      源站点
      * @param destination 目的区域
+     * @param materials   物料列表
      * @return 任务
      * @throws Exception 异常
      */
-    Task addTask(Site source, AgvArea destination) throws Exception;
+    Task addTask(Site source, AgvArea destination, List<Material> materials) throws Exception;
 
     /**
      * 添加任务
      *
      * @param source      源站点
      * @param destination 目的站点
+     * @param materials   物料列表
      * @return 任务
      * @throws Exception 异常
      */
-    Task addTask(Site source, Site destination) throws Exception;
+    Task addTask(Site source, Site destination, List<Material> materials) throws Exception;
 
     /**
      * 取消任务
@@ -84,9 +87,10 @@ public interface IScheduler {
      *
      * @param source      源站点编码
      * @param destination 目的站点编码
+     * @param materials   物料列表
      * @return 任务
      */
-    Task onAddTask(String source, String destination);
+    Task onAddTask(String source, String destination, List<Material> materials);
 
     /**
      * 取消任务事件

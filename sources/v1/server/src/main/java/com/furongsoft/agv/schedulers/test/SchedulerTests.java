@@ -67,7 +67,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
@@ -81,7 +81,7 @@ public class SchedulerTests implements InitializingBean {
         result = scheduler.addContainer(containerId2, sites[2].getCode());
         assertEquals(false, result);
 
-        Task task2 = scheduler.addTask(sites[5], sites[2]);
+        Task task2 = scheduler.addTask(sites[5], sites[2], null);
         assertEquals(false, task2 != null);
     }
 
@@ -99,7 +99,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
@@ -113,7 +113,7 @@ public class SchedulerTests implements InitializingBean {
         result = scheduler.addContainer(containerId3, sites[4].getCode());
         assertEquals(true, result);
 
-        Task task2 = scheduler.addTask(sites[4], sites[2]);
+        Task task2 = scheduler.addTask(sites[4], sites[2], null);
         assertEquals(true, task2 != null);
     }
 
@@ -132,7 +132,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[2].getCode());
         assertEquals(true, result);
 
-        Task task1 = scheduler.addTask(sites[2], sites[5]);
+        Task task1 = scheduler.addTask(sites[2], sites[5], null);
         assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
@@ -159,7 +159,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[8].getCode());
         assertEquals(true, result);
 
-        Task task = scheduler.addTask(sites[8], sites[14]);
+        Task task = scheduler.addTask(sites[8], sites[14], null);
         assertEquals(true, task != null);
 
         for (int i = 14; i < 21; ++i) {
@@ -171,7 +171,7 @@ public class SchedulerTests implements InitializingBean {
                 }
             }
 
-            task = scheduler.addTask(sites[i], sites[i + 1]);
+            task = scheduler.addTask(sites[i], sites[i + 1], null);
             assertEquals(true, task != null);
         }
     }
@@ -188,7 +188,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[21].getCode());
         assertEquals(true, result);
 
-        Task task = scheduler.addTask(sites[21], sites[8]);
+        Task task = scheduler.addTask(sites[21], sites[8], null);
         assertEquals(true, task != null);
 
         int[] dests = new int[] { 8, 9, 11, 12, 13 };
@@ -201,7 +201,7 @@ public class SchedulerTests implements InitializingBean {
                 }
             }
 
-            task = scheduler.addTask(sites[dests[i]], sites[dests[i + 1]]);
+            task = scheduler.addTask(sites[dests[i]], sites[dests[i + 1]], null);
             assertEquals(true, task != null);
         }
     }
@@ -219,7 +219,7 @@ public class SchedulerTests implements InitializingBean {
         assertEquals(true, result);
 
         for (int i = 22; i < 26; ++i) {
-            Task task = scheduler.addTask(sites[i], sites[i + 1]);
+            Task task = scheduler.addTask(sites[i], sites[i + 1], null);
             assertEquals(true, task != null);
 
             // 等待AGV小车取走A点的货架
@@ -244,7 +244,7 @@ public class SchedulerTests implements InitializingBean {
         boolean result = scheduler.addContainer(containerId1, sites[26].getCode());
         assertEquals(true, result);
 
-        Task task = scheduler.addTask(sites[26], sites[27]);
+        Task task = scheduler.addTask(sites[26], sites[27], null);
         assertEquals(true, task != null);
 
         for (int i = 27; i < 34; ++i) {
@@ -256,7 +256,7 @@ public class SchedulerTests implements InitializingBean {
                 }
             }
 
-            task = scheduler.addTask(sites[i], sites[i + 1]);
+            task = scheduler.addTask(sites[i], sites[i + 1], null);
             assertEquals(true, task != null);
         }
     }
@@ -274,7 +274,7 @@ public class SchedulerTests implements InitializingBean {
         assertEquals(true, result);
 
         // 仓库-包装
-        Task task1 = scheduler.addTask(sites[4], sites[20]);
+        Task task1 = scheduler.addTask(sites[4], sites[20], null);
         assertEquals(true, task1 != null);
 
         // 等待AGV小车取走A点的货架
@@ -289,14 +289,14 @@ public class SchedulerTests implements InitializingBean {
         assertEquals(true, result2);
 
         // 包装-仓库
-        Task task2 = scheduler.addTask(sites[20], sites[4]);
+        Task task2 = scheduler.addTask(sites[20], sites[4], null);
         assertEquals(true, task2 != null);
 
         boolean result3 = scheduler.addContainer(containerId3, sites[9].getCode());
         assertEquals(true, result3);
 
         // 包材-仓库
-        Task task3 = scheduler.addTask(sites[9], sites[5]);
+        Task task3 = scheduler.addTask(sites[9], sites[5], null);
         assertEquals(true, task3 != null);
     }
 }

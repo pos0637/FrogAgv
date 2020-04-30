@@ -1,5 +1,7 @@
 package com.furongsoft.agv.schedulers.entities;
 
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,6 +55,11 @@ public class Task {
      * 状态
      */
     private Status status;
+
+    /**
+     * 物料列表
+     */
+    private List<Material> materials;
 
     public String toString() {
         try {

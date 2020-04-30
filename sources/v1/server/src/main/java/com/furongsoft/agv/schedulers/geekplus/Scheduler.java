@@ -1,8 +1,10 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.furongsoft.agv.schedulers.BaseScheduler;
+import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
@@ -60,7 +62,7 @@ public class Scheduler extends BaseScheduler {
     private String version;
 
     @Override
-    public synchronized Task onAddTask(String source, String destination) {
+    public synchronized Task onAddTask(String source, String destination, List<Material> materials) {
         MovingRequestMsg request = new MovingRequestMsg(
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
@@ -71,7 +73,7 @@ public class Scheduler extends BaseScheduler {
             return null;
         }
 
-        return super.addRunningTask(source, destination, response.getData()[0].getWorkflowWorkId());
+        return super.addRunningTask(source, destination, response.getData()[0].getWorkflowWorkId(), materials);
     }
 
     @Override
