@@ -99,11 +99,17 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public synchronized boolean cancel(Task task) {
+        if (pendingTasks.contains(task)) {
+            pendingTasks.remove(task);
+            return true;
+        }
+
         return onCancel(task);
     }
 
     @Override
     public synchronized boolean cancel(Site source) {
+        pendingTasks.stream().filter(t -> t.getSource().equals(source.getCode())).map(this::cancel);
         tasks.stream().filter(t -> t.getSource().equals(source.getCode())).map(this::cancel);
         return true;
     }
