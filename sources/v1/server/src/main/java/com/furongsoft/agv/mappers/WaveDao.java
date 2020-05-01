@@ -91,6 +91,25 @@ public interface WaveDao extends BaseMapper<Wave> {
     @UpdateProvider(type = DaoProvider.class, method = "deleteWaveByCode")
     boolean deleteWaveByCode(@Param("code") String code);
 
+    /**
+     * 通过生产订单号获取波次集合
+     *
+     * @param productionOrderNo 生产订单号
+     * @return 波次集合
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectWaveModelByProductionOrderNo")
+    List<WaveModel> selectWaveModelByProductionOrderNo(@Param("productionOrderNo") String productionOrderNo);
+
+    /**
+     * 查找昨天与今天新建的波次
+     *
+     * @param yesterday 昨天 yyyy-MM-dd 00:00:00
+     * @param today     今天 yyyy-MM-dd 23:59:59
+     * @return 波次列表
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectWaveModelFromYesterdayToToday")
+    List<WaveModel> selectWaveModelFromYesterdayToToday(@Param("yesterday") String yesterday, @Param("today") String today);
+
     class DaoProvider {
         private static final String WAVE_TABLE_NAME = Wave.class.getAnnotation(TableName.class).value();
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
@@ -104,7 +123,7 @@ public interface WaveDao extends BaseMapper<Wave> {
         public String selectWaveById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type");
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type,t1.production_order_no");
                     FROM(WAVE_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -119,7 +138,7 @@ public interface WaveDao extends BaseMapper<Wave> {
         public String selectWaveByCode() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type");
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type,t1.production_order_no");
                     FROM(WAVE_TABLE_NAME + " t1");
                     WHERE("t1.code=#{code} AND t1.enabled=1");
                 }
@@ -135,7 +154,7 @@ public interface WaveDao extends BaseMapper<Wave> {
             return new SQL() {
                 {
                     SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
-                            "t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
                     FROM(WAVE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
@@ -161,7 +180,7 @@ public interface WaveDao extends BaseMapper<Wave> {
             return new SQL() {
                 {
                     SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
-                            "t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
                     FROM(WAVE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
@@ -206,11 +225,17 @@ public interface WaveDao extends BaseMapper<Wave> {
             }.toString();
         }
 
+        /**
+         * 通过日期查询波次信息
+         *
+         * @param param 查询参数
+         * @return sql
+         */
         public String selectWaveModelsByDate(final Map<String, Object> param) {
             return new SQL() {
                 {
                     SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
-                            "t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
                     FROM(WAVE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
@@ -227,5 +252,42 @@ public interface WaveDao extends BaseMapper<Wave> {
                 }
             }.toString();
         }
+
+        /**
+         * 通过生产订单号获取波次集合
+         *
+         * @return sql
+         */
+        public String selectWaveModelByProductionOrderNo() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                    FROM(WAVE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
+                    WHERE("t1.enabled=1 and t1.production_order_no = #{productionOrderNo} ");
+                }
+            }.toString();
+        }
+
+        /**
+         * 查找昨天与今天新建的波次
+         *
+         * @return sql
+         */
+        public String selectWaveModelFromYesterdayToToday() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
+                    FROM(WAVE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
+                    WHERE("t1.enabled=1 and t1.create_time >= #{yesterday} and t1.create_time <= #{today}");
+                }
+            }.toString();
+        }
+
     }
 }

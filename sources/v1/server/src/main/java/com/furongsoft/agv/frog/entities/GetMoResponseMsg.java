@@ -68,7 +68,7 @@ public class GetMoResponseMsg extends BaseResponseMsg {
         /**
          * 单据是否作废
          */
-        private Boolean dr;
+        private Integer dr;
 
         /**
          * 来源单据号

@@ -67,4 +67,9 @@ public class GetMoRequestMsg {
      * 是否启用has_next的分页方式，如果指定true,则返回的结果中不包含总记录数，但是会新增一个是否存在下一页的的字段，通过此种方式获取增量交易，接口调用成功率在原有的基础上有所提升。_false
      */
     private Boolean page_use_has_next;
+
+    /**
+     * 是否删除：0：在用；1：删除
+     */
+    private Integer dr;
 }

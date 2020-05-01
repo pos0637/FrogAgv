@@ -74,6 +74,11 @@ public class WaveModel implements Serializable {
     private Integer enabled;
 
     /**
+     * 生产订单号
+     */
+    private String productionOrderNo;
+
+    /**
      * 波次信息集合
      */
     private List<WaveModel> waveModels;

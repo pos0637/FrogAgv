@@ -118,7 +118,7 @@ public class GetBomInfoResponseMsg extends BaseResponseMsg {
         /**
          * 单据是否作废
          */
-        private Boolean dr;
+        private Integer dr;
 
         /**
          * 子项存货id

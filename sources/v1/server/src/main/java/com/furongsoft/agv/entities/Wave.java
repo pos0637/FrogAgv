@@ -80,6 +80,11 @@ public class Wave extends BaseEntity {
      */
     private Integer enabled;
 
+    /**
+     * 生产订单号
+     */
+    private String productionOrderNo;
+
     public Wave(WaveModel waveModel) {
         this.code = waveModel.getCode();
         this.teamId = waveModel.getTeamId();
@@ -91,5 +96,19 @@ public class Wave extends BaseEntity {
         this.state = waveModel.getState();
         this.type = waveModel.getType();
         this.enabled = waveModel.getEnabled();
+        this.productionOrderNo = waveModel.getProductionOrderNo();
+    }
+
+    public Wave(String code, String teamId, String teamName, long areaId, long materialId, Date executionTime, int state, int type, Integer enabled, String productionOrderNo) {
+        this.code = code;
+        this.teamId = teamId;
+        this.teamName = teamName;
+        this.areaId = areaId;
+        this.materialId = materialId;
+        this.executionTime = executionTime;
+        this.state = state;
+        this.type = type;
+        this.enabled = enabled;
+        this.productionOrderNo = productionOrderNo;
     }
 }

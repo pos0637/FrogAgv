@@ -34,7 +34,7 @@ public class DeviceInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws BaseException {
-        // initDeviceManager();
+         initDeviceManager();
     }
 
     /**

@@ -2,7 +2,9 @@ package com.furongsoft.agv.frog.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +18,8 @@ import javax.persistence.Id;
 @Entity
 @TableName("t_agv_bom")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Bom extends BaseEntity {
     @Id
     @GeneratedValue
@@ -40,4 +44,11 @@ public class Bom extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
+
+    public Bom(String materialCode, int fullCount, String version, Integer enabled) {
+        this.materialCode = materialCode;
+        this.fullCount = fullCount;
+        this.version = version;
+        this.enabled = enabled;
+    }
 }

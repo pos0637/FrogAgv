@@ -58,4 +58,12 @@ public class WaveDetail extends BaseEntity {
         this.count = waveDetailModel.getCount();
         this.enabled = waveDetailModel.getEnabled();
     }
+
+    public WaveDetail(String code, String waveCode, long materialId, int count, Integer enabled) {
+        this.code = code;
+        this.waveCode = waveCode;
+        this.materialId = materialId;
+        this.count = count;
+        this.enabled = enabled;
+    }
 }

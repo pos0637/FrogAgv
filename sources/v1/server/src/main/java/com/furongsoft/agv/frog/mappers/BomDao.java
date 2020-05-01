@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.jdbc.SQL;
 
+import java.util.Set;
+
 /**
  * BOM表数据库操作
  *
@@ -34,6 +36,14 @@ public interface BomDao extends BaseMapper<Bom> {
      */
     @SelectProvider(type = DaoProvider.class, method = "selectBomByMaterialUuid")
     BomModel selectBomByMaterialUuid(@Param("materialCode") String materialCode);
+
+    /**
+     * 查找所有未删除的BOM的物料编号
+     *
+     * @return BOM的物料编号集合
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectMaterialCodes")
+    Set<String> selectMaterialCodes();
 
     class DaoProvider {
         private static final String BOM_TABLE_NAME = Bom.class.getAnnotation(TableName.class).value();
@@ -68,5 +78,19 @@ public interface BomDao extends BaseMapper<Bom> {
             }.toString();
         }
 
+        /**
+         * 查找物料编号集合
+         *
+         * @return sql
+         */
+        public String selectMaterialCodes() {
+            return new SQL() {
+                {
+                    SELECT("material_code");
+                    FROM(BOM_TABLE_NAME);
+                    WHERE("enabled=1");
+                }
+            }.toString();
+        }
     }
 }

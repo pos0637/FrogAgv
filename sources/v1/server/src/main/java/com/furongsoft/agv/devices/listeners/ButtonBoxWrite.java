@@ -8,6 +8,7 @@ import com.furongsoft.agv.services.CallMaterialService;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.communication.modbusTcp.ModbusTcp;
 import com.serotonin.modbus4j.ModbusMaster;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ButtonBoxWrite implements Runnable {
     private final CallMaterialService callMaterialService;
 
+    @Autowired
     public ButtonBoxWrite(CallMaterialService callMaterialService) {
         this.callMaterialService = callMaterialService;
     }
@@ -57,54 +59,46 @@ public class ButtonBoxWrite implements Runnable {
                                         .getCallButtonModelByButtonCode(taskModel.getButtonNo());
                                 boolean executeSuccess = false;
                                 if (callButtonModel.getCode().indexOf("CALL") > 0) {
-                                    // 执行叫料 TODO Could not open JPA EntityManager for transaction; nested exception
-                                    // is java.lang.IllegalStateException: EntityManagerFactory is closed
+                                    // 执行叫料
                                     executeSuccess = callMaterialService.callMaterial(callButtonModel);
-                                    Tracker.warn("执行" + callButtonModel.getName() + "的逻辑,并将编号"
-                                            + callButtonModel.getButtonCode() + "设置为false。");
+                                    Tracker.agv("执行" + callButtonModel.getName() + "的逻辑。");
                                 } else if (callButtonModel.getCode().indexOf("BACK") > 0) {
                                     try {
                                         // 执行退货
                                         executeSuccess = callMaterialService.backMaterialBox(callButtonModel);
-                                        Tracker.warn("执行退货");
+                                        Tracker.agv("执行退货");
                                     } catch (Exception e) {
                                         Tracker.error(e);
                                     }
                                 }
                                 if (executeSuccess) {
-                                    // 执行成功则亮灯、添加灭灯任务
-                                    // ModbusTcp.writeCoil(currentMaster, 254,
-                                    // Integer.valueOf(callButtonModel.getButtonCode()), true);
-                                    addLightOffTask(buttonBoxModel, taskModel);
+                                    // 执行成功则移除任务
                                     taskModels.remove(taskModel);
                                 } else {
+                                    // 执行失败，则闪烁三下后删除任务
                                     try {
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), true);
-                                        Thread.sleep(5);
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), false);
                                         Thread.sleep(5);
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), true);
-                                        Thread.sleep(5);
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), false);
                                         Thread.sleep(5);
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), true);
-                                        Thread.sleep(5);
                                         ModbusTcp.writeCoil(currentMaster, 254,
                                                 Integer.valueOf(callButtonModel.getButtonCode()), false);
                                     } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                                        Tracker.error(e.getCause());
                                     }
                                     taskModels.remove(taskModel);
                                 }
                             });
                         }
                     }
-
                 });
             } catch (Exception e) {
                 Tracker.error(e.getCause());
