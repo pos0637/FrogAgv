@@ -20,6 +20,7 @@ import com.furongsoft.base.misc.Tracker;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * AGV调度管理器
@@ -30,10 +31,14 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     @Autowired
     private SiteService siteService;
 
+    @Autowired
+    @Lazy
+    private ISchedulerNotification schedulerNotification;
+
     /**
      * AGV调度管理器事件接口
      */
-    protected Optional<ISchedulerNotification> notification = Optional.empty();
+    protected Optional<ISchedulerNotification> notification;
 
     /**
      * 区域列表
@@ -52,6 +57,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        // 设置调度管理器事件接口
+        notification = Optional.ofNullable(schedulerNotification);
+
+        // 获取区域列表
         List<AgvArea> agvAreas = siteService.selectAgvAreasByType(8);
         areas = new ArrayList<Area>();
         agvAreas.forEach(agvArea -> {
