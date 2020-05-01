@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
  */
 public class ButtonBoxRead implements Runnable {
     private final ButtonBoxModel buttonBoxModel;
+    int[] registersOffset = { 3, 8, 13, 18 }; // 闪开寄存器偏移
 
     public ButtonBoxRead(ButtonBoxModel buttonBoxModel) {
         this.buttonBoxModel = buttonBoxModel;
@@ -42,11 +43,8 @@ public class ButtonBoxRead implements Runnable {
                     boolean[] result = ModbusTcp.convert(byteBuffer);
                     for (int i = 0; i < buttonBoxModel.getCallButtonModels().size(); ++i) {
                         if (result[i]) {
-                            addTask(i);
-                            Tracker.error(buttonBoxModel.getCallButtonModelByButtonCode(i).getName());
-                            ModbusTcp.writeCoil(currentMaster, 254, i, true);
-                            // 将叫料状态激活
-//                            buttonBoxModel.getCallState().set(i, true);
+                            addTask(currentMaster, i);
+                            Tracker.error("***---***:m"+buttonBoxModel.getCallButtonModelByButtonCode(i).getName());
                         }
                     }
                 } else {
@@ -68,13 +66,14 @@ public class ButtonBoxRead implements Runnable {
      *
      * @param codeNo 按钮编号
      */
-    public void addTask(int codeNo) {
+    public void addTask(ModbusMaster currentMaster, int codeNo) {
         TaskModel taskModel = new TaskModel(codeNo, buttonBoxModel.getIpAddress(), null);
         synchronized (buttonBoxModel.getCallTaskModels()) {
             if (buttonBoxModel.getCallTaskModels().contains(taskModel)) {
                 Tracker.error("不添加呼叫任务");
                 return;
             } else {
+                ModbusTcp.writeRegisters(currentMaster, 254, registersOffset[codeNo], new short[] { 0x0004, 0x0014 });
                 buttonBoxModel.getCallTaskModels().add(taskModel);
                 Tracker.info("添加一个呼叫任务");
             }

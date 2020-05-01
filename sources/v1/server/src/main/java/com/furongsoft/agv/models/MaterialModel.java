@@ -36,6 +36,21 @@ public class MaterialModel implements Serializable {
     private String uuid;
 
     /**
+     * 产品规格
+     */
+    private String specs;
+
+    /**
+     * 产品单位
+     */
+    private String unit;
+
+    /**
+     * 产品批次号
+     */
+    private String batch;
+
+    /**
      * 数量
      */
     private int count;

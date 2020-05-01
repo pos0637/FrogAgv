@@ -38,6 +38,16 @@ public interface BomDetailDao extends BaseMapper<BomDetail> {
     @SelectProvider(type = DaoProvider.class, method = "selectBomDetailByBomId")
     List<BomDetailModel> selectBomDetailByBomId(@Param("bomId") long bomId);
 
+    /**
+     * 通过BOMID和类型获取BOM详情集合
+     *
+     * @param bomId
+     * @param type  类型
+     * @return BOM详情集合
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectBomDetailByBomIdAndType")
+    List<BomDetailModel> selectBomDetailByBomIdAndType(@Param("bomId") long bomId, @Param("type") int type);
+
     class DaoProvider {
         private static final String BOM_DETAIL_TABLE_NAME = BomDetail.class.getAnnotation(TableName.class).value();
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
@@ -69,6 +79,22 @@ public interface BomDetailDao extends BaseMapper<BomDetail> {
                     FROM(BOM_DETAIL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_code = t2.uuid");
                     WHERE("t1.bom_id=#{bomId} AND t1.enabled=1");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过BOM主键和类型获取BOM详情信息
+         *
+         * @return sql
+         */
+        public String selectBomDetailByBomIdAndType() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.bom_id,t1.material_code,t1.count,t1.type,t2.name AS materialName,t2.id AS materialId");
+                    FROM(BOM_DETAIL_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_code = t2.uuid");
+                    WHERE("t1.bom_id=#{bomId} AND t1.type=#{type} AND t1.enabled=1");
                 }
             }.toString();
         }

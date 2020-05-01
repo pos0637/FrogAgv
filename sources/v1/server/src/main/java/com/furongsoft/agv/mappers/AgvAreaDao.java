@@ -151,7 +151,7 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
         public String selectParentAreaById() {
             return new SQL() {
                 {
-                    SELECT("t2.id,t2.parent_id,t2.type,t2.code,t2.name,t2.uuid");
+                    SELECT("t2.id,t2.parent_id,t2.type,t2.code,t2.name");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t2 ON t1.parent_id = t2.id");
                     WHERE("t1.id = #{id}");

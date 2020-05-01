@@ -1,6 +1,8 @@
 package com.furongsoft.agv.frog.services;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.furongsoft.agv.frog.entities.Bom;
+import com.furongsoft.agv.frog.entities.BomDetail;
 import com.furongsoft.agv.frog.mappers.BomDao;
 import com.furongsoft.agv.frog.mappers.BomDetailDao;
 import com.furongsoft.agv.frog.models.BomDetailModel;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * bom信息服务
@@ -54,6 +57,17 @@ public class BomService extends BaseService<BomDao, Bom> {
     }
 
     /**
+     * 通过BOM主键以及物料类型获取BOM清单
+     *
+     * @param bomId BOM主键
+     * @param type  物料类型
+     * @return bom清单
+     */
+    public List<BomDetailModel> selectBomDetailByBomIdAndType(long bomId, int type) {
+        return bomDetailDao.selectBomDetailByBomIdAndType(bomId, type);
+    }
+
+    /**
      * 通过产品UUID查找BOM信息
      *
      * @param materialCode 产品UUID
@@ -61,5 +75,35 @@ public class BomService extends BaseService<BomDao, Bom> {
      */
     public BomModel selectBomByMaterialUuid(String materialCode) {
         return bomDao.selectBomByMaterialUuid(materialCode);
+    }
+
+    /**
+     * 查找未被删除的BOM列表
+     *
+     * @return
+     */
+    public List<Bom> selectBom() {
+        EntityWrapper<Bom> ew = new EntityWrapper<>();
+        ew.eq("enabled", 1);
+        return bomDao.selectList(ew);
+    }
+
+    /**
+     * 查找所有未删除的BOM的物料编号
+     *
+     * @return BOM的物料编号集合
+     */
+    public Set<String> selectMaterialCodes() {
+        return bomDao.selectMaterialCodes();
+    }
+
+    /**
+     * 新增bom详情
+     *
+     * @param bomDetail bom详情对象
+     * @return 成功、失败返回值
+     */
+    public Integer addBomDetail(BomDetail bomDetail) {
+        return bomDetailDao.insert(bomDetail);
     }
 }

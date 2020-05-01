@@ -60,7 +60,7 @@ public class GetBillFullInfoResponseMsg extends BaseResponseMsg {
         /**
          * 单据是否作废
          */
-        private Boolean dr;
+        private Integer dr;
 
         /**
          * 单据日期

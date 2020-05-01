@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 存货服务
@@ -50,13 +51,11 @@ public class MaterialService extends BaseService<MaterialDao, Material> {
     }
 
     /**
-     * 查找未被删除的产品列表
+     * 查找未被删除的产品编号列表
      *
-     * @return 产品列表
+     * @return 产品编号列表
      */
-    public List<Material> selectMaterials() {
-        EntityWrapper<Material> materialEntityWrapper = new EntityWrapper<>();
-        materialEntityWrapper.eq("enabled", 1);
-        return materialDao.selectList(materialEntityWrapper);
+    public Set<String> selectMaterialUuids() {
+        return materialDao.selectMaterialUuids();
     }
 }

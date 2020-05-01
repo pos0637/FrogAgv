@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.jdbc.SQL;
 
+import java.util.Set;
+
 /**
  * 物料表数据库操作
  *
@@ -29,13 +31,21 @@ public interface MaterialDao extends BaseMapper<Material> {
     @SelectProvider(type = DaoProvider.class, method = "selectMaterialByUuid")
     MaterialModel selectMaterialByUuid(@Param("uuid") String uuid);
 
+    /**
+     * 查找未被删除的产品编号集合
+     *
+     * @return 产品编号集合
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectMaterialUuids")
+    Set<String> selectMaterialUuids();
+
     class DaoProvider {
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
 
         public String selectMaterialById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.code,t1.name,t1.uuid");
+                    SELECT("t1.id,t1.code,t1.name,t1.uuid, t1.specs, t1.unit, t1.batch");
                     FROM(MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -50,9 +60,24 @@ public interface MaterialDao extends BaseMapper<Material> {
         public String selectMaterialByUuid() {
             return new SQL() {
                 {
-                    SELECT("t1.id, t1.code, t1.name, t1.uuid");
+                    SELECT("t1.id, t1.code, t1.name, t1.uuid, t1.specs, t1.unit, t1.batch");
                     FROM(MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.uuid=#{uuid}");
+                }
+            }.toString();
+        }
+
+        /**
+         * 查找未被删除的产品编号集合
+         *
+         * @return sql
+         */
+        public String selectMaterialUuids() {
+            return new SQL() {
+                {
+                    SELECT("uuid");
+                    FROM(MATERIAL_TABLE_NAME);
+                    WHERE("enabled=1");
                 }
             }.toString();
         }

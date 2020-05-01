@@ -6,8 +6,10 @@ import com.furongsoft.agv.entities.WaveDetail;
 import com.furongsoft.agv.mappers.WaveDao;
 import com.furongsoft.agv.models.WaveDetailModel;
 import com.furongsoft.agv.models.WaveModel;
+import com.furongsoft.base.misc.DateUtils;
 import com.furongsoft.base.misc.UUIDUtils;
 import com.furongsoft.base.services.BaseService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -293,5 +295,25 @@ public class WaveService extends BaseService<WaveDao, Wave> {
                 waveDetailService.insertBatch(insertWaveDetails);
             }
         }
+    }
+
+    /**
+     * 通过生产订单号获取波次集合
+     *
+     * @param productionOrderNo 生产订单号
+     * @return 波次集合
+     */
+    public List<WaveModel> selectWaveModelByProductionOrderNo(String productionOrderNo) {
+        return waveDao.selectWaveModelByProductionOrderNo(productionOrderNo);
+    }
+
+    /**
+     * 查找昨天与今天新建的波次
+     *
+     * @return 波次列表
+     */
+    public List<WaveModel> selectWaveModelFromYesterdayToToday() {
+        Map<String, String> dateMap = DateUtils.getYesterdayTodayTomorrowString("yyyy-MM-dd");
+        return waveDao.selectWaveModelFromYesterdayToToday(dateMap.get("yesterday") + " 00:00:00", dateMap.get("today") + " 23:59:59");
     }
 }

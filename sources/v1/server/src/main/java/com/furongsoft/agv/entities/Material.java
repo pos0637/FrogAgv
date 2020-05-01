@@ -2,9 +2,7 @@ package com.furongsoft.agv.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +16,8 @@ import javax.persistence.Id;
 @Entity
 @TableName("t_agv_material")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Material extends BaseEntity {
 
     @Id
@@ -40,7 +40,7 @@ public class Material extends BaseEntity {
     private String uuid;
 
     /**
-     * 产品规格 TODO
+     * 产品规格
      */
     private String specs;
 
@@ -58,4 +58,14 @@ public class Material extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
+
+    public Material(String code, String name, String uuid, String specs, String unit, String batch, Integer enabled) {
+        this.code = code;
+        this.name = name;
+        this.uuid = uuid;
+        this.specs = specs;
+        this.unit = unit;
+        this.batch = batch;
+        this.enabled = enabled;
+    }
 }

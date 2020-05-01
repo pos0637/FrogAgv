@@ -116,7 +116,8 @@ logging:
     root: info
 
 geekplus:
-  url: http://1.119.129.226:48267
+  #  url: http://1.119.129.226:48267
+  url: http://192.168.2.90:24249
   clientCode: geekcode
   channelId: 11111
   warehouseCode: geekwarehousecode
@@ -124,5 +125,17 @@ geekplus:
   userKey: 123456
   language: zh_cn
   version: 1.0.0
+
+qr-code:
+  materialCarCode: 000000
+  siteCode: DB
+
+qwwz:
+  url: http://192.168.2.31:9082/service/QwwzItfServlet
+  format: json
+  app_key: 0001
+  simplify: false
+  version: 1.0
+  pkCorp: 1006
 
 env: pro

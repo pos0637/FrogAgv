@@ -2,7 +2,9 @@ package com.furongsoft.agv.frog.entities;
 
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.furongsoft.base.entities.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +18,8 @@ import javax.persistence.Id;
 @Entity
 @TableName("t_agv_bom_detail")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BomDetail extends BaseEntity {
     @Id
     @GeneratedValue
@@ -32,7 +36,7 @@ public class BomDetail extends BaseEntity {
     private String materialCode;
 
     /**
-     * 满料车数量
+     * 比例数量
      */
     private int count;
 
@@ -45,4 +49,12 @@ public class BomDetail extends BaseEntity {
      * 是否启用
      */
     private Integer enabled;
+
+    public BomDetail(long bomId, String materialCode, int count, int type, Integer enabled) {
+        this.bomId = bomId;
+        this.materialCode = materialCode;
+        this.count = count;
+        this.type = type;
+        this.enabled = enabled;
+    }
 }
