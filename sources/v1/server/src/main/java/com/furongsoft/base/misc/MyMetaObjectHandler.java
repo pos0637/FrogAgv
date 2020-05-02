@@ -1,11 +1,12 @@
 package com.furongsoft.base.misc;
 
-import com.baomidou.mybatisplus.mapper.MetaObjectHandler;
-import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.Objects;
+
+import com.baomidou.mybatisplus.mapper.MetaObjectHandler;
+
+import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Alex
@@ -22,7 +23,7 @@ public class MyMetaObjectHandler extends MetaObjectHandler {
                     userId = SecurityUtils.getCurrentUser().getId();
                 }
             } catch (Exception e) {
-
+                Tracker.error(e);
             }
 
             setFieldValByName("createUser", userId, metaObject);
@@ -47,8 +48,9 @@ public class MyMetaObjectHandler extends MetaObjectHandler {
                 userId = SecurityUtils.getCurrentUser().getId();
             }
         } catch (Exception e) {
-
+            Tracker.error(e);
         }
+
         setFieldValByName("lastModifiedUser", userId, metaObject);
     }
 }
