@@ -18,6 +18,7 @@ import com.furongsoft.agv.schedulers.services.TaskService;
 import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
+import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
  *
  * @author Alex
  */
+@Log
 public abstract class BaseScheduler implements IScheduler, InitializingBean, Runnable {
     @Autowired
     private SiteService siteService;

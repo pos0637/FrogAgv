@@ -4,6 +4,7 @@ import com.furongsoft.agv.schedulers.IScheduler;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.base.entities.RestResponse;
 import com.furongsoft.base.misc.Tracker;
+import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/agv")
+@Log
 public class SchedulerController {
     @Autowired
     private IScheduler scheduler;
@@ -36,20 +38,21 @@ public class SchedulerController {
         switch (body.getWorkflowPhase()) {
             case 20:
                 if (body.getTaskPhase().equalsIgnoreCase("GO_FETCHING")) {
-                    scheduler.onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
+                    scheduler.onMovingStarted(String.valueOf(body.getRobotId()),
+                            String.valueOf(body.getWorkflowWorkId()));
                 }
                 break;
             case 25:
-            scheduler.onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
+                scheduler.onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 26:
-            scheduler.onMovingPaused(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
+                scheduler.onMovingPaused(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 30:
-            scheduler.onMovingArrived(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
+                scheduler.onMovingArrived(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             case 31:
-            scheduler.onMovingFail(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
+                scheduler.onMovingFail(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
                 break;
             default:
                 break;

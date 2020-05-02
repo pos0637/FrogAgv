@@ -14,6 +14,7 @@ import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseM
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.UUIDUtils;
+import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
+@Log
 public class Scheduler extends BaseScheduler {
     @Value("${geekplus.url}")
     private String url;
