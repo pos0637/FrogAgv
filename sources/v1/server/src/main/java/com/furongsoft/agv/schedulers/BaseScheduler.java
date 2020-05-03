@@ -14,9 +14,11 @@ import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.entities.Task.Status;
+import com.furongsoft.agv.schedulers.services.TaskService;
 import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
+import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,13 @@ import org.springframework.context.annotation.Lazy;
  *
  * @author Alex
  */
+@Log
 public abstract class BaseScheduler implements IScheduler, InitializingBean, Runnable {
     @Autowired
     private SiteService siteService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     @Lazy
@@ -99,11 +105,19 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public synchronized boolean cancel(Task task) {
+        if (pendingTasks.contains(task)) {
+            task.setEnabled(false);
+            taskService.updateById(task);
+            pendingTasks.remove(task);
+            return true;
+        }
+
         return onCancel(task);
     }
 
     @Override
     public synchronized boolean cancel(Site source) {
+        pendingTasks.stream().filter(t -> t.getSource().equals(source.getCode())).map(this::cancel);
         tasks.stream().filter(t -> t.getSource().equals(source.getCode())).map(this::cancel);
         return true;
     }
@@ -124,10 +138,16 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         return onContainerLeft(containerId, destination);
     }
 
-    // TODO 任务在待下发的任务列表中
     @Override
     public synchronized boolean onCancel(Task task) {
+        if (!tasks.contains(task)) {
+            return false;
+        }
+
+        task.setEnabled(false);
+        taskService.updateById(task);
         tasks.remove(task);
+
         return true;
     }
 
@@ -138,6 +158,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
             task.setStatus(Status.Moving);
             task.setReplaceable(false);
             task.setCancelable(false);
+            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingStarted(agvId, task));
             Tracker.agv(String.format("OnMovingStarted: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -147,6 +168,8 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingArrived(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
+            task.setEnabled(false);
+            taskService.updateById(task);
             tasks.remove(task);
             removeContainer(null, task.getDestination());
             notification.ifPresent(n -> n.onMovingArrived(agvId, task));
@@ -158,6 +181,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingPaused(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
+            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingPaused(agvId, task));
             Tracker.agv(String.format("OnMovingPaused: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -167,6 +191,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingWaiting(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
+            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingWaiting(agvId, task));
             Tracker.agv(String.format("OnMovingWaiting: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -176,6 +201,8 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingCancelled(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
+            task.setEnabled(false);
+            taskService.updateById(task);
             tasks.remove(task);
             removeContainer(null, task.getSource());
             removeContainer(null, task.getDestination());
@@ -188,6 +215,8 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingFail(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
+            task.setEnabled(false);
+            taskService.updateById(task);
             tasks.remove(task);
             removeContainer(null, task.getSource());
             removeContainer(null, task.getDestination());
@@ -199,7 +228,6 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     @Override
     public synchronized boolean onContainerArrived(String containerId, String destination) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
-        // TODO 入场成功了，返回失败
         if (site == null) {
             return false;
         }
@@ -270,7 +298,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @throws Exception 异常
      */
     protected synchronized Task addTask(String source, String destination, String destinationArea,
-                                        List<Material> materials) throws Exception {
+            List<Material> materials) throws Exception {
         if (!hasContainer(source)) {
             Tracker.agv("无料车无法发货:" + source);
             throw new NonMaterialCarException();
@@ -311,8 +339,9 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addRunningTask(String source, String destination, String wcsTaskId,
-                                               List<Material> materials) {
-        Task task = new Task(source, destination, null, wcsTaskId, null, true, true, Status.Initialized, materials);
+            List<Material> materials) {
+        Task task = new Task(source, destination, null, wcsTaskId, materials);
+        taskService.add(task);
         tasks.add(task);
 
         return task;
@@ -328,10 +357,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addPendingTask(String source, String destination, String destinationArea,
-                                               List<Material> materials) {
-        Task task = new Task(source, destination, destinationArea, null, null, true, true, Status.Initialized,
-                materials);
-        pendingTasks.add(task);
+            List<Material> materials) {
+        Task task = new Task(source, destination, destinationArea, null, materials);
+        taskService.add(task);
+        tasks.add(task);
 
         return task;
     }

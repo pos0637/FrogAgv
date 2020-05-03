@@ -1,42 +1,33 @@
 package com.furongsoft.agv.schedulers.geekplus;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.furongsoft.agv.schedulers.BaseScheduler;
 import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
-import com.furongsoft.agv.schedulers.geekplus.entities.MovingCallbackMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelResponseMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingResponseMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlRequestMsg;
 import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseMsg;
-import com.furongsoft.base.entities.RestResponse;
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.StringUtils;
-import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.base.misc.UUIDUtils;
+import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * AGV调度管理器
  *
  * @author Alex
  */
-@CrossOrigin(origins = "*")
-@RestController
-@RequestMapping("/api/v1/agv")
+@Service
+@Transactional(rollbackFor = Exception.class)
+@Log
 public class Scheduler extends BaseScheduler {
     @Value("${geekplus.url}")
     private String url;
@@ -135,52 +126,5 @@ public class Scheduler extends BaseScheduler {
         }
 
         return super.onContainerLeft(containerId, destination);
-    }
-
-    /**
-     * AGV回调消息
-     *
-     * @param movingCallbackMsg 回调消息
-     * @return 响应内容
-     */
-    @PostMapping("/callback")
-    public RestResponse movingCallbackMsg(@RequestBody MovingCallbackMsg movingCallbackMsg) {
-        Tracker.agv(movingCallbackMsg);
-        MovingCallbackMsg.Body body = movingCallbackMsg.getBody();
-        switch (body.getWorkflowPhase()) {
-            case 20:
-                if (body.getTaskPhase().equalsIgnoreCase("GO_FETCHING")) {
-                    onMovingStarted(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
-                }
-                break;
-            case 25:
-                onMovingWaiting(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
-                break;
-            case 26:
-                onMovingPaused(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
-                break;
-            case 30:
-                onMovingArrived(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
-                break;
-            case 31:
-                onMovingFail(String.valueOf(body.getRobotId()), String.valueOf(body.getWorkflowWorkId()));
-                break;
-            default:
-                break;
-        }
-
-        return new RestResponse(HttpStatus.OK);
-    }
-
-    /**
-     * 取消任务
-     *
-     * @param wcsTaskId WCS任务索引
-     * @return 是否成功
-     */
-    @GetMapping("/cancelTask")
-    public boolean cancelTask(@RequestParam(value = "taskId") String wcsTaskId) {
-        Optional<Task> task = getTaskByWcsTaskId(wcsTaskId);
-        return task.isPresent() && cancel(task.get());
     }
 }
