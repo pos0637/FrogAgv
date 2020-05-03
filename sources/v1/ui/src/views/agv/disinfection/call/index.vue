@@ -10,13 +10,13 @@
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
         >叫料</div>
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/disinfection/call/history')"
         >
           叫料历史
           <span class="pick">{{this.num}}</span>
-        </div>
+        </div>-->
       </div>
       <!-- 右边内容 -->
       <div
@@ -47,7 +47,20 @@
                 <div class="bom-num"></div>
                 <div class="bom-done"></div>
                 <div class="data-content-operation flex-box flex-align-items-center">
-                  <div class="bom-delete" @click="callWave(wave)" v-if="!wave.isCalled">叫料</div>
+                  <div
+                    class="bom-delete"
+                    @click="callWave(wave)"
+                    v-if="!wave.isCalled"
+                    style="width:90px;"
+                  >叫料</div>
+                </div>
+                <div class="data-content-operation flex-box flex-align-items-center">
+                  <div
+                    class="bom-cancel"
+                    @click="cancelWave(wave)"
+                    v-if="wave.isCalled"
+                    style="width:90px;"
+                  >取消</div>
                 </div>
               </div>
               <div
@@ -66,7 +79,7 @@
                   <span v-else>未叫料</span>
                 </div>
                 <div class="data-content-operation flex-box flex-align-items-center">
-                  <div class="bom-delete" @click="callBom(bom)" v-if="isEmpty(bom.callId)">叫料</div>
+                  <!-- <div class="bom-delete" @click="callBom(bom)" v-if="isEmpty(bom.callId)">叫料</div> -->
                 </div>
               </div>
             </div>
@@ -78,19 +91,19 @@
 </template>
 
 <script>
-  import '../../product/home/home.scss'
-import './call.scss'
-import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import '../../product/home/home.scss';
+  import './call.scss';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  export default {
     name: 'call',
     components: {},
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     data() {
       return {
         num: '99+',
@@ -98,68 +111,115 @@ export default {
         // 加载对象
         load: null,
         callPlans: []
-      }
-  },
+      };
+    },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '消毒间叫料')
-        this.getCallPlans()
+        this.$store.dispatch('updateTitle', '消毒间叫料');
+        this.$store.dispatch('updateNeedLogin', false);
+        this.timer();
       },
       isEmpty,
       // 跳转
       turn(url) {
-        this.$router.push({ path: url })
+        this.$router.push({ path: url });
       },
       toggleShow() {},
+      timer() {
+        this.getCallPlans();
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => {
+          this.getCallPlans();
+        }, 5000);
+      },
       // 叫波次
       callWave(wave) {
         if (!isEmpty(wave.waveDetailModels) && wave.waveDetailModels.length > 0) {
           wave.waveDetailModels.forEach(item => {
-            item.areaType = 3
-          })
+            item.areaType = 3;
+          });
         }
+        this.load = this.showErrorMessage('叫料中，请稍后');
         request({
           url: '/agv/callMaterials/addWaveDetailCallMaterials',
           method: 'POST',
           data: wave.waveDetailModels
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              this.getCallPlans()
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.getCallPlans();
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+          });
       },
       // 叫详情
       callBom(bom) {
-        const callBoms = []
+        const callBoms = [];
         if (!isEmpty(bom)) {
-          bom.areaType = 3
-          callBoms.push(bom)
+          bom.areaType = 3;
+          callBoms.push(bom);
         }
+        this.load = this.showErrorMessage('叫料中，请稍后');
         request({
           url: '/agv/callMaterials/addWaveDetailCallMaterials',
           method: 'POST',
           data: callBoms
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              this.getCallPlans()
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.getCallPlans();
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+          });
+      },
+      // 波次取消叫料
+      cancelWave(wave) {
+        this.load = this.showErrorMessage('正在取消，请稍后');
+        request({
+          url: '/agv/callMaterials/cancelWave',
+          method: 'POST',
+          params: {
+            waveCode: wave.code
+          }
+        })
+          .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            if (response.errno === 0) {
+              this.getCallPlans();
+            }
           })
+          .catch(_ => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+          });
       },
       // 获取叫料计划
       getCallPlans() {
@@ -174,17 +234,13 @@ export default {
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.callPlans = response.data
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
+                this.callPlans = response.data;
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            console.log(_);
+          });
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -194,9 +250,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

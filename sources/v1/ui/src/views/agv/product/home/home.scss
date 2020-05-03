@@ -89,6 +89,7 @@
   .data-content-produce-row {
     height: 40px;
     font-size: 25px;
+    line-height: 40px;
   }
 
   .data-content-produce-row {
@@ -104,6 +105,7 @@
   .data-name {
     width: 650px;
     text-align: center;
+    color: white;
   }
   .wave-name {
     width: 650px;
@@ -113,6 +115,7 @@
     width: 650px;
     text-align: center;
     padding-left: 40px;
+    font-size: 18px;
   }
   .bom-num {
     width: 200px;
@@ -150,6 +153,19 @@
   .bom-delete,
   .bom-back {
     color: #4a375e;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  .bom-cancel {
+    width: 60px;
+    font-size: 20px;
+    background-color: red;
+    margin-left: 30px;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+    color: white;
   }
 
   .bom-update,
@@ -191,4 +207,8 @@
   .wave-delete {
     color: #4a375e;
   }
+}
+
+.disabledClick {
+  pointer-events: none;
 }

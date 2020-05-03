@@ -10,10 +10,10 @@
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/disinfection/call')"
         >叫料</div>
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/disinfection/call/history')"
-        >叫料历史</div>
+        >叫料历史</div>-->
       </div>
       <!-- 右边内容 -->
       <div class="flex-box" style="width:100%;margin-left:10px;margin-right:20px;">
@@ -60,20 +60,20 @@
 </template>
 
 <script>
-  import '../../product/home/home.scss'
-import './task.scss'
-import TaskOut from './taskOut'
-import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import '../../product/home/home.scss';
+  import './task.scss';
+  import TaskOut from './taskOut';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  export default {
     name: 'home',
     components: { TaskOut },
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     data() {
       return {
         state: {
@@ -85,25 +85,26 @@ export default {
         tasks: [],
         taskOutPositionName: '',
         taskOutBom: null
-      }
-  },
+      };
+    },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '消毒间配货任务')
-        this.getSites()
-        this.getDistributionTasks()
+        this.$store.dispatch('updateTitle', '消毒间配货任务');
+        this.$store.dispatch('updateNeedLogin', false);
+        this.getSites();
+        this.getDistributionTasks();
       },
       // 跳转到配送管理页面
       turn(url) {
-        this.$router.push({ path: url })
+        this.$router.push({ path: url });
       },
       toggleShow() {
-        this.state.taskOutVisible = false
+        this.state.taskOutVisible = false;
       },
       taskOut(bom) {
-        this.taskOutBom = bom
-        this.taskOutPositionName = bom.name
-        this.state.taskOutVisible = true
+        this.taskOutBom = bom;
+        this.taskOutPositionName = bom.name;
+        this.state.taskOutVisible = true;
       },
       getSites() {
         request({
@@ -116,17 +117,17 @@ export default {
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.sites = response.data
+                this.sites = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       getDistributionTasks() {
         request({
@@ -139,17 +140,17 @@ export default {
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.tasks = response.data
+                this.tasks = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -159,9 +160,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

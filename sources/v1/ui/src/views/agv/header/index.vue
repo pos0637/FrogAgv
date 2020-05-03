@@ -3,8 +3,8 @@
     <div class="header-time">{{this.currentTime}}</div>
     <div class="header-title">{{this.title}}</div>
     <div class="header-user flex-box flex-align-items-center">
-      <div class="header-user-name">{{this.userName}}</div>
-      <el-dropdown>
+      <div class="header-user-name" v-if="this.needLogin">{{this.userName}}</div>
+      <el-dropdown v-if="this.needLogin">
         <div class="header-icon"></div>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item divided>
@@ -42,6 +42,9 @@
     computed: {
       title() {
         return this.$store.state.AgvHeader.title;
+      },
+      needLogin() {
+        return this.$store.state.AgvHeader.needLogin;
       }
     },
     mounted() {

@@ -23,6 +23,7 @@ const getters = {
   projects: state => state.project.projects,
   tasks: state => state.task.tasks,
   types: state => state.type.types,
-  title: state => state.AgvHeader.title
+  title: state => state.AgvHeader.title,
+  needLoign: state => state.AgvHeader.needLoign
 }
 export default getters

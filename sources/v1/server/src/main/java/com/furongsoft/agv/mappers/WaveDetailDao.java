@@ -143,7 +143,7 @@ public interface WaveDetailDao extends BaseMapper<WaveDetail> {
         public String selectWaveDetailsByWaveCodeAndAreaType() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.code,t1.wave_code,t1.material_id,t1.count,t2.name AS materialName,t2.uuid AS materialCode,t3.id AS callId");
+                    SELECT("t1.id,t1.code,t1.wave_code,t1.material_id,t1.count,t2.name AS materialName,t2.uuid AS materialCode,t3.id AS callId, t3.state AS callState");
                     FROM(WAVE_DETAIL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
                     LEFT_OUTER_JOIN(CALL_MATERIAL_TABLE_NAME + " t3 ON t1.code = t3.wave_detail_code");

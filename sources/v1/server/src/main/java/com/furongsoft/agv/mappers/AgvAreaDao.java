@@ -68,6 +68,15 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
     @SelectProvider(type = DaoProvider.class, method = "selectParentAreaById")
     AgvAreaModel selectParentAreaById(@Param("id") Long id);
 
+    /**
+     * 通过编号查找区域
+     *
+     * @param areaCode 区域编号
+     * @return 区域
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectAgvAreaByCode")
+    AgvArea selectAgvAreaByCode(@Param("areaCode") String areaCode);
+
     class DaoProvider {
         private static final String AGV_AREA_TABLE_NAME = AgvArea.class.getAnnotation(TableName.class).value();
         private static final String SITE_DETAIL_TABLE_NAME = SiteDetail.class.getAnnotation(TableName.class).value();
@@ -159,6 +168,20 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
             }.toString();
         }
 
+        /**
+         * 通过编号查找区域
+         *
+         * @return sql
+         */
+        public String selectAgvAreaByCode() {
+            return new SQL() {
+                {
+                    SELECT("t1.id, t1.parent_id, t1.type, t1.name, t1.code");
+                    FROM(AGV_AREA_TABLE_NAME + " t1");
+                    WHERE("t1.code = #{areaCode} AND t1.enabled=1");
+                }
+            }.toString();
+        }
 
     }
 }

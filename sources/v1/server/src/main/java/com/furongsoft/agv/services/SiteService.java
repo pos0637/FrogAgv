@@ -239,4 +239,14 @@ public class SiteService extends BaseService<SiteDao, Site> {
     public List<AgvArea> selectAgvAreasByType(int type) {
         return siteDao.selectAreaByType(type);
     }
+
+    /**
+     * 通过编号查找区域
+     *
+     * @param areaCode 区域编号
+     * @return 区域
+     */
+    public AgvArea selectAgvAreaByCode(String areaCode) {
+        return agvAreaDao.selectAgvAreaByCode(areaCode);
+    }
 }

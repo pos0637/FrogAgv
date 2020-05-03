@@ -111,5 +111,16 @@ public class CallMaterialController {
         return new RestResponse(HttpStatus.OK);
     }
 
+    /**
+     * 通过波次取消叫料
+     *
+     * @param waveCode 波次编号
+     * @return 响应内容
+     */
+    @PostMapping("/callMaterials/cancelWave")
+    public RestResponse cancelWaveCallMaterials(@RequestParam String waveCode) {
+        callMaterialService.cancelWaveCallMaterials(waveCode);
+        return new RestResponse(HttpStatus.OK);
+    }
 
 }

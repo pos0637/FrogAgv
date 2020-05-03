@@ -139,6 +139,7 @@ public class WaveService extends BaseService<WaveDao, Wave> {
                         WaveDetailModel calledModel = waveDetailModelMap.get(waveDetailModel.getCode());
                         if (!ObjectUtils.isEmpty(calledModel)) {
                             waveDetailModel.setCallId(calledModel.getCallId());
+                            waveDetailModel.setCallState(calledModel.getCallState());
                         } else {
                             // 存在未叫料的波次详情，则这个波次没有全部叫料
                             waveModel.setIsCalled(false);

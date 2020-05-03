@@ -55,11 +55,21 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
      * 通过波次详情编码以及区域类型获取叫料信息
      *
      * @param waveDetailCode 波次详情编码
-     * @param areaType       区域类型
+     * @param areaType       叫料区域类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
      * @return 叫料信息
      */
     @SelectProvider(type = DaoProvider.class, method = "selectCallMaterialByWaveDetailCodeAndAreaType")
     CallMaterialModel selectCallMaterialByWaveDetailCodeAndAreaType(@Param("waveDetailCode") String waveDetailCode, @Param("areaType") int areaType);
+
+    /**
+     * 通过波次编码以及区域类型获取叫料列表
+     *
+     * @param waveCode 波次编码
+     * @param areaType 叫料区域类型[1：灌装区；2：包装区；3：消毒间；4：拆包间]
+     * @return 叫料列表
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectCallMaterialByWaveCodeAndAreaType")
+    List<CallMaterialModel> selectCallMaterialByWaveCodeAndAreaType(@Param("waveCode") String waveCode, @Param("areaType") int areaType, @Param("state") Integer state);
 
     /**
      * 通过ID对叫料信息进行伪删除
@@ -69,6 +79,15 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
      */
     @UpdateProvider(type = DaoProvider.class, method = "deleteCallMaterial")
     boolean deleteCallMaterial(@Param("id") long id);
+
+    /**
+     * 通过波次详情取消叫料
+     *
+     * @param waveDetailCode 波次详情编号
+     * @return 是否成功
+     */
+    @UpdateProvider(type = DaoProvider.class, method = "deleteCallMaterialByCode")
+    boolean deleteCallMaterialByCode(@Param("waveDetailCode") String waveDetailCode);
 
     /**
      * 更新叫料状态
@@ -125,7 +144,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialsByConditions(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.cancel_reason,t1.area_id,t1.team_id, " +
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.type,t1.call_time,t1.wave_detail_code,t1.cancel_reason,t1.area_id,t1.team_id, " +
                             "t2.name AS materialName, t2.code AS materialCode, t2.uuid AS materialUuid, t2.specs AS materialSpecs, t2.unit AS materialUnit, " +
                             "t2.batch AS materialBatch, t4.code AS waveCode, t4.material_id AS productId, t5.name AS productName, t5.uuid AS productUuid, t6.code AS productLineCode");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1 ");
@@ -166,6 +185,21 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         }
 
         /**
+         * 通过波次详情编号取消叫料
+         *
+         * @return sql
+         */
+        public String deleteCallMaterialByCode() {
+            return new SQL() {
+                {
+                    UPDATE(CALL_MATERIAL_TABLE_NAME);
+                    SET("enabled=0");
+                    WHERE("wave_detail_code=#{waveDetailCode}");
+                }
+            }.toString();
+        }
+
+        /**
          * 通过波次详情编码以及区域类型获取叫料信息
          *
          * @return sql
@@ -179,6 +213,27 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                 }
             }.toString();
         }
+
+        /**
+         * 通过波次编码以及区域类型获取叫料列表
+         *
+         * @return sql
+         */
+        public String selectCallMaterialByWaveCodeAndAreaType(final Map<String, Object> params) {
+            return new SQL() {
+                {
+                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode");
+                    FROM(CALL_MATERIAL_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(WAVE_DETAIL_TABLE_NAME + " t2 ON t1.wave_detail_code = t2.code");
+                    LEFT_OUTER_JOIN(WAVE_TABLE_NAME + " t3 ON t2.wave_code = t3.code");
+                    WHERE("t3.code = #{waveCode} AND t1.type = #{areaType} AND t1.enabled = 1 AND t3.enabled=1");
+                    if (null != params.get("state")) {
+                        WHERE("t1.state=#{state}");
+                    }
+                }
+            }.toString();
+        }
+
 
         /**
          * 更新叫料状态

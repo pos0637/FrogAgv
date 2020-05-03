@@ -22,12 +22,14 @@ import com.furongsoft.agv.models.WaveModel;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.services.BaseService;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 叫料服务
@@ -188,6 +190,20 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     }
 
     /**
+     * 通过波次取消叫料
+     *
+     * @param waveCode 波次编号
+     */
+    public void cancelWaveCallMaterials(String waveCode) {
+        List<WaveDetailModel> waveDetailModels = waveDetailDao.selectWaveDetails(waveCode);
+        if (!CollectionUtils.isEmpty(waveDetailModels)) {
+            waveDetailModels.forEach(waveDetailModel -> {
+                callMaterialDao.deleteCallMaterialByCode(waveDetailModel.getCode());
+            });
+        }
+    }
+
+    /**
      * 更新叫料状态
      *
      * @param id    叫料ID
@@ -228,6 +244,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
         List<WaveModel> waveModels = waveDao.selectWaveModelsByAreaId(callLine.getId());
         if (!CollectionUtils.isEmpty(waveModels)) {
             List<WaveModel> unCallWaves = new ArrayList<>();
+            // 找出所有未叫料的波次
             waveModels.forEach(waveModel -> {
                 // 所有波次详情
                 List<WaveDetailModel> waveDetailModels = waveDetailDao.selectWaveDetails(waveModel.getCode());
@@ -241,6 +258,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                         waveDetailModelMap.put(callWaveDetailModel.getCode(), callWaveDetailModel);
                     });
                     List<WaveDetailModel> unCallWaveDetails = new ArrayList<>();
+                    // 找出未叫料的波次详情加入到列表中
                     waveDetailModels.forEach(waveDetailModel -> {
                         WaveDetailModel calledModel = waveDetailModelMap.get(waveDetailModel.getCode());
                         // 如果还未叫料，则加入未叫料波次详情列表中
@@ -255,6 +273,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                             unCallWaveDetails.add(waveDetailModel);
                         }
                     });
+                    // 如果存在未叫料的波次详情，则添加未叫料波次
                     if (!CollectionUtils.isEmpty(unCallWaveDetails)) {
                         waveModel.setWaveDetailModels(unCallWaveDetails);
                         unCallWaves.add(waveModel);
@@ -305,12 +324,25 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
         DeliveryTaskModel deliveryTaskModel = new DeliveryTaskModel();
         deliveryTaskModel.setStartSiteId(callButtonModel.getSiteId());
         if (callArea.getCode().equals("PRODUCT_FILLING")) {
+            // 灌装区退回
             deliveryTaskModel.setType(2);
             return deliveryTaskService.addDeliveryTask(deliveryTaskModel);
         } else if (callArea.getCode().equals("PRODUCT_PACKAGING")) {
+            // 包装区退回
             deliveryTaskModel.setType(6);
             return deliveryTaskService.addDeliveryTask(deliveryTaskModel);
         }
         return false;
+    }
+
+    /**
+     * 通过波次编码以及区域类型获取叫料列表
+     *
+     * @param waveCode 波次编码
+     * @param areaType 区域类型
+     * @return 叫料列表
+     */
+    public List<CallMaterialModel> selectCallMaterialByWaveCodeAndAreaType(String waveCode, int areaType, Integer state) {
+        return callMaterialDao.selectCallMaterialByWaveCodeAndAreaType(waveCode, areaType, state);
     }
 }

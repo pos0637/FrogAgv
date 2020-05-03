@@ -124,6 +124,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         return onContainerLeft(containerId, destination);
     }
 
+    // TODO 任务在待下发的任务列表中
     @Override
     public synchronized boolean onCancel(Task task) {
         tasks.remove(task);
@@ -198,6 +199,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     @Override
     public synchronized boolean onContainerArrived(String containerId, String destination) {
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
+        // TODO 入场成功了，返回失败
         if (site == null) {
             return false;
         }
@@ -259,7 +261,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     /**
      * 添加任务
-     * 
+     *
      * @param source          源站点编码
      * @param destination     目的站点编码
      * @param destinationArea 目的区域编码
@@ -268,7 +270,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @throws Exception 异常
      */
     protected synchronized Task addTask(String source, String destination, String destinationArea,
-            List<Material> materials) throws Exception {
+                                        List<Material> materials) throws Exception {
         if (!hasContainer(source)) {
             Tracker.agv("无料车无法发货:" + source);
             throw new NonMaterialCarException();
@@ -301,7 +303,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     /**
      * 添加执行任务
-     * 
+     *
      * @param source      源站点编码
      * @param destination 目的站点编码
      * @param wcsTaskId   WCS任务索引
@@ -309,7 +311,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addRunningTask(String source, String destination, String wcsTaskId,
-            List<Material> materials) {
+                                               List<Material> materials) {
         Task task = new Task(source, destination, null, wcsTaskId, null, true, true, Status.Initialized, materials);
         tasks.add(task);
 
@@ -318,7 +320,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     /**
      * 添加等待任务
-     * 
+     *
      * @param source          源站点编码
      * @param destination     目的站点编码
      * @param destinationArea 目的区域编码
@@ -326,10 +328,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addPendingTask(String source, String destination, String destinationArea,
-            List<Material> materials) {
+                                               List<Material> materials) {
         Task task = new Task(source, destination, destinationArea, null, null, true, true, Status.Initialized,
                 materials);
-        tasks.add(task);
+        pendingTasks.add(task);
 
         return task;
     }
@@ -396,7 +398,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     /**
      * 是否为空闲站点
-     * 
+     *
      * @param code 站点编码
      * @return 是否为空闲站点
      */
@@ -411,7 +413,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     /**
      * 是否为空闲站点
-     * 
+     *
      * @param site 站点
      * @return 是否为空闲站点
      */

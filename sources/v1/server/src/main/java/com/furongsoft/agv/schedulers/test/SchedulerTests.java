@@ -299,4 +299,56 @@ public class SchedulerTests implements InitializingBean {
         Task task3 = scheduler.addTask(sites[9], sites[5], null);
         assertEquals(true, task3 != null);
     }
+
+    /**
+     * 点到点搬运，搬走后取消
+     *
+     * @param startCode 起始站点
+     * @param endCode 目标站点
+     * @param containerCode1 容器1编号
+     * @param containerCode2 容器2编号
+     * @throws Exception
+     */
+    @GetMapping("/test16")
+    public void test16(int startCode, int endCode, String containerCode1, String containerCode2) throws Exception {
+        scheduler.removeAllContainers();
+
+        boolean result = scheduler.addContainer(containerCode1, sites[startCode].getCode());
+        assertEquals(true, result);
+
+        Task task1 = scheduler.addTask(sites[startCode], sites[endCode], null);
+        assertEquals(true, task1 != null);
+
+        // 等待AGV小车取走A点的货架
+        while (task1.getStatus() != Status.Moving) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        result = scheduler.cancel(task1);
+        assertEquals(true, result);
+    }
+
+    /**
+     * 点到点搬运
+     *
+     * @param startCode 起始站点
+     * @param endCode 目标站点
+     * @param containerCode1 容器1编号
+     * @param containerCode2 容器2编号
+     * @throws Exception
+     */
+    @GetMapping("/test17")
+    public void test17(int startCode, int endCode, String containerCode1, String containerCode2) throws Exception {
+        scheduler.removeAllContainers();
+
+        boolean result = scheduler.addContainer(containerCode1, sites[startCode].getCode());
+        assertEquals(true, result);
+
+        Task task1 = scheduler.addTask(sites[startCode], sites[endCode], null);
+        assertEquals(true, task1 != null);
+    }
+
 }

@@ -62,4 +62,9 @@ public class DeliveryTaskModel implements Serializable {
      * 生产线
      */
     private String productLine;
+
+    /**
+     * 波次编号
+     */
+    private String waveCode;
 }

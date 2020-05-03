@@ -64,6 +64,11 @@ public class WaveDetailModel implements Serializable {
     private Long callId;
 
     /**
+     * 叫料状态
+     */
+    private Integer callState;
+
+    /**
      * (1：灌装区；2：包装区；3：消毒间；4：拆包间)
      */
     private Integer areaType;

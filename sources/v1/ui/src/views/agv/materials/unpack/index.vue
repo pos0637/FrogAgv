@@ -1,7 +1,7 @@
 <template>
   <div class="flex-box flex-direction-column" style="height:100%">
     <!-- 头部 -->
-    <div class="content flex-box fillParent">
+    <div class="content flex-box fillParent" style="height:100%">
       <!-- 左边菜单 -->
       <div class="left-menu">
         <div
@@ -17,20 +17,25 @@
         >备货任务</div>
       </div>
       <!-- 右边内容 -->
-      <div class="flex-box" style="width:100%;margin-left:10px;margin-right:20px;">
+      <div
+        class="flex-box"
+        style="width:100%;margin-left:10px;margin-right:20px;margin-bottom:10px;"
+      >
         <!-- 配送任务 -->
-        <div class="task-list-box">
+        <div class="task-list-box flex-box flex-direction-column">
           <div class="task-list-title">配送任务</div>
-          <div v-for="(item) in tasks" :key="item.id">
-            <div class="task-list-name">{{item.productName}}</div>
-            <div
-              v-for="(bom) in item.callMaterialModels"
-              :key="bom.id"
-              class="flex-box"
-              style=" margin-top:5px;"
-            >
-              <div class="task-list-bom-name">{{bom.materialName}}</div>
-              <div class="task-list-bom-num">{{bom.count}}</div>
+          <div style="overflow:auto; overflow-x:visible;">
+            <div v-for="(item) in tasks" :key="item.id">
+              <div class="task-list-name">{{item.productName}}</div>
+              <div
+                v-for="(bom) in item.callMaterialModels"
+                :key="bom.id"
+                class="flex-box"
+                style=" margin-top:5px;"
+              >
+                <div class="task-list-bom-name">{{bom.materialName}}</div>
+                <div class="task-list-bom-num">{{bom.count}}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -38,7 +43,7 @@
         <div class="task-content">
           <div class="title">备货区</div>
           <div class="position-box flex-box flex-wrap">
-            <div v-if="item.areaId === 17" v-for="(item) in sites" :key="item.id">
+            <div v-for="(item) in sites" :key="item.id">
               <div @click="taskOut(item)" class="pointer site-item">
                 <div class="position position-pointer" v-if="item.materialBoxId">
                   <div
@@ -65,20 +70,20 @@
 </template>
 
 <script>
-  import '../../product/home/home.scss'
-import '../../demolition/task/task.scss'
-import TaskOut from './taskOut'
-import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import '../../product/home/home.scss';
+  import '../pack/task.scss';
+  import TaskOut from './taskOut';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  export default {
     name: 'home',
     components: { TaskOut },
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     data() {
       return {
         state: {
@@ -90,25 +95,25 @@ export default {
         tasks: [],
         taskOutPositionName: '',
         taskOutBom: null
-      }
-  },
+      };
+    },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '包材仓-拆包间任务')
-        this.getSites()
-        this.getDistributionTasks()
+        this.$store.dispatch('updateTitle', '包材仓-拆包间任务');
+        this.getSites();
+        this.getDistributionTasks();
       },
       // 跳转到配送管理页面
       turn(url) {
-        this.$router.push({ path: url })
+        this.$router.push({ path: url });
       },
       toggleShow() {
-        this.state.taskOutVisible = false
+        this.state.taskOutVisible = false;
       },
       taskOut(bom) {
-        this.taskOutBom = bom
-        this.taskOutPositionName = bom.name
-        this.state.taskOutVisible = true
+        this.taskOutBom = bom;
+        this.taskOutPositionName = bom.name;
+        this.state.taskOutVisible = true;
       },
       getSites() {
         request({
@@ -119,20 +124,20 @@ export default {
           }
         })
           .then(response => {
-            console.log(response, '------')
+            console.log(response, '------');
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.sites = response.data
+                this.sites = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       getDistributionTasks() {
         request({
@@ -146,20 +151,20 @@ export default {
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.tasks = response.data
+                this.tasks = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       formatShowName(item) {
-        const showName = ''
+        const showName = '';
         // if (
         //   !isEmpty(item.materialBoxMaterialModels) &&
         //   item.materialBoxMaterialModels.length > 0
@@ -168,7 +173,7 @@ export default {
         //     showName += obj.materialName + ' ' + obj.count + ' \n';
         //   });
         // }
-        return showName
+        return showName;
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -178,9 +183,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>
