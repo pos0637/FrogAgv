@@ -5,15 +5,15 @@
       <div class="left-menu">
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn1"
+          @click="turn('/dashboard')"
         >配送管理</div>
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
         >波次管理</div>
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn3"
-        >叫料历史</div>
+          @click="turn('/agv/call/history')"
+        >叫料历史</div>-->
       </div>
       <!-- 右边内容 -->
       <div
@@ -106,21 +106,22 @@
 </template>
 
 <script>
-  import draggable from 'vuedraggable'
-import '../home/home.scss'
-import BackBom from './backBom'
-import SaveBom from './saveBom'
-import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import draggable from 'vuedraggable';
+  import '../home/home.scss';
+  import BackBom from './backBom';
+  import SaveBom from './saveBom';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  const areaTypeString = process.env.AREA_TYPE;
+  export default {
     name: 'home',
     components: { draggable, BackBom, SaveBom },
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     data() {
       return {
         state: {
@@ -133,71 +134,79 @@ export default {
         backBomId: null,
         saveBomId: null,
         waves: [],
-        datas: []
-      }
-  },
+        datas: [],
+        teamId: '',
+        areaType: 1 // 区域类型,默认灌装区 1:灌装区;2:包装区
+      };
+    },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '波次管理')
-        this.getWaves()
+        this.teamId = this.$store.state.AgvHeader.teamId;
+        this.formateAreaType();
+        this.getWaves();
+      },
+      formateAreaType() {
+        if (areaTypeString === 'filling') {
+          this.areaType = 1;
+          this.$store.dispatch('updateTitle', '灌装区波次管理');
+        } else if (areaTypeString === 'packing') {
+          this.areaType = 2;
+          this.$store.dispatch('updateTitle', '包装区波次管理');
+        }
       },
       showAll() {
-        this.waveState = null
-        this.getWaves()
+        this.waveState = null;
+        this.getWaves();
       },
       showUnFinish() {
-        this.waveState = 0
-        this.getWaves()
+        this.waveState = 0;
+        this.getWaves();
       },
       getWaves() {
         request({
           url: '/agv/wavesPlan',
           method: 'GET',
           params: {
-            type: 1,
-            teamId: 'uuidxxxxb03',
+            type: this.areaType,
+            teamId: this.teamId,
             state: this.waveState
           }
         })
           .then(response => {
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.waves = response.data
+                this.waves = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
-      // 跳转到配送管理页面
-      turn1() {
-        this.$router.push({ path: '/dashboard' })
-      },
-      // 跳转到历史叫料页面
-      turn3() {
-        this.$router.push({ path: '/agv/call/history' })
+      // 跳转到指定页面
+      turn(url) {
+        this.$router.push({ path: url });
       },
       // 原料退货
       backBom(bomId) {
-        console.log('backBom>>>>>>>', bomId)
-        this.backBomId = bomId
+        console.log('backBom>>>>>>>', bomId);
+        this.backBomId = bomId;
       },
       // 原料验收
       saveBom(bomId) {
-        console.log('saveBom>>>>>>>', bomId)
+        console.log('saveBom>>>>>>>', bomId);
       },
       // 一波退货
       backWave(waveId) {
-        console.log('backWave>>>>>>>', waveId)
+        console.log('backWave>>>>>>>', waveId);
       },
       // 一波验收
       saveWave(waveId) {
-        console.log('backWave>>>>>>>', waveId)
+        console.log('backWave>>>>>>>', waveId);
       },
       // 拖动之后的顺序
       changeSort() {
@@ -208,30 +217,30 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves()
+              this.getWaves();
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       toggleShow() {
-        this.backBomVisible = false
-        this.saveBomVisible = false
+        this.backBomVisible = false;
+        this.saveBomVisible = false;
       },
       // 格式化状态
       formateState(waveState) {
-        let stateName = ''
+        let stateName = '';
         Constants.waveState.forEach(item => {
           if (item.value === waveState) {
-            stateName = item.label
+            stateName = item.label;
           }
-        })
-        return stateName
+        });
+        return stateName;
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -241,9 +250,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

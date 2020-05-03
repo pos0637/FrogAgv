@@ -9,6 +9,12 @@ const AgvHeader = {
     },
     UPDATE_NEED_LOGIN: (state, needLogin) => {
       state.needLogin = needLogin
+    },
+    UPDATE_USER_NAME: (state, userName) => {
+      state.userName = userName
+    },
+    UPDATE_TEAM_ID: (state, teamId) => {
+      state.teamId = teamId
     }
   },
   actions: {
@@ -17,6 +23,12 @@ const AgvHeader = {
     },
     updateNeedLogin({ commit, state }, needLogin) {
       commit('UPDATE_NEED_LOGIN', needLogin)
+    },
+    updateUserName({ commit, state }, userName) {
+      commit('UPDATE_USER_NAME', userName)
+    },
+    updateTeamId({ commit, state }, teamId) {
+      commit('UPDATE_TEAM_ID', teamId)
     }
   }
 }

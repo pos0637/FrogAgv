@@ -5,11 +5,11 @@
       <div class="left-menu">
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn1"
+          @click="turn('/dashboard')"
         >配送管理</div>
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn2"
+          @click="turn('/agv/wave')"
         >波次管理</div>
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
@@ -44,16 +44,16 @@
 </template>
 
 <script>
-  import ComplexTable from '@/components/ComplexTable'
-import '../../product/home/home.scss'
-import '../../table.scss'
+  import ComplexTable from '@/components/ComplexTable';
+  import '../../product/home/home.scss';
+  import '../../table.scss';
 
-export default {
+  export default {
     name: 'call',
     components: { ComplexTable },
     created() {
-      this.$store.dispatch('updateTitle', '叫料历史')
-  },
+      this.$store.dispatch('updateTitle', '叫料历史');
+    },
     data() {
       return {
         callState: 0,
@@ -95,25 +95,21 @@ export default {
             sortable: 'false'
           }
         ]
-      }
-  },
+      };
+    },
     methods: {
       // 跳转
       turn(url) {
-        this.$router.push({ path: url })
+        this.$router.push({ path: url });
       },
-      // 跳转到波次管理页面
-      turn1() {
-        this.$router.push({ path: '/dashboard' })
-      },
-      // 跳转到波次管理页面
-      turn2() {
-        this.$router.push({ path: '/agv/wave' })
+      // 跳转到指定页面
+      turn(url) {
+        this.$router.push({ path: url });
       },
       toggleShow() {},
       callBom(bomId) {
-        console.log('callBom>>>>>>>>>>>>', bomId)
+        console.log('callBom>>>>>>>>>>>>', bomId);
       }
     }
-  }
+  };
 </script>

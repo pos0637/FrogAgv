@@ -4,6 +4,8 @@ import store from '@/store'
 import router from '@/router'
 import { getToken } from '@/utils/auth'
 
+const areaType = process.env.AREA_TYPE;
+
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
@@ -73,7 +75,15 @@ service.interceptors.response.use(
     if (error.response.data.code === 401) {
       store.dispatch('FedLogOut').then(() => {
         // location.reload() // 为了重新实例化vue-router对象 避免bug
-        router.push('/login')
+        if (areaType === 'demolition') {
+          router.push('/demolition/task')
+        } else if (areaType === 'disinfection') {
+          router.push('/disinfection/task')
+        } else if (areaType === 'materials') {
+          router.push('/materials/pack')
+        } else {
+          router.push('/login') // 否则全部重定向到登录页
+        }
       })
     }
     Message({

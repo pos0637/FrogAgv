@@ -24,6 +24,8 @@ const getters = {
   tasks: state => state.task.tasks,
   types: state => state.type.types,
   title: state => state.AgvHeader.title,
-  needLoign: state => state.AgvHeader.needLoign
+  needLoign: state => state.AgvHeader.needLoign,
+  userName: state => state.AgvHeader.userName,
+  teamId: state => state.AgvHeader.teamId
 }
 export default getters

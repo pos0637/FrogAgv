@@ -3,10 +3,10 @@
     <div class="content flex-box fillParent">
       <!-- 左边菜单 -->
       <div class="left-menu">
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/materials/unpack')"
-        >拆包配货</div>
+        >拆包配货</div>-->
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/materials/pack')"
@@ -76,6 +76,7 @@
     components: {},
     created() {
       this.$store.dispatch('updateTitle', '包材仓备货任务');
+      this.$store.dispatch('updateNeedLogin', false);
     },
     data() {
       return {

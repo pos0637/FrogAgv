@@ -18,6 +18,7 @@
 <script>
   import './header.scss';
   import mqtt from 'mqtt';
+  import { isEmpty } from '@/utils/helper';
 
   const options = {
     connectTimeout: 40000,
@@ -27,17 +28,23 @@
     clean: true
   };
   var client = mqtt.connect(process.env.MQTT_SERVICE, options);
+
   export default {
     name: 'AGVheaders',
     data() {
       return {
         currentTime: '',
-        userName: '用户名字'
+        userName: '请选择班组',
+        teamId: ''
       };
     },
     created() {
       this.getTime();
       this.mqttMSG();
+      this.userName = isEmpty(this.$store.state.AgvHeader.userName)
+        ? ''
+        : this.$store.state.AgvHeader.userName;
+      this.teamId = this.$store.state.AgvHeader.teamId;
     },
     computed: {
       title() {
@@ -107,6 +114,8 @@
           yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss;
       },
       logout() {
+        this.$store.dispatch('updateTeamId', '');
+        this.$store.dispatch('updateUserName', '请选择班组');
         this.$store.dispatch('LogOut').then(() => {
           location.reload(); // In order to re-instantiate the vue-router object to avoid bugs
         });

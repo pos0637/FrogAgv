@@ -8,12 +8,12 @@
         >配送管理</div>
         <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn2"
+          @click="turn('/agv/wave')"
         >波次管理</div>
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
-          @click="turn3"
-        >叫料历史</div>
+          @click="turn('/agv/call/history')"
+        >叫料历史</div>-->
       </div>
       <!-- 右边内容 -->
       <div
@@ -113,21 +113,22 @@
 </template>
 
 <script>
-  import './home.scss'
-import EditBom from './editBom'
-import AddBom from './addBom'
-import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import './home.scss';
+  import EditBom from './editBom';
+  import AddBom from './addBom';
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-// 配送管理
-export default {
+  const areaTypeString = process.env.AREA_TYPE;
+  // 配送管理
+  export default {
     name: 'home',
     components: { EditBom, AddBom },
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     data() {
       return {
         state: {
@@ -139,29 +140,37 @@ export default {
         editBom: null,
         addBomWave: null,
         waves: [],
-        waveState: 0
-      }
-  },
+        waveState: 0,
+        teamId: '',
+        areaType: 1 // 区域类型,默认灌装区 1:灌装区;2:包装区
+      };
+    },
     methods: {
       loadingInfo() {
-        this.$store.dispatch('updateTitle', '配送管理')
-        this.getWaves()
+        this.teamId = this.$store.state.AgvHeader.teamId;
+        this.formateAreaType();
+        this.getWaves();
+      },
+      formateAreaType() {
+        if (areaTypeString === 'filling') {
+          this.areaType = 1;
+          this.$store.dispatch('updateTitle', '灌装区配送管理');
+        } else if (areaTypeString === 'packing') {
+          this.areaType = 2;
+          this.$store.dispatch('updateTitle', '包装区配送管理');
+        }
       },
       showAll() {
-        this.waveState = null
-        this.getWaves()
+        this.waveState = null;
+        this.getWaves();
       },
       showUnFinish() {
-        this.waveState = 0
-        this.getWaves()
+        this.waveState = 0;
+        this.getWaves();
       },
-      // 跳转到波次管理页面
-      turn2() {
-        this.$router.push({ path: '/agv/wave' })
-      },
-      // 跳转到历史叫料页面
-      turn3() {
-        this.$router.push({ path: '/agv/call/history' })
+      // 跳转到指定页面
+      turn(url) {
+        this.$router.push({ path: url });
       },
       // 删除原料 -删除完后需要刷新
       deleteBom(bomId) {
@@ -171,25 +180,25 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves()
+              this.getWaves();
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       // 修改原料信息
       updateBom(bom) {
-        this.editBom = bom
-        this.state.editBomVisible = true
+        this.editBom = bom;
+        this.state.editBomVisible = true;
       },
       addBom(wave) {
-        this.addBomWave = wave
-        this.state.addBomVisible = true
+        this.addBomWave = wave;
+        this.state.addBomVisible = true;
       },
       // 删除波次
       deleteWave(wave) {
@@ -202,16 +211,16 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves()
+              this.getWaves();
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       // 删除产品
       deleteProduce(produce) {
@@ -222,16 +231,16 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves()
+              this.getWaves();
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       // 根据产品 增加一个波次
       addWave(produce) {
@@ -242,56 +251,56 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              this.getWaves()
+              this.getWaves();
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       toggleShow() {
-        this.state.editBomVisible = false
-        this.state.addBomVisible = false
+        this.state.editBomVisible = false;
+        this.state.addBomVisible = false;
       },
       getWaves() {
         request({
           url: '/agv/waves',
           method: 'GET',
           params: {
-            type: 1,
-            teamId: 'uuidxxxxb03',
+            type: this.areaType,
+            teamId: this.teamId,
             state: this.waveState
           }
         })
           .then(response => {
-            console.log('getWaves*****:', response)
+            console.log('getWaves*****:', response);
             if (response.errno === 0) {
               if (!isEmpty(response.data)) {
-                this.waves = response.data
+                this.waves = response.data;
               }
               // 如果遮罩层存在
               if (!isEmpty(this.load)) {
-                this.load.close()
+                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            this.load = this.showErrorMessage('服务器请求失败');
+          });
       },
       // 格式化状态
       formateState(waveState) {
-        let stateName = ''
+        let stateName = '';
         Constants.waveState.forEach(item => {
           if (item.value === waveState) {
-            stateName = item.label
+            stateName = item.label;
           }
-        })
-        return stateName
+        });
+        return stateName;
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -301,9 +310,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

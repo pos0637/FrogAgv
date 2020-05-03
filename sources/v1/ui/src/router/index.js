@@ -9,6 +9,11 @@ export const constantRouterMap = [
     hidden: true
   },
   {
+    path: '/selectTeam',
+    component: () => import('@/views/agv/login/selectTeam'),
+    hidden: true
+  },
+  {
     path: '',
     component: Layout,
     redirect: 'dashboard',
