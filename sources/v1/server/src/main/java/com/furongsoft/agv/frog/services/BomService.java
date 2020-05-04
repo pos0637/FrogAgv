@@ -8,9 +8,12 @@ import com.furongsoft.agv.frog.mappers.BomDetailDao;
 import com.furongsoft.agv.frog.models.BomDetailModel;
 import com.furongsoft.agv.frog.models.BomModel;
 import com.furongsoft.base.services.BaseService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -23,10 +26,8 @@ import java.util.Set;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class BomService extends BaseService<BomDao, Bom> {
-
     private final BomDao bomDao;
     private final BomDetailDao bomDetailDao;
-
 
     @Autowired
     public BomService(BomDao bomDao, BomDetailDao bomDetailDao) {
@@ -78,6 +79,26 @@ public class BomService extends BaseService<BomDao, Bom> {
     }
 
     /**
+     * 通过是否更新的状态查找BOM列表
+     *
+     * @param updateState 是否更新的状态
+     * @return BOM列表
+     */
+    public List<BomModel> selectBomByUpdateState(int updateState) {
+        return bomDao.selectBomByUpdateState(updateState);
+    }
+
+    /**
+     * 通过bom主键查找bom详情
+     *
+     * @param bomId bom主键
+     * @return bom详情列表
+     */
+    public List<BomDetailModel> selectBomDetailsByBomId(long bomId) {
+        return bomDetailDao.selectBomDetailsByBomId(bomId);
+    }
+
+    /**
      * 查找未被删除的BOM列表
      *
      * @return
@@ -105,5 +126,28 @@ public class BomService extends BaseService<BomDao, Bom> {
      */
     public Integer addBomDetail(BomDetail bomDetail) {
         return bomDetailDao.insert(bomDetail);
+    }
+
+    /**
+     * 更新BOM
+     *
+     * @param bomModel BOM信息
+     * @return 是否成功
+     */
+    public boolean updateBom(BomModel bomModel) {
+        if (ObjectUtils.isEmpty(bomModel)) {
+            return false;
+        }
+        if (CollectionUtils.isEmpty(bomModel.getBomDetails())) {
+            return false;
+        }
+        bomModel.setUpdateState(1);
+        Bom bom = new Bom();
+        BeanUtils.copyProperties(bomModel, bom);
+        bomDao.updateById(bom);
+        bomModel.getBomDetails().forEach(bomDetail -> {
+            bomDetailDao.updateById(bomDetail);
+        });
+        return true;
     }
 }

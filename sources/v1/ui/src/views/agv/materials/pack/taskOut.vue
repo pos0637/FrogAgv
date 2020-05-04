@@ -80,12 +80,12 @@
 </template>
 
 <script>
-  import request from '@/utils/request'
-import Constants from '@/utils/constants'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import request from '@/utils/request';
+  import Constants from '@/utils/constants';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  export default {
     name: 'editBom',
     data() {
       return {
@@ -98,77 +98,81 @@ export default {
         load: null,
         lines: [],
         datas: []
-      }
+      };
     },
     created() {
-      this.loadingInfo()
+      this.loadingInfo();
     },
     props: {
       bom: [Object]
     },
     methods: {
       loadingInfo() {
-        this.getSiteInfo()
-        this.getProductLines()
+        this.getSiteInfo();
+        this.getProductLines();
       },
       isEmpty,
       // 弹出框标志变化
       toggleShow() {
-        this.$emit('toggleShow')
+        this.$emit('toggleShow');
       },
       // 发货
       deliverGoods() {
-        const info = this.info
+        const info = this.info;
         if (isEmpty(info.materialBoxId) || isEmpty(info.materialBoxModel)) {
-          return
+          return;
         }
         if (info.materialBoxModel.state != Constants.materialBoxState[1].value) {
-          return
+          return;
         }
         const sendItem = {
           startSiteId: info.id,
           materialBoxId: info.materialBoxId,
           type: 5,
           productLine: info.line
-        }
+        };
         if (info.areaId === 17) {
-          sendItem.productLine = info.line
-          sendItem.type = 3
+          sendItem.productLine = info.line;
+          sendItem.type = 3;
         }
+        this.load = this.showErrorMessage('发货请求中,请稍后...');
         request({
           url: '/agv/delivery/addDeliveryTask',
           method: 'POST',
           data: sendItem
         })
           .then(response => {
-            console.log('*******:', response)
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              this.getSiteInfo()
-              this.reloadParent()
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.getSiteInfo();
+              this.reloadParent();
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+          });
       },
       formmatDeliverGoodsState() {
-        const info = this.info
+        const info = this.info;
         if (isEmpty(info.materialBoxId) || isEmpty(info.materialBoxModel)) {
-          return true
+          return true;
         }
         // 如果有料框，并且料框没货
         if (info.materialBoxModel.state != Constants.materialBoxState[1].value) {
-          return true
+          return true;
         }
         // 如果当前有配送任务，则不能配送 TODO
         // if (!isEmpty(info.deliveryTaskId) && !isEmpty(info.deliveryTaskModel)) {
         //   return true;
         // }
-        return false
+        return false;
       },
       // 获取生产线
       getProductLines() {
@@ -180,19 +184,21 @@ export default {
           }
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.lines = response.data
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.lines = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败,请返回重试');
+          });
       },
       getSiteInfo() {
         request({
@@ -200,61 +206,64 @@ export default {
           method: 'GET'
         })
           .then(response => {
-            console.log('***getSiteInfo****:', response)
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
+              this.info = response.data;
               if (!isEmpty(response.data)) {
-                this.info = response.data
-                this.formmatMaterials(response.data)
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
+                this.formmatMaterials(response.data);
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败,请返回重试');
+          });
       },
       // 格式化站点状态
       formmatSiteState(siteState) {
-        let stateName = ''
+        let stateName = '';
         Constants.siteState.forEach(item => {
           if (item.value === siteState) {
-            stateName = item.label
+            stateName = item.label;
           }
-        })
-        return stateName
+        });
+        return stateName;
       },
       formmatDeliveryTaskState(deliveryTaskState) {
-        let stateName = ''
+        let stateName = '';
         Constants.deliveryTaskState.forEach(item => {
           if (item.value === deliveryTaskState) {
-            stateName = item.label
+            stateName = item.label;
           }
-        })
-        return stateName
+        });
+        return stateName;
       },
       formmatMaterialBoxState(materialBoxState) {
-        let stateName = ''
+        let stateName = '';
         Constants.materialBoxState.forEach(item => {
           if (item.value === materialBoxState) {
-            stateName = item.label
+            stateName = item.label;
           }
-        })
-        return stateName
+        });
+        return stateName;
       },
       // 格式化原料列表
       formmatMaterials(siteInfo) {
         if (!isEmpty(siteInfo.materialBoxModel)) {
-          this.datas = siteInfo.materialBoxModel.materialBoxMaterialModels
+          this.datas = siteInfo.materialBoxModel.materialBoxMaterialModels;
         } else {
-          this.datas = []
+          this.datas = [];
         }
       },
       // 刷新父级
       reloadParent() {
-        this.$emit('reloadParent')
+        this.$emit('reloadParent');
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -264,9 +273,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

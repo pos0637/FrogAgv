@@ -10,6 +10,11 @@
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
         >波次管理</div>
+        <div
+          v-if="auth==='admin'"
+          class="menu-item flex-box flex-justify-content-center flex-align-items-center"
+          @click="turn('/agv/setting')"
+        >生产设置</div>
         <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/agv/call/history')"
@@ -136,14 +141,16 @@
         waves: [],
         datas: [],
         teamId: '',
-        areaType: 1 // 区域类型,默认灌装区 1:灌装区;2:包装区
+        areaType: 1, // 区域类型,默认灌装区 1:灌装区;2:包装区
+        auth: 'user'
       };
     },
     methods: {
       loadingInfo() {
         this.teamId = this.$store.state.AgvHeader.teamId;
+        this.auth = this.$store.state.AgvHeader.auth;
         this.formateAreaType();
-        this.getWaves();
+        this.timer();
       },
       formateAreaType() {
         if (areaTypeString === 'filling') {
@@ -153,6 +160,15 @@
           this.areaType = 2;
           this.$store.dispatch('updateTitle', '包装区波次管理');
         }
+      },
+      timer() {
+        this.getWaves();
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => {
+          this.getWaves();
+        }, 5000);
       },
       showAll() {
         this.waveState = null;
@@ -177,14 +193,10 @@
               if (!isEmpty(response.data)) {
                 this.waves = response.data;
               }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       // 跳转到指定页面
@@ -218,14 +230,10 @@
           .then(response => {
             if (response.errno === 0) {
               this.getWaves();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       toggleShow() {

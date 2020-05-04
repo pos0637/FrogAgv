@@ -26,6 +26,7 @@ const getters = {
   title: state => state.AgvHeader.title,
   needLoign: state => state.AgvHeader.needLoign,
   userName: state => state.AgvHeader.userName,
-  teamId: state => state.AgvHeader.teamId
+  teamId: state => state.AgvHeader.teamId,
+  auth: state => state.AgvHeader.auth
 }
 export default getters

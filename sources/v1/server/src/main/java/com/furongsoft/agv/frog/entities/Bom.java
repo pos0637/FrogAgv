@@ -41,14 +41,20 @@ public class Bom extends BaseEntity {
     private String version;
 
     /**
+     * 是否更新状态[0:未更新；1：已更新]
+     */
+    private int updateState;
+
+    /**
      * 是否启用
      */
     private Integer enabled;
 
-    public Bom(String materialCode, int fullCount, String version, Integer enabled) {
+    public Bom(String materialCode, int fullCount, String version, Integer enabled, int updateState) {
         this.materialCode = materialCode;
         this.fullCount = fullCount;
         this.version = version;
         this.enabled = enabled;
+        this.updateState = updateState;
     }
 }

@@ -1,9 +1,10 @@
 package com.furongsoft.agv.frog.models;
 
+import com.furongsoft.agv.frog.entities.BomDetail;
 import com.furongsoft.base.entities.BaseEntity;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
+import java.util.List;
 
 /**
  * BOM信息
@@ -38,4 +39,14 @@ public class BomModel extends BaseEntity {
      * 物料名称
      */
     private String materialName;
+
+    /**
+     * 更新状态
+     */
+    private int updateState;
+
+    /**
+     * BOM详情列表
+     */
+    private List<BomDetail> bomDetails;
 }

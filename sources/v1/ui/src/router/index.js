@@ -32,6 +32,12 @@ export const constantRouterMap = [
     redirect: 'noredirect',
     children: [
       {
+        path: 'setting',
+        component: () => import('@/views/agv/product/setting/index'),
+        name: 'agvSetting',
+        meta: { title: 'agvSetting', icon: 'agvSetting', noCache: true }
+      },
+      {
         path: 'wave',
         component: () => import('@/views/agv/product/wave/index'),
         name: 'agvWave',
@@ -41,7 +47,7 @@ export const constantRouterMap = [
         path: 'call/history',
         component: () => import('@/views/agv/product/history/index'),
         name: 'agvHistory',
-        meta: { title: 'agvWave', icon: 'agvWave', noCache: true }
+        meta: { title: 'agvHistory', icon: 'agvHistory', noCache: true }
       }
     ]
   },

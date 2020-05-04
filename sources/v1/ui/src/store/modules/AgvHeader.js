@@ -15,6 +15,9 @@ const AgvHeader = {
     },
     UPDATE_TEAM_ID: (state, teamId) => {
       state.teamId = teamId
+    },
+    UPDATE_AUTH: (state, auth) => {
+      state.auth = auth
     }
   },
   actions: {
@@ -29,6 +32,9 @@ const AgvHeader = {
     },
     updateTeamId({ commit, state }, teamId) {
       commit('UPDATE_TEAM_ID', teamId)
+    },
+    updateAuth({ commit, state }, auth) {
+      commit('UPDATE_AUTH', auth)
     }
   }
 }

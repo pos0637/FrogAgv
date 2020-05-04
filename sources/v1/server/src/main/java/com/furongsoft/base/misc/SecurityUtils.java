@@ -2,6 +2,7 @@ package com.furongsoft.base.misc;
 
 import com.furongsoft.base.rbac.entities.User;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 
 /**
  * 安全工具
@@ -15,7 +16,8 @@ public class SecurityUtils {
      * @return 当前用户信息
      */
     public static User getCurrentUser() {
-        return (User) org.apache.shiro.SecurityUtils.getSubject().getPrincipal();
+        Subject subject = org.apache.shiro.SecurityUtils.getSubject();
+        return (User) subject.getPrincipal();
     }
 
     /**

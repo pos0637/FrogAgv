@@ -45,6 +45,20 @@
   display: none;
 }
 
+.setting {
+  .dialog-height {
+    height: calc(100vh - 250px);
+    overflow-y: auto;
+    position: relative;
+    .data-content {
+      height: calc(100vh - 430px);
+    }
+  }
+  .agv-dialog .el-input--medium .el-input__inner {
+    height: 40px;
+    line-height: 40px;
+  }
+}
 .agv-dialog {
   .dialog-header {
     font-size: 30px;

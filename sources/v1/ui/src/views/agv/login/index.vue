@@ -32,12 +32,14 @@
     },
     methods: {
       adminLogin() {
+        this.$store.dispatch('updateAuth', 'admin');
         this.$store.dispatch('updateTeamId', '');
         this.$store.dispatch('updateUserName', '管理员');
         this.$router.push({ path: 'dashboard' });
       },
       // 跳转到波次管理页面
       turn(url) {
+        this.$store.dispatch('updateAuth', 'user');
         this.$router.push({ path: url });
       }
     }

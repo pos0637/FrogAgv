@@ -52,6 +52,9 @@
   .btn-add {
     background-color: #c00000;
   }
+  .btn-update {
+    background-color: #00b050;
+  }
 }
 
 .data-header-content {
@@ -116,10 +119,16 @@
     text-align: center;
     padding-left: 40px;
     font-size: 18px;
+    color: black;
+  }
+  .bom-sort {
+    width: 250px;
+    text-align: center;
   }
   .bom-num {
     width: 200px;
     text-align: center;
+    color: black;
   }
   .bom-done {
     width: 250px;
@@ -157,6 +166,11 @@
     line-height: 30px;
   }
 
+  .bom-delete {
+    background-color: red;
+    color: white;
+  }
+
   .bom-cancel {
     width: 60px;
     font-size: 20px;
@@ -171,6 +185,8 @@
   .bom-update,
   .bom-save {
     color: #00b050;
+    height: 30px;
+    line-height: 30px;
   }
 }
 
@@ -179,6 +195,8 @@
   .wave-add,
   .wave-back,
   .wave-save {
+    height: 30px;
+    line-height: 30px;
     width: 60px;
     font-size: 20px;
     background-color: #ffffff;
@@ -188,6 +206,11 @@
   .wave-delete,
   .wave-back {
     color: #4a375e;
+  }
+
+  .wave-delete {
+    color: white;
+    background-color: red;
   }
 
   .wave-add,
@@ -200,12 +223,14 @@
   .wave-delete {
     width: 60px;
     font-size: 20px;
-    background-color: #ffffff;
+    background-color: red;
     margin-left: 30px;
     cursor: pointer;
   }
   .wave-delete {
-    color: #4a375e;
+    height: 30px;
+    line-height: 30px;
+    color: white;
   }
 }
 

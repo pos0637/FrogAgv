@@ -50,11 +50,6 @@ class FrogTests {
     }
 
     @Test
-    public void printTest() {
-        productionPlanScheduler.printTest();
-    }
-
-    @Test
     public void getProductionPlan() {
         productionPlanScheduler.getProductionPlan();
         System.out.println("**********");

@@ -71,12 +71,6 @@ public class ProductionPlanScheduler {
         tomorrow;
     }
 
-    public void printTest() {
-        System.out.println(DayType.today.name());
-        System.out.println(DayType.today.toString());
-        System.out.println(DayType.today.hashCode());
-    }
-
     /**
      * 获取今日生产计划
      * 1、新增物料
@@ -107,14 +101,14 @@ public class ProductionPlanScheduler {
         List<Material> totalMaterials = new ArrayList<>();
         // 所有执行新增的原料列表
         List<Material> addMaterials = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(tomorrowResponse.getErp_mm_mo_get_response().getData())) {
+        if (!ObjectUtils.isEmpty(tomorrowResponse.getErp_mm_mo_get_response()) && !CollectionUtils.isEmpty(tomorrowResponse.getErp_mm_mo_get_response().getData())) {
             tomorrowResponse.getErp_mm_mo_get_response().getData().forEach(moEntity -> {
                 if ((!StringUtils.isNullOrEmpty(moEntity.getProductlinename())) && (moEntity.getProductlinename().indexOf("3B") >= 0) && (moEntity.getDr() != 1)) {
                     allMoEntities.add(moEntity);
                 }
             });
         }
-        if (!CollectionUtils.isEmpty(todayResponse.getErp_mm_mo_get_response().getData())) {
+        if (!ObjectUtils.isEmpty(todayResponse.getErp_mm_mo_get_response()) && !CollectionUtils.isEmpty(todayResponse.getErp_mm_mo_get_response().getData())) {
             todayResponse.getErp_mm_mo_get_response().getData().forEach(moEntity -> {
                 if ((!StringUtils.isNullOrEmpty(moEntity.getProductlinename())) && (moEntity.getProductlinename().indexOf("3B") >= 0) && (moEntity.getDr() != 1)) {
                     allMoEntities.add(moEntity);
@@ -161,7 +155,7 @@ public class ProductionPlanScheduler {
                     GetBomInfoResponseMsg.DataEntity bomInfoData = bom.getErp_basedoc_bominfo_get_response().getData().get(0);
                     if (!existBom.contains(bomInfoData.getWlbm())) {
                         // 新增去重后的BOM
-                        Bom newBom = new Bom(bomInfoData.getWlbm(), 50, bomInfoData.getVersion(), 1);
+                        Bom newBom = new Bom(bomInfoData.getWlbm(), 50, bomInfoData.getVersion(), 1, 0);
                         bomService.add(newBom);
                         List<GetBomInfoResponseMsg.DataEntity> bomInfoDataList = bom.getErp_basedoc_bominfo_get_response().getData();
                         bomInfoDataList.forEach(bomInfoDetail -> {
@@ -343,9 +337,11 @@ public class ProductionPlanScheduler {
     }
 
     /**
-     * @param totalityItems
-     * @param bomDetailModels
-     * @return
+     * 通过所有领料单详情列表以及bom详情列表，获取需要拆分波次的领料单详情列表
+     *
+     * @param totalityItems   所有领料单详情列表
+     * @param bomDetailModels bom详情列表
+     * @return 需要拆分波次的领料单详情列表
      */
     private List<GetBillFullInfoResponseMsg.ItemEntity> getAddList(List<GetBillFullInfoResponseMsg.ItemEntity> totalityItems, List<BomDetailModel> bomDetailModels) {
         Set<String> materialCodes = new HashSet<>();

@@ -80,7 +80,7 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
     }
 
     /**
-     * 获取今日的配送任务（今日任务=今日配送+明日备货）
+     * 获取今日的配送任务（今日任务=今日配送+明日备货+之前未完成）
      *
      * @return 获取今日的配送产品列表
      */
@@ -93,9 +93,14 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
         List<WaveModel> waveModels = waveDao.selectWaveModelsByDate(1, startDay, endDay);
         // 包装区波次
         List<WaveModel> packagingWaveModels = waveDao.selectWaveModelsByDate(2, startDay, endDay);
+        // 查找灌装区今天之前未完成的
+        List<WaveModel> unFinished = waveDao.selectUnFinishedByDate(2, startDay);
+        // 查找包装区今天之前未完成的
+        List<WaveModel> packagingUnFinished = waveDao.selectUnFinishedByDate(2, startDay);
         // 返回的原料列表
         List<MaterialModel> backMaterials = new ArrayList<>();
         Map<String, WaveModel> waveModelMap = new HashMap<>();
+        // 灌装区波次
         if (!CollectionUtils.isEmpty(waveModels)) {
             waveModels.forEach(waveModel -> {
                 String waveKey = waveModel.getMaterialCode() + "_GZ";
@@ -109,6 +114,20 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
                 }
             });
         }
+        if (!CollectionUtils.isEmpty(unFinished)) {
+            unFinished.forEach(waveModel -> {
+                String waveKey = waveModel.getMaterialCode() + "_GZ";
+                WaveModel exitModel = waveModelMap.get(waveKey);
+                if (null == exitModel) {
+                    // 查找BOM获取满料数量  产品ID、名称、数量、编号、类型
+                    BomModel bomModel = bomService.selectBomByMaterialUuid(waveModel.getMaterialCode());
+                    MaterialModel materialModel = new MaterialModel(waveModel.getMaterialId(), waveModel.getMaterialName() + "[灌装]", waveKey, bomModel.getFullCount(), 1);
+                    backMaterials.add(materialModel);
+                    waveModelMap.put(waveKey, waveModel);
+                }
+            });
+        }
+        // 包装区波次
         if (!CollectionUtils.isEmpty(packagingWaveModels)) {
             packagingWaveModels.forEach(waveModel -> {
                 String waveKey = waveModel.getMaterialCode() + "_BZ";
@@ -117,6 +136,19 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
                     // 查找BOM获取满料数量  产品ID、名称、数量、编号、类型
                     BomModel bomModel = bomService.selectBomByMaterialUuid(waveModel.getMaterialCode());
                     MaterialModel materialModel = new MaterialModel(waveModel.getMaterialId(), waveModel.getMaterialName() + "[包装]", waveKey, bomModel.getFullCount(), 2);
+                    backMaterials.add(materialModel);
+                    waveModelMap.put(waveKey, waveModel);
+                }
+            });
+        }
+        if (!CollectionUtils.isEmpty(packagingUnFinished)) {
+            packagingUnFinished.forEach(waveModel -> {
+                String waveKey = waveModel.getMaterialCode() + "_GZ";
+                WaveModel exitModel = waveModelMap.get(waveKey);
+                if (null == exitModel) {
+                    // 查找BOM获取满料数量  产品ID、名称、数量、编号、类型
+                    BomModel bomModel = bomService.selectBomByMaterialUuid(waveModel.getMaterialCode());
+                    MaterialModel materialModel = new MaterialModel(waveModel.getMaterialId(), waveModel.getMaterialName() + "[灌装]", waveKey, bomModel.getFullCount(), 1);
                     backMaterials.add(materialModel);
                     waveModelMap.put(waveKey, waveModel);
                 }
@@ -138,9 +170,15 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
         // 站点
         SiteDetailModel siteDetailModel = selectSiteDetailModelByQrCode(stockUpRecordModel.getLandMaskName());
         materialBoxMaterialDao.deleteMaterialBoxMaterialByMaterialId(materialBoxModel.getId()); // 将料框上的原料移除
+        // TODO 通过站点查找区域
+        // TODO 通过区域判断备货类型
+        // TODO 获取所有未备货的波次 TODO
+        // TODO 通过产品编号，查找出波次
+        // TODO 通过波次编号、备货类型，删除备货表的备货信息
         if (!StringUtils.isNullOrEmpty(stockUpRecordModel.getMaterialName())) {
-            int materialType;
-            String materialUuid;
+            // 有选择产品，即有原料
+            int materialType; // 原料类型
+            String materialUuid; // 原料uuid
             int endIndex;
             if (stockUpRecordModel.getMaterialName().indexOf("_GZ") > 0) {
                 materialType = 1;
@@ -151,14 +189,14 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
                 endIndex = stockUpRecordModel.getMaterialName().indexOf("_BZ");
                 materialUuid = stockUpRecordModel.getMaterialName().substring(0, endIndex);
             }
-            // 通过产品查找出产品信息
+            // 通过产品uuid查找出产品信息
             MaterialModel materialModel = materialDao.selectMaterialByUuid(materialUuid);
             // 通过UUID查出BOM详情
             BomModel bomModel = bomService.selectBomByMaterialUuid(materialUuid);
             List<BomDetailModel> bomDetailModels = bomService.selectBomDetailsByMaterialUuid(materialModel.getUuid());
             if (!CollectionUtils.isEmpty(bomDetailModels)) {
                 // 有原料列表
-                materialBoxDao.updateMaterialBoxState(materialBoxModel.getId(), 1); // 设成有货
+                materialBoxDao.updateMaterialBoxState(materialBoxModel.getId(), 1); // 将料车设成有货
                 bomDetailModels.forEach(bomDetailModel -> {
                     if (bomDetailModel.getType() == materialType) {
                         MaterialBoxMaterial materialBoxMaterial = new MaterialBoxMaterial(materialBoxModel.getId(), bomDetailModel.getMaterialId(), bomModel.getFullCount() * bomDetailModel.getCount(), 0);

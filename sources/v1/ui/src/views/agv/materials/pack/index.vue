@@ -99,8 +99,7 @@
       loadingInfo() {
         this.$store.dispatch('updateTitle', '包材仓配货任务');
         this.$store.dispatch('updateNeedLogin', false);
-        this.getSites();
-        this.getDistributionTasks();
+        this.timer();
       },
       // 跳转到配送管理页面
       turn(url) {
@@ -110,12 +109,14 @@
         this.state.taskOutVisible = false;
       },
       timer() {
-        this.getCallPlans();
+        this.getSites();
+        this.getDistributionTasks();
         if (this.timer) {
           clearInterval(this.timer);
         }
         this.timer = setInterval(() => {
-          this.getCallPlans();
+          this.getSites();
+          this.getDistributionTasks();
         }, 5000);
       },
       taskOut(bom) {
@@ -132,19 +133,12 @@
           }
         })
           .then(response => {
-            console.log(response, '------');
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.sites = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.sites = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       getDistributionTasks() {
@@ -158,17 +152,11 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.tasks = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.tasks = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       formatShowName(item) {

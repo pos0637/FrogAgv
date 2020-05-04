@@ -10,6 +10,11 @@
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/agv/wave')"
         >波次管理</div>
+        <div
+          v-if="auth==='admin'"
+          class="menu-item flex-box flex-justify-content-center flex-align-items-center"
+          @click="turn('/agv/setting')"
+        >生产设置</div>
         <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/agv/call/history')"
@@ -142,14 +147,16 @@
         waves: [],
         waveState: 0,
         teamId: '',
-        areaType: 1 // 区域类型,默认灌装区 1:灌装区;2:包装区
+        areaType: 1, // 区域类型,默认灌装区 1:灌装区;2:包装区
+        auth: 'user'
       };
     },
     methods: {
       loadingInfo() {
         this.teamId = this.$store.state.AgvHeader.teamId;
+        this.auth = this.$store.state.AgvHeader.auth;
         this.formateAreaType();
-        this.getWaves();
+        this.timer();
       },
       formateAreaType() {
         if (areaTypeString === 'filling') {
@@ -159,6 +166,15 @@
           this.areaType = 2;
           this.$store.dispatch('updateTitle', '包装区配送管理');
         }
+      },
+      timer() {
+        this.getWaves();
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => {
+          this.getWaves();
+        }, 5000);
       },
       showAll() {
         this.waveState = null;
@@ -174,21 +190,26 @@
       },
       // 删除原料 -删除完后需要刷新
       deleteBom(bomId) {
+        this.load = this.showErrorMessage('删除中,请稍后...');
         request({
           url: '/agv/waves/deleteDetail/' + bomId,
           method: 'DELETE'
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
               this.getWaves();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       // 修改原料信息
@@ -202,6 +223,7 @@
       },
       // 删除波次
       deleteWave(wave) {
+        this.load = this.showErrorMessage('删除中,请稍后...');
         request({
           url: '/agv/waves/deleteWave',
           method: 'DELETE',
@@ -210,56 +232,74 @@
           }
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
               this.getWaves();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       // 删除产品
       deleteProduce(produce) {
+        this.load = this.showErrorMessage('删除中,请稍后...');
         request({
           url: '/agv/waves/deleteWaves',
           method: 'DELETE',
           data: produce
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
               this.getWaves();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       // 根据产品 增加一个波次
       addWave(produce) {
+        // 如果遮罩层存在
+        if (!isEmpty(this.load)) {
+          this.load.close();
+        }
+        this.load = this.showErrorMessage('新增中,请稍后...');
         request({
           url: '/agv/waves',
           method: 'POST',
           data: produce
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
               this.getWaves();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       toggleShow() {
@@ -277,19 +317,12 @@
           }
         })
           .then(response => {
-            console.log('getWaves*****:', response);
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.waves = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.waves = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       // 格式化状态
