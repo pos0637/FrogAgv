@@ -35,7 +35,7 @@
           <div v-for="(item) in callPlans" :key="item.id">
             <div class="data-content-produce-row flex-box flex-align-items-center">
               <div
-                class="data-name"
+                class="data-name textOverflow"
               >{{item.materialName+" （"+item.productLineCode+"）"+item.executionTime}}</div>
               <div class="bom-num"></div>
               <div class="bom-done"></div>
@@ -48,7 +48,7 @@
                 <div class="bom-done"></div>
                 <div class="data-content-operation flex-box flex-align-items-center">
                   <div
-                    class="bom-delete"
+                    class="bom-call"
                     @click="callWave(wave)"
                     v-if="!wave.isCalled"
                     style="width:90px;"
@@ -68,9 +68,7 @@
                 :key="bom.id"
                 class="flex-box data-content-row"
               >
-                <div
-                  class="bom-name flex-box flex-align-items-center flex-justify-content-center"
-                >{{bom.materialName}}</div>
+                <div class="bom-name textOverflow">{{bom.materialName}}</div>
                 <div
                   class="bom-num flex-box flex-align-items-center flex-justify-content-center"
                 >{{bom.count}}</div>

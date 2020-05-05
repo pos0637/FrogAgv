@@ -11,6 +11,6 @@ module.exports = {
   // AREA_TYPE: '"demolition"'
   // AREA_TYPE: '"disinfection"'
   // AREA_TYPE: '"materials"'
-  AREA_TYPE: '"packing"'
-  // AREA_TYPE: '"filling"'
+  // AREA_TYPE: '"packing"'
+  AREA_TYPE: '"filling"'
 }

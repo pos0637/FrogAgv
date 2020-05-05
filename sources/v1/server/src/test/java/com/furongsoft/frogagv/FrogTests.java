@@ -3,10 +3,12 @@ package com.furongsoft.frogagv;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.furongsoft.agv.devices.model.CallButtonModel;
 import com.furongsoft.agv.frog.entities.GetBillFullInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetBomInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetMoResponseMsg;
 import com.furongsoft.agv.frog.schedulers.ProductionPlanScheduler;
+import com.furongsoft.agv.services.CallMaterialService;
 import com.furongsoft.base.misc.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -19,6 +21,8 @@ class FrogTests {
 
     @Autowired
     private ProductionPlanScheduler productionPlanScheduler;
+    @Autowired
+    private CallMaterialService callMaterialService;
 
     @Test
     public void GetMoTest() {
@@ -54,4 +58,12 @@ class FrogTests {
         productionPlanScheduler.getProductionPlan();
         System.out.println("**********");
     }
+
+    @Test
+    public void callTest() {
+        CallButtonModel callButtonModel = new CallButtonModel();
+        callButtonModel.setAreaId(23l);
+        callMaterialService.callMaterial(callButtonModel);
+    }
+
 }

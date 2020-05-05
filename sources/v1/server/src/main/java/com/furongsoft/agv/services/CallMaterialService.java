@@ -300,6 +300,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                 Date newDate = new Date();
                 callDetails.forEach(waveDetailModel -> {
                     CallMaterial callMaterial = new CallMaterial(waveDetailModel);
+                    callMaterial.setAreaId(callLine.getId());
                     callMaterial.setCallTime(newDate);
                     insertDetails.add(callMaterial);
                 });

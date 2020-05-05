@@ -32,7 +32,7 @@
           <div v-for="(item) in callPlans" :key="item.id">
             <div class="data-content-produce-row flex-box flex-align-items-center">
               <div
-                class="data-name"
+                class="data-name textOverflow"
               >{{item.materialName+" （"+item.productLineCode+"）"+item.executionTime}}</div>
               <div class="bom-num"></div>
               <div class="bom-done"></div>
@@ -45,7 +45,7 @@
                 <div class="bom-done"></div>
                 <div class="data-content-operation flex-box flex-align-items-center">
                   <div
-                    class="bom-delete"
+                    class="bom-call"
                     @click="callWave(wave)"
                     v-if="!wave.isCalled"
                     style="width:90px;"
@@ -65,9 +65,7 @@
                 :key="bom.id"
                 class="flex-box data-content-row"
               >
-                <div
-                  class="bom-name flex-box flex-align-items-center flex-justify-content-center"
-                >{{bom.materialName}}</div>
+                <div class="bom-name textOverflow">{{bom.materialName}}</div>
                 <div
                   class="bom-num flex-box flex-align-items-center flex-justify-content-center"
                 >{{bom.count}}</div>
@@ -172,6 +170,7 @@
               this.load.close();
             }
             this.$message.error('服务器请求失败');
+            console.log(_);
           });
       },
       // 叫详情
@@ -202,6 +201,7 @@
               this.load.close();
             }
             this.$message.error('服务器请求失败');
+            console.log(_);
           });
       },
       // 波次取消叫料
@@ -229,6 +229,7 @@
               this.load.close();
             }
             this.$message.error('服务器请求失败');
+            console.log(_);
           });
       },
       // 取消叫料
@@ -253,6 +254,7 @@
               this.load.close();
             }
             this.$message.error('服务器请求失败');
+            console.log(_);
           });
       },
       // 获取叫料计划
@@ -267,9 +269,7 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.callPlans = response.data;
-              }
+              this.callPlans = response.data;
             }
           })
           .catch(_ => {

@@ -113,7 +113,7 @@ public class SiteService extends BaseService<SiteDao, Site> {
      * @param type     区域类型
      * @return 区域信息集合
      */
-    public List<AgvAreaModel> selectAreasByParentId(int parentId, Integer type) {
+    public List<AgvAreaModel> selectAreasByParentId(long parentId, Integer type) {
         return agvAreaDao.selectAreaByParentId(parentId, type);
     }
 

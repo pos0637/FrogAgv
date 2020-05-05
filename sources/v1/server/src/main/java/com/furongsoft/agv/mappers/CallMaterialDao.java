@@ -137,7 +137,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         }
 
         /**
-         * 通过类型获取叫料列表(默认获取到未完成的叫料列表)
+         * 通过类型获取叫料列表(默认获取到未完成的叫料列表) TODO 查出来的是空
          *
          * @return sql
          */
@@ -222,7 +222,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialByWaveCodeAndAreaType(final Map<String, Object> params) {
             return new SQL() {
                 {
-                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode");
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(WAVE_DETAIL_TABLE_NAME + " t2 ON t1.wave_detail_code = t2.code");
                     LEFT_OUTER_JOIN(WAVE_TABLE_NAME + " t3 ON t2.wave_code = t3.code");

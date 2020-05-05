@@ -31,7 +31,7 @@
                   style="width:200px;"
                   class="data-content-operation flex-box flex-align-items-center"
                 >
-                  <div class="bom-delete" @click="deliverGoods(item)" style="width:90px;">配送</div>
+                  <div class="bom-call" @click="deliverGoods(item)" style="width:90px;">配送</div>
                 </div>
               </div>
               <div class="data-wave">
@@ -40,7 +40,7 @@
                   :key="bom.id"
                   class="flex-box data-content-row"
                 >
-                  <div class="task-list-bom-name">{{bom.materialName}}</div>
+                  <div class="task-list-bom-name textOverflow">{{bom.materialName}}</div>
                   <div class="task-list-bom-num">{{bom.count}}</div>
                 </div>
               </div>
@@ -141,9 +141,7 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.sites = response.data;
-              }
+              this.sites = response.data;
             }
           })
           .catch(_ => {
@@ -161,9 +159,7 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.tasks = response.data;
-              }
+              this.tasks = response.data;
             }
           })
           .catch(_ => {
@@ -176,23 +172,29 @@
           waveCode: wave.waveCode,
           type: 7
         };
+        this.load = this.showErrorMessage('发货中，请稍后');
         request({
           url: '/agv/delivery/addDeliveryTask',
           method: 'POST',
           data: sendItem
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              this.getSiteInfo();
-              this.reloadParent();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.getSites();
+              this.getDistributionTasks();
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+            console.log(_);
           });
       },
       // 退回
@@ -209,13 +211,13 @@
           data: sendItem
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
-              this.getSiteInfo();
-              this.reloadParent();
+              this.getSites();
+              this.getDistributionTasks();
             }
           })
           .catch(_ => {

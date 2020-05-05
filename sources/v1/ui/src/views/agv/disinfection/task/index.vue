@@ -53,6 +53,7 @@
       :visible.sync="state.taskOutVisible"
       :title="taskOutPositionName"
       class="dialog-transfer"
+      :width="'75%'"
     >
       <TaskOut :bom="taskOutBom" @toggleShow="toggleShow"></TaskOut>
     </el-dialog>

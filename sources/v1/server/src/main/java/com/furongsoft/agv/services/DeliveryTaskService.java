@@ -91,6 +91,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 // 获取灌装区指定生产线的库位列表
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_FILLING",
                         deliveryTaskModel.getProductLine());
+                // TODO 同样无法获取到站点信息
                 List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(location.getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
@@ -181,7 +182,15 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 taskNo = "PS" + currentTime;
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_PACKAGING",
                         deliveryTaskModel.getProductLine());
-                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(location.getId());
+                List<AgvAreaModel> agvAreaModels = siteService.selectAreasByParentId(location.getId(), 8);
+                // 如果找不到产线的库位区域则返回失败
+                if (CollectionUtils.isEmpty(agvAreaModels)) {
+                    return false;
+                }
+
+                // TODO 通过生产线区域找到对应的生产线库位区域
+                // TODO 没有获取到站点集合
+                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(agvAreaModels.get(0).getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
                     // 站点未配送的叫料集合
@@ -373,6 +382,12 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
         });
     }
 
+    /**
+     * 更新叫料状态
+     *
+     * @param callMaterialModels 叫料列表
+     * @param state              叫料状态
+     */
     public void updateCallMaterialState(List<CallMaterialModel> callMaterialModels, int state) {
         callMaterialModels.forEach(callMaterialModel -> {
             // 修改配送状态

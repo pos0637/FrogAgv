@@ -67,15 +67,15 @@
     text-align: center;
   }
   .data-header-name {
-    width: 650px;
+    width: 400px;
     text-align: center;
   }
   .data-header-num {
-    width: 200px;
+    width: 120px;
     text-align: center;
   }
   .data-header-done {
-    width: 250px;
+    width: 120px;
     text-align: center;
   }
   .data-header-operation {
@@ -91,7 +91,7 @@
   .data-content-wave-row,
   .data-content-produce-row {
     height: 40px;
-    font-size: 25px;
+    font-size: 15px;
     line-height: 40px;
   }
 
@@ -106,19 +106,19 @@
     text-align: center;
   }
   .data-name {
-    width: 650px;
+    width: 400px;
     text-align: center;
     color: white;
   }
   .wave-name {
-    width: 650px;
+    width: 400px;
     text-align: center;
   }
   .bom-name {
-    width: 650px;
+    width: 400px;
     text-align: center;
     padding-left: 40px;
-    font-size: 18px;
+    font-size: 15px;
     color: black;
   }
   .bom-sort {
@@ -126,12 +126,12 @@
     text-align: center;
   }
   .bom-num {
-    width: 200px;
+    width: 120px;
     text-align: center;
     color: black;
   }
   .bom-done {
-    width: 250px;
+    width: 120px;
     text-align: center;
   }
   .bom-add-icon {
@@ -151,6 +151,7 @@
 .data-content-operation {
   .bom-delete,
   .bom-update,
+  .bom-call,
   .bom-back,
   .bom-save {
     width: 60px;
@@ -169,6 +170,11 @@
   .bom-delete {
     background-color: red;
     color: white;
+  }
+
+  .bom-call {
+    height: 30px;
+    line-height: 30px;
   }
 
   .bom-cancel {
