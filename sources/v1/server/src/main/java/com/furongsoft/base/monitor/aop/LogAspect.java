@@ -16,6 +16,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+/**
+ * 日志记录器
+ * 
+ * @author Alex
+ */
 @Aspect
 @Component
 public class LogAspect {
@@ -41,13 +46,15 @@ public class LogAspect {
     }
 
     @Around(value = "log()")
-    public void around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        proceedingJoinPoint.proceed();
+    public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        Object result = proceedingJoinPoint.proceed();
 
         MethodLog log = methodLog.get();
         log.setEndTime(new Date());
         log.setElapsed(log.getEndTime().getTime() - log.getStartTime().getTime());
         save(log);
+
+        return result;
     }
 
     private void save(MethodLog methodLog) {
