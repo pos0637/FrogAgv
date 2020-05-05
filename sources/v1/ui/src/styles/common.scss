@@ -609,4 +609,10 @@
   cursor:text; 
 }
 
+.textOverflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 
