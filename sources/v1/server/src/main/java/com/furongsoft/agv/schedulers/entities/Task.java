@@ -16,6 +16,7 @@ import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
 /**
  * AGV任务
@@ -89,7 +90,11 @@ public class Task extends BaseEntity {
         this.destination = destination;
         this.destinationArea = destinationArea;
         this.wcsTaskId = wcsTaskId;
-        this.materials = new ArrayList<>(materials);
+        if (!CollectionUtils.isEmpty(materials)) {
+            this.materials = new ArrayList<>(materials);
+        } else {
+            this.materials = new ArrayList<>();
+        }
         this.replaceable = true;
         this.cancelable = true;
         this.enabled = true;

@@ -92,7 +92,9 @@ public class SiteService extends BaseService<SiteDao, Site> {
                             .selectMaterialBoxById(siteModel.getMaterialBoxId());
                     List<MaterialBoxMaterialModel> materialBoxMaterialModels = materialBoxMaterialDao
                             .selectMaterialBoxMaterialByMaterialBoxId(siteModel.getMaterialBoxId());
-                    materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
+                    if (!CollectionUtils.isEmpty(materialBoxMaterialModels)) {
+                        materialBoxModel.setMaterialBoxMaterialModels(materialBoxMaterialModels);
+                    }
                     siteModel.setMaterialBoxModel(materialBoxModel);
                 }
                 if (null != siteModel.getDeliveryTaskId()) {

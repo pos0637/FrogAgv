@@ -9,6 +9,7 @@ import com.furongsoft.agv.services.SiteService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 调度器处理事件
@@ -35,10 +36,10 @@ public class SchedulerProcess implements ISchedulerNotification {
     public void onMovingArrived(String agvId, Task task) {
         DeliveryTaskModel deliveryTaskModel = deliveryTaskService
                 .selectDeliveryTaskModelByWorkflowWorkId(task.getWcsTaskId());
-        deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 3); // 任务改成已完成
-        siteService.addMaterialBox(deliveryTaskModel.getEndSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在目标点添加料框，并设为有货
-        // 容器离场 TODO
-        scheduler.removeContainer(null, siteService.get(deliveryTaskModel.getEndSiteId()).getCode());
+        if (!ObjectUtils.isEmpty(deliveryTaskModel)) {
+            deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 3); // 任务改成已完成
+            siteService.addMaterialBox(deliveryTaskModel.getEndSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在目标点添加料框，并设为有货
+        }
     }
 
     @Override
