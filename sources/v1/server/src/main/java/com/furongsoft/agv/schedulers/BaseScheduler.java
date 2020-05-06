@@ -171,7 +171,20 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
             task.setEnabled(false);
             taskService.updateById(task);
             tasks.remove(task);
-            removeContainer(null, task.getDestination());
+
+            // 设置源站点与目的站点容器
+            String containerId = null;
+            com.furongsoft.agv.schedulers.entities.Site site = getSite(task.getSource());
+            if (site != null) {
+                containerId = site.getContainerId();
+                site.setContainerId(null);
+            }
+
+            site = getSite(task.getDestination());
+            if (site != null) {
+                site.setContainerId(containerId);
+            }
+
             notification.ifPresent(n -> n.onMovingArrived(agvId, task));
             Tracker.agv(String.format("OnMovingArrived: task: %s, agv: %s", task.toString(), agvId));
         });
