@@ -49,7 +49,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
      * @return 叫料列表
      */
     @SelectProvider(type = DaoProvider.class, method = "selectCallMaterialsByConditions")
-    List<CallMaterialModel> selectCallMaterialsByConditions(@Param("type") int type, @Param("state") Integer state, @Param("teamId") String teamId, @Param("areaId") Long areaId);
+    List<CallMaterialModel> selectCallMaterialsByConditions(@Param("type") int type, @Param("state") Integer state, @Param("teamId") String teamId, @Param("areaId") Long areaId, @Param("siteId") Long siteId);
 
     /**
      * 通过波次详情编码以及区域类型获取叫料信息
@@ -114,7 +114,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialById() {
             return new SQL() {
                 {
-                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
+                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason,t1.area_id,t1.team_id,t1.site_id");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -129,7 +129,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectUnDeliveryCallMaterialById() {
             return new SQL() {
                 {
-                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
+                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason,t1.area_id,t1.team_id,t1.site_id");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id} AND t1.state=1");
                 }
@@ -137,14 +137,14 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         }
 
         /**
-         * 通过类型获取叫料列表(默认获取到未完成的叫料列表) TODO 查出来的是空
+         * 通过类型获取叫料列表(默认获取到未完成的叫料列表)
          *
          * @return sql
          */
         public String selectCallMaterialsByConditions(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.type,t1.call_time,t1.wave_detail_code,t1.cancel_reason,t1.area_id,t1.team_id, " +
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.type,t1.call_time,t1.wave_detail_code,t1.cancel_reason,t1.area_id,t1.team_id, t1.site_id, " +
                             "t2.name AS materialName, t2.code AS materialCode, t2.uuid AS materialUuid, t2.specs AS materialSpecs, t2.unit AS materialUnit, " +
                             "t2.batch AS materialBatch, t4.code AS waveCode, t4.material_id AS productId, t5.name AS productName, t5.uuid AS productUuid, t6.code AS productLineCode");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1 ");
@@ -164,6 +164,9 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                     }
                     if (null != param.get("areaId")) {
                         WHERE("t1.area_id = #{areaId}");
+                    }
+                    if (null != param.get("siteId")) {
+                        WHERE("t1.site_id=#{siteId}");
                     }
                 }
             }.toString();
@@ -207,7 +210,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialByWaveDetailCodeAndAreaType() {
             return new SQL() {
                 {
-                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason");
+                    SELECT("t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason,t1.area_id,t1.team_id,t1.site_id");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     WHERE("t1.wave_detail_code = #{waveDetailCode} AND t1.type = #{areaType} AND t1.enabled = 1");
                 }
@@ -222,7 +225,7 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialByWaveCodeAndAreaType(final Map<String, Object> params) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode");
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode,t1.area_id,t1.team_id,t1.site_id");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(WAVE_DETAIL_TABLE_NAME + " t2 ON t1.wave_detail_code = t2.code");
                     LEFT_OUTER_JOIN(WAVE_TABLE_NAME + " t3 ON t2.wave_code = t3.code");

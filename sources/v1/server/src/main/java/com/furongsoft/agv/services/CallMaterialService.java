@@ -79,8 +79,8 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @return 叫料列表
      */
     public List<CallMaterialModel> selectCallMaterialsByConditions(int type, Integer state, String teamId,
-            Long areaId) {
-        return callMaterialDao.selectCallMaterialsByConditions(type, state, teamId, areaId);
+            Long areaId, Long siteId) {
+        return callMaterialDao.selectCallMaterialsByConditions(type, state, teamId, areaId, siteId);
     }
 
     /**
@@ -93,9 +93,9 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @return 配货任务列表
      */
     public List<DistributionTaskModel> selectDistributionTaskByConditions(int type, Integer state, String teamId,
-            Long areaId) {
+            Long areaId, Long siteId) {
         List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(type, state,
-                teamId, areaId);
+                teamId, areaId, siteId);
         Map<String, DistributionTaskModel> distributionTaskModelMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(callMaterialModels)) {
             callMaterialModels.forEach(callMaterialModel -> {
@@ -301,6 +301,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
                 callDetails.forEach(waveDetailModel -> {
                     CallMaterial callMaterial = new CallMaterial(waveDetailModel);
                     callMaterial.setAreaId(callLine.getId());
+                    callMaterial.setSiteId(callButtonModel.getSiteId());
                     callMaterial.setCallTime(newDate);
                     insertDetails.add(callMaterial);
                 });

@@ -117,28 +117,33 @@
         this.$emit('toggleShow');
       },
       getSiteInfo() {
+        this.load = this.showErrorMessage('正在获取站点信息，请稍候......');
         request({
           url: '/agv/sites/' + this.bom.id,
           method: 'GET'
         })
           .then(response => {
-            console.log('*******:', response);
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
+              this.info = response.data;
               if (!isEmpty(response.data)) {
-                this.info = response.data;
                 this.formmatMaterials(response.data);
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
               }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       getProductLines() {
+        this.load = this.showErrorMessage('正在获取生产线列表，请稍候......');
         request({
           url: '/agv/agvAreas/selectProductLines',
           method: 'GET',
@@ -147,18 +152,20 @@
           }
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.lines = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.lines = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       // 格式化站点状态

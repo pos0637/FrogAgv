@@ -124,19 +124,12 @@
           }
         })
           .then(response => {
-            console.log(response, '------');
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.sites = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.sites = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       getDistributionTasks() {
@@ -150,17 +143,11 @@
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.tasks = response.data;
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
+              this.tasks = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            console.log(_);
           });
       },
       formatShowName(item) {

@@ -58,7 +58,7 @@ public interface ISchedulerNotification {
      * 容器进场事件
      *
      * @param containerId 容器索引
-     * @param target      目的站点编码
+     * @param destination 目的站点编码
      */
     void onContainerArrived(String containerId, String destination);
 
@@ -66,23 +66,15 @@ public interface ISchedulerNotification {
      * 容器离场事件
      *
      * @param containerId 容器索引
-     * @param target      目的站点编码
+     * @param destination 目的站点编码
      */
     void onContainerLeft(String containerId, String destination);
 
     /**
-     * 小车接单回调
-     *
-     * @param workflowWorkId 搬运系统任务ID
-     * @param robotId        小车唯一标识
-     */
-    void onAcceptTask(String workflowWorkId, String robotId);
-
-    /**
      * 取走容器回调
      *
-     * @param workflowWorkId 搬运系统任务ID
-     * @param robotId        小车唯一标识
+     * @param agvId AGV索引
+     * @param task  任务对象
      */
-    void onTakeAway(String workflowWorkId, String robotId);
+    void onTakeAway(String agvId, Task task);
 }

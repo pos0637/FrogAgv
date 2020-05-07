@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/agv")
-@Log
+//@Log
 public class SchedulerController {
     @Autowired
     private IScheduler scheduler;
@@ -38,7 +38,13 @@ public class SchedulerController {
         switch (body.getWorkflowPhase()) {
             case 20:
                 if (body.getTaskPhase().equalsIgnoreCase("GO_FETCHING")) {
+                    // AGV接单
                     scheduler.onMovingStarted(String.valueOf(body.getRobotId()),
+                            String.valueOf(body.getWorkflowWorkId()));
+                }
+                if (body.getTaskPhase().equalsIgnoreCase("GO_RETURN")) {
+                    // AGV驼走货架
+                    scheduler.onTakeAway(String.valueOf(body.getRobotId()),
                             String.valueOf(body.getWorkflowWorkId()));
                 }
                 break;

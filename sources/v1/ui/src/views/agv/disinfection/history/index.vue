@@ -133,21 +133,26 @@
       toggleShow() {},
       // 取消叫料
       cancelCall(row) {
+        this.load = this.showErrorMessage('正在取消，请稍候......');
         request({
           url: '/agv/callMaterials/cancel/' + row.id,
           method: 'DELETE'
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
               this.reloadTable();
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close();
-              }
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败');
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
           });
       },
       // 是否可以点击

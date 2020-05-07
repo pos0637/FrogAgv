@@ -21,6 +21,9 @@ public class MobileController {
         this.stockUpRecordService = stockUpRecordService;
     }
 
+    /**
+     * 原料信息
+     */
     @Data
     @AllArgsConstructor
     private static class Material {
@@ -29,13 +32,62 @@ public class MobileController {
         private int count;
     }
 
+    /**
+     * 备货操作
+     */
+    @Data
+    @AllArgsConstructor
+    private static class StockUpModel {
+        /**
+         * 产品码
+         */
+        private String materialCode;
+
+        /**
+         * 料车码
+         */
+        private String materialCarCode;
+
+        /**
+         * 地标码
+         */
+        private String landMaskCode;
+
+        /**
+         * 原料列表
+         */
+        private List<Material> materials;
+    }
+
+    /**
+     * 前台获取的备货任务列表
+     */
+    @Data
+    @AllArgsConstructor
+    private static class StockUpTask {
+        /**
+         * 产品码（用于回传）
+         */
+        private String materialCode;
+
+        /**
+         * 产品名称（用于展示）
+         */
+        private String materialName;
+
+        /**
+         * 原料列表(列表中的原料数量有默认值，支持修改)
+         */
+        private List<Material> materials;
+    }
+
     private final StockUpRecordService stockUpRecordService;
 
     @Value("${qr-code.materialCarCode}")
     private String materialCarCode;
 
     /**
-     * 获取今日任务的所有产品
+     * 获取今日任务的所有产品 TODO 待修改
      *
      * @return 产品列表
      */
@@ -69,7 +121,7 @@ public class MobileController {
     }
 
     /**
-     * 执行备货操作
+     * 执行备货操作 TODO 待修改
      *
      * @return
      */

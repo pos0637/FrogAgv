@@ -34,11 +34,11 @@
 </template>
 
 <script>
-  import request from '@/utils/request'
-import { isEmpty } from '@/utils/helper'
-import { Loading } from 'element-ui'
+  import request from '@/utils/request';
+  import { isEmpty } from '@/utils/helper';
+  import { Loading } from 'element-ui';
 
-export default {
+  export default {
     name: 'editBom',
     data() {
       return {
@@ -53,25 +53,25 @@ export default {
         multipleSelection: [],
         // 加载对象
         load: null
-      }
-  },
+      };
+    },
     created() {
-      this.loadingInfo()
-  },
+      this.loadingInfo();
+    },
     props: {
       bom: [Object]
     },
     methods: {
       loadingInfo() {
-        this.getBomDetails()
+        this.getBomDetails();
       },
       // 弹出框标志变化
       toggleShow() {
-        this.$emit('toggleShow')
+        this.$emit('toggleShow');
       },
       // 修改信息
       updateData() {
-        const addItems = []
+        const addItems = [];
         if (
           !isEmpty(this.multipleSelection) &&
           this.multipleSelection.length > 0
@@ -83,33 +83,38 @@ export default {
               materialId: item.materialId,
               count: item.num,
               enabled: 1
-            }
-            addItems.push(addItem)
-          })
+            };
+            addItems.push(addItem);
+          });
         } else {
-          return
+          return;
         }
+        this.load = this.showErrorMessage('正在保存，请稍候......');
         request({
           url: '/agv/waves/addWaveDetails',
           method: 'POST',
           data: addItems
         })
           .then(response => {
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
             if (response.errno === 0) {
-              this.$emit('reloadWaves')
-              this.$emit('toggleShow')
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.$emit('reloadWaves');
+              this.$emit('toggleShow');
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            // 如果遮罩层存在
+            if (!isEmpty(this.load)) {
+              this.load.close();
+            }
+            this.$message.error('服务器请求失败');
+          });
       },
       handleSelectionChange(val) {
-        this.multipleSelection = val
+        this.multipleSelection = val;
       },
       getBomDetails() {
         request({
@@ -121,18 +126,12 @@ export default {
         })
           .then(response => {
             if (response.errno === 0) {
-              if (!isEmpty(response.data)) {
-                this.bomDetails = response.data
-              }
-              // 如果遮罩层存在
-              if (!isEmpty(this.load)) {
-                this.load.close()
-              }
+              this.bomDetails = response.data;
             }
           })
           .catch(_ => {
-            this.load = this.showErrorMessage('服务器请求失败')
-          })
+            console.log(_);
+          });
       },
       // 用遮罩层显示错误信息
       showErrorMessage(message) {
@@ -142,9 +141,9 @@ export default {
           text: message,
           spinner: '',
           background: 'rgba(0, 0, 0, 0.7)'
-        }
-        return Loading.service(options)
+        };
+        return Loading.service(options);
       }
     }
-  }
+  };
 </script>

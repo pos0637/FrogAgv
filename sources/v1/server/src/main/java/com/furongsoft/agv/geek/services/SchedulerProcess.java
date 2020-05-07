@@ -29,7 +29,12 @@ public class SchedulerProcess implements ISchedulerNotification {
 
     @Override
     public void onMovingStarted(String agvId, Task task) {
-
+        DeliveryTaskModel deliveryTaskModel = deliveryTaskService
+                .selectDeliveryTaskModelByWorkflowWorkId(task.getWcsTaskId());
+        if (!ObjectUtils.isEmpty(deliveryTaskModel)) {
+            deliveryTaskService.updateRobotByWorkflowWorkId(task.getWcsTaskId(), agvId);
+            deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 1); // 将配送任务修改为取货中
+        }
     }
 
     @Override
@@ -39,6 +44,9 @@ public class SchedulerProcess implements ISchedulerNotification {
         if (!ObjectUtils.isEmpty(deliveryTaskModel)) {
             deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 3); // 任务改成已完成
             siteService.addMaterialBox(deliveryTaskModel.getEndSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在目标点添加料框，并设为有货
+            siteService.removeMaterialBox(deliveryTaskModel.getStartSiteId()); // 在起始点删除料框，并设为空闲
+
+            // TODO 叫料如果存在，改为已完成
         }
     }
 
@@ -73,30 +81,18 @@ public class SchedulerProcess implements ISchedulerNotification {
     }
 
     /**
-     * 小车接单回调
-     *
-     * @param workflowWorkId 搬运系统任务ID
-     * @param robotId        小车唯一标识
-     */
-    @Override
-    public void onAcceptTask(String workflowWorkId, String robotId) {
-        DeliveryTaskModel deliveryTaskModel = deliveryTaskService
-                .selectDeliveryTaskModelByWorkflowWorkId(workflowWorkId);
-        deliveryTaskService.updateRobotByWorkflowWorkId(workflowWorkId, robotId);
-        deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 1); // 将配送任务修改为取货中
-    }
-
-    /**
      * 取走容器回调
      *
-     * @param workflowWorkId 搬运系统任务ID
-     * @param robotId        小车唯一标识
+     * @param agvId 搬运系统任务ID
+     * @param task        小车唯一标识
      */
     @Override
-    public void onTakeAway(String workflowWorkId, String robotId) {
+    public void onTakeAway(String agvId, Task task) {
         DeliveryTaskModel deliveryTaskModel = deliveryTaskService
-                .selectDeliveryTaskModelByWorkflowWorkId(workflowWorkId);
-        deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 2); // 将配送任务修改为配送中
-        siteService.addMaterialBox(deliveryTaskModel.getStartSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在起始点删除料框，并设为空闲
+                .selectDeliveryTaskModelByWorkflowWorkId(task.getWcsTaskId());
+        if (!ObjectUtils.isEmpty(deliveryTaskModel)) {
+            deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 2); // 将配送任务修改为配送中
+            siteService.removeMaterialBox(deliveryTaskModel.getStartSiteId()); // 在起始点删除料框，并设为空闲
+        }
     }
 }

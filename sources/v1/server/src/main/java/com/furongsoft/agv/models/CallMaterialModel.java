@@ -107,6 +107,11 @@ public class CallMaterialModel implements Serializable {
     private Integer areaId;
 
     /**
+     * 站点ID
+     */
+    private Long siteId;
+
+    /**
      * 波次编码
      */
     private String waveCode;

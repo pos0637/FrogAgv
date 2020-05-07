@@ -139,7 +139,7 @@
             item.areaType = 3;
           });
         }
-        this.load = this.showErrorMessage('叫料中，请稍后');
+        this.load = this.showErrorMessage('叫料中，请稍候......');
         request({
           url: '/agv/callMaterials/addWaveDetailCallMaterials',
           method: 'POST',

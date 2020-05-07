@@ -91,13 +91,18 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 // 获取灌装区指定生产线的库位列表
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_FILLING",
                         deliveryTaskModel.getProductLine());
-                // TODO 同样无法获取到站点信息
-                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(location.getId());
+                // 找到指定产线的库位区域
+                List<AgvAreaModel> agvAreaModels = siteService.selectAreasByParentId(location.getId(), 8);
+                // 如果找不到产线的库位区域则返回失败
+                if (CollectionUtils.isEmpty(agvAreaModels)) {
+                    return false;
+                }
+                List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(agvAreaModels.get(0).getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
                     // 站点未配送的叫料集合
                     List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(1, 1,
-                            null, siteModel.getId());
+                            null, null, siteModel.getId());
                     if (CollectionUtils.isEmpty(callMaterialModels)) {
                         continue;
                     }
@@ -142,7 +147,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 AgvArea agvArea = siteService.selectAgvAreaByCode("CB_LOCATION");
                 // 获取拆包间叫料信息
                 List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(4, 1, null,
-                        null);
+                        null, null);
                 if (CollectionUtils.isEmpty(callMaterialModels)) {
                     Tracker.error("包材-拆包配送失败。拆包间无叫料");
                     throw new BaseException("拆包间无未配送的叫料请求,无法发货");
@@ -182,20 +187,19 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 taskNo = "PS" + currentTime;
                 AgvAreaModel location = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_PACKAGING",
                         deliveryTaskModel.getProductLine());
+                // 找到指定产线的库位区域
                 List<AgvAreaModel> agvAreaModels = siteService.selectAreasByParentId(location.getId(), 8);
                 // 如果找不到产线的库位区域则返回失败
                 if (CollectionUtils.isEmpty(agvAreaModels)) {
                     return false;
                 }
-
-                // TODO 通过生产线区域找到对应的生产线库位区域
-                // TODO 没有获取到站点集合
+                // 找到指定产线的站点集合
                 List<SiteModel> siteModels = siteService.selectLocationsByAreaIdWithMaterialBox(agvAreaModels.get(0).getId());
                 // 判断站点是否有叫料，有则下发任务。任务成功则结束循环，任务失败则进入下一个循环
                 for (SiteModel siteModel : siteModels) {
                     // 站点未配送的叫料集合
                     List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(2, 1,
-                            null, siteModel.getId());
+                            null, null, siteModel.getId());
                     if (CollectionUtils.isEmpty(callMaterialModels)) {
                         continue;
                     }
@@ -223,7 +227,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
                 taskNo = "TH" + currentTime;
                 // 查找包材-包装空闲库位
                 AgvArea agvArea = siteService.selectAgvAreaByCode("BC_BZ_LOCATION");
-                Task task = executeSchedulerAddTask(deliveryTaskModel.getStartSiteId(), taskNo, agvArea, 0, "包装-包材下发退货任务失败。", true, null);
+                Task task = executeSchedulerAddTask(deliveryTaskModel.getStartSiteId(), taskNo, agvArea, 0, "包装-包材下发退货任务失败。", false, null);
                 if (ObjectUtils.isEmpty(task)) {
                     return false;
                 }
@@ -288,6 +292,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
         MaterialBoxModel materialBox = materialBoxDao.selectMaterialBoxById(materialBoxId);
         // 如果需要则执行容器入场
         if (containerArrivedFlag) {
+            scheduler.removeContainer(null, source.getCode());
             // 目标点容器入场失败则无法执行下发任务
             if (!scheduler.addContainer(materialBox.getCode(), source.getCode())) {
                 Tracker.error("容器入场失败");
@@ -337,6 +342,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
         }
         // 如果需要则执行容器入场
         if (containerArrivedFlag) {
+            scheduler.removeContainer(null, source.getCode());
             // 目标点容器入场失败则无法执行下发任务
             if (!scheduler.addContainer(materialBoxCode, source.getCode())) {
                 Tracker.error("容器入场失败");

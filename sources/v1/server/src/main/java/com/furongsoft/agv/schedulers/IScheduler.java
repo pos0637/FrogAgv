@@ -20,7 +20,7 @@ public interface IScheduler {
 
     /**
      * 获取任务列表
-     * 
+     *
      * @return 任务列表
      */
     List<Task> getTasks();
@@ -107,6 +107,14 @@ public interface IScheduler {
      * @param taskId 任务索引
      */
     void onMovingStarted(String agvId, String taskId);
+
+    /**
+     * 取走起始点容器事件
+     *
+     * @param agvId  AGV索引
+     * @param taskId 任务索引
+     */
+    void onTakeAway(String agvId, String taskId);
 
     /**
      * 搬运完成事件

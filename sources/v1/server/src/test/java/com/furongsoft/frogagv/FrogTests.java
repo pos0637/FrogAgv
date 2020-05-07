@@ -8,7 +8,9 @@ import com.furongsoft.agv.frog.entities.GetBillFullInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetBomInfoResponseMsg;
 import com.furongsoft.agv.frog.entities.GetMoResponseMsg;
 import com.furongsoft.agv.frog.schedulers.ProductionPlanScheduler;
+import com.furongsoft.agv.models.DeliveryTaskModel;
 import com.furongsoft.agv.services.CallMaterialService;
+import com.furongsoft.agv.services.DeliveryTaskService;
 import com.furongsoft.base.misc.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -23,6 +25,8 @@ class FrogTests {
     private ProductionPlanScheduler productionPlanScheduler;
     @Autowired
     private CallMaterialService callMaterialService;
+    @Autowired
+    private DeliveryTaskService deliveryTaskService;
 
     @Test
     public void GetMoTest() {
@@ -62,8 +66,22 @@ class FrogTests {
     @Test
     public void callTest() {
         CallButtonModel callButtonModel = new CallButtonModel();
+        callButtonModel.setSiteId(52l);
         callButtonModel.setAreaId(23l);
         callMaterialService.callMaterial(callButtonModel);
+    }
+
+    @Test
+    public void addDeliveryTaskTest() {
+        DeliveryTaskModel deliveryTaskModel = new DeliveryTaskModel();
+        deliveryTaskModel.setType(5);
+        deliveryTaskModel.setProductLine("L12");
+        deliveryTaskModel.setStartSiteId(37);
+        try {
+            deliveryTaskService.addDeliveryTask(deliveryTaskModel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

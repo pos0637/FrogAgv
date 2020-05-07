@@ -87,6 +87,11 @@ public class CallMaterial extends BaseEntity {
     private Long areaId;
 
     /**
+     * 站点ID
+     */
+    private Long siteId;
+
+    /**
      * 叫料人
      */
     private Long callMaterialUser;
