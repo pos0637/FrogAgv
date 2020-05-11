@@ -9,27 +9,23 @@ import java.util.Map;
 import com.furongsoft.agv.devices.mappers.CallButtonDao;
 import com.furongsoft.agv.devices.model.CallButtonModel;
 import com.furongsoft.agv.entities.CallMaterial;
+import com.furongsoft.agv.frog.models.BomModel;
+import com.furongsoft.agv.frog.services.BomService;
 import com.furongsoft.agv.mappers.AgvAreaDao;
 import com.furongsoft.agv.mappers.CallMaterialDao;
 import com.furongsoft.agv.mappers.WaveDao;
 import com.furongsoft.agv.mappers.WaveDetailDao;
-import com.furongsoft.agv.models.AgvAreaModel;
-import com.furongsoft.agv.models.CallMaterialModel;
-import com.furongsoft.agv.models.DeliveryTaskModel;
-import com.furongsoft.agv.models.DistributionTaskModel;
-import com.furongsoft.agv.models.WaveDetailModel;
-import com.furongsoft.agv.models.WaveModel;
+import com.furongsoft.agv.models.*;
 import com.furongsoft.base.exceptions.BaseException;
 import com.furongsoft.base.services.BaseService;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
 
 /**
  * 叫料服务
@@ -46,10 +42,11 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
     private final WaveDao waveDao;
     private final WaveDetailDao waveDetailDao;
     private final DeliveryTaskService deliveryTaskService;
+    private final BomService bomService;
 
     @Autowired
     public CallMaterialService(CallMaterialDao callMaterialDao, CallButtonDao callButtonDao, AgvAreaDao agvAreaDao,
-            WaveDao waveDao, WaveDetailDao waveDetailDao, DeliveryTaskService deliveryTaskService) {
+                               WaveDao waveDao, WaveDetailDao waveDetailDao, DeliveryTaskService deliveryTaskService, BomService bomService) {
         super(callMaterialDao);
         this.callMaterialDao = callMaterialDao;
         this.callButtonDao = callButtonDao;
@@ -57,6 +54,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
         this.waveDao = waveDao;
         this.waveDetailDao = waveDetailDao;
         this.deliveryTaskService = deliveryTaskService;
+        this.bomService = bomService;
     }
 
     /**
@@ -79,7 +77,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @return 叫料列表
      */
     public List<CallMaterialModel> selectCallMaterialsByConditions(int type, Integer state, String teamId,
-            Long areaId, Long siteId) {
+                                                                   Long areaId, Long siteId) {
         return callMaterialDao.selectCallMaterialsByConditions(type, state, teamId, areaId, siteId);
     }
 
@@ -93,7 +91,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @return 配货任务列表
      */
     public List<DistributionTaskModel> selectDistributionTaskByConditions(int type, Integer state, String teamId,
-            Long areaId, Long siteId) {
+                                                                          Long areaId, Long siteId) {
         List<CallMaterialModel> callMaterialModels = callMaterialDao.selectCallMaterialsByConditions(type, state,
                 teamId, areaId, siteId);
         Map<String, DistributionTaskModel> distributionTaskModelMap = new HashMap<>();
@@ -118,6 +116,18 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
             distributionTaskModels.add(value);
         });
         return distributionTaskModels;
+    }
+
+    /**
+     * 查找仓库任务
+     *
+     * @return 仓库未配送任务列表
+     */
+    public List<DistributionTaskModel> selectWarehouseTask() {
+        List<DistributionTaskModel> packageTasks = selectDistributionTaskByConditions(2,1,null,null, null);
+        List<DistributionTaskModel> unpack = selectDistributionTaskByConditions(4,1,null,null, null);
+        packageTasks.addAll(unpack);
+        return packageTasks;
     }
 
     /**
@@ -318,7 +328,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      * @param callButtonModel 按钮对象
      * @throws Exception
      */
-    public boolean backMaterialBox(CallButtonModel callButtonModel) throws Exception {
+    public String backMaterialBox(CallButtonModel callButtonModel) throws Exception {
         // 获取叫料产线
         AgvAreaModel callLine = agvAreaDao.selectParentAreaById(callButtonModel.getAreaId());
         // 获取叫料区域
@@ -334,7 +344,7 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
             deliveryTaskModel.setType(6);
             return deliveryTaskService.addDeliveryTask(deliveryTaskModel);
         }
-        return false;
+        return "退货失败";
     }
 
     /**
@@ -346,5 +356,104 @@ public class CallMaterialService extends BaseService<CallMaterialDao, CallMateri
      */
     public List<CallMaterialModel> selectCallMaterialByWaveCodeAndAreaType(String waveCode, int areaType, Integer state) {
         return callMaterialDao.selectCallMaterialByWaveCodeAndAreaType(waveCode, areaType, state);
+    }
+
+    /**
+     * 获取未配送的已叫料波次
+     *
+     * @return
+     */
+    public List<CallMaterialModel> selectUnDeliveryWaves(String areaCode) {
+        List<CallMaterialModel> backCallModels = new ArrayList<>();
+        if (!StringUtils.isEmpty(areaCode) && "3C_DISINFECTION".equalsIgnoreCase(areaCode)) {
+            // 灌装区未配送叫料列表
+            List<CallMaterialModel> fillingUnDeliveryCalls = callMaterialDao.selectCallMaterialByWaveCodeAndAreaType(null, 1, 1);
+            Map<String, CallMaterialModel> map = new HashMap<>();
+            if (!CollectionUtils.isEmpty(fillingUnDeliveryCalls)) {
+                fillingUnDeliveryCalls.forEach(callModel -> {
+                    String callKey = callModel.getMaterialId() + "_" + callModel.getType();
+                    if (null != callModel.getSiteId()) {
+                        callKey += "_" + callModel.getSiteId();
+                    }
+                    CallMaterialModel callMaterialModel = map.get(callKey);
+                    if (ObjectUtils.isEmpty(callMaterialModel)) {
+                        map.put(callKey, callModel);
+                    }
+                });
+            }
+            if (map.size() > 0) {
+                map.forEach((key, value) -> {
+                    backCallModels.add(value);
+                });
+            }
+        } else {
+            // 拆包间未配送叫料列表
+            List<CallMaterialModel> unpackUnDeliveryCalls = callMaterialDao.selectCallMaterialByWaveCodeAndAreaType(null, 4, 1);
+            // 包装区未配送叫料列表
+            List<CallMaterialModel> packageUnDeliveryCalls = callMaterialDao.selectCallMaterialByWaveCodeAndAreaType(null, 2, 1);
+            Map<String, CallMaterialModel> map = new HashMap<>();
+            if (!CollectionUtils.isEmpty(unpackUnDeliveryCalls)) {
+                unpackUnDeliveryCalls.forEach(callModel -> {
+                    String callKey = callModel.getMaterialId() + "_" + callModel.getType();
+                    if (null != callModel.getSiteId()) {
+                        callKey += "_" + callModel.getSiteId();
+                    }
+                    CallMaterialModel callMaterialModel = map.get(callKey);
+                    if (ObjectUtils.isEmpty(callMaterialModel)) {
+                        map.put(callKey, callModel);
+                    }
+                });
+            }
+            if (!CollectionUtils.isEmpty(packageUnDeliveryCalls)) {
+                packageUnDeliveryCalls.forEach(callModel -> {
+                    String callKey = callModel.getMaterialId() + "_" + callModel.getType();
+                    if (null != callModel.getSiteId()) {
+                        callKey += "_" + callModel.getSiteId();
+                    }
+                    CallMaterialModel callMaterialModel = map.get(callKey);
+                    if (ObjectUtils.isEmpty(callMaterialModel)) {
+                        map.put(callKey, callModel);
+                    }
+                });
+            }
+            if (map.size() > 0) {
+                map.forEach((key, value) -> {
+                    backCallModels.add(value);
+                });
+            }
+        }
+
+        return backCallModels;
+    }
+
+    /**
+     * 通过波次编号查找未完成的叫料列表
+     *
+     * @param waveCode 波次编号
+     * @return 未完成的叫料列表
+     */
+    public List<CallMaterialModel> selectUnFinishCallsByWaveCode(String waveCode) {
+        return callMaterialDao.selectUnFinishCallsByWaveCode(waveCode);
+    }
+
+    /**
+     * 通过状态以及波次更新叫料
+     *
+     * @param waveCode 波次
+     * @param type     类型
+     * @param state    状态
+     * @return 是否成功
+     */
+    public boolean updateCallMaterialStateByWaveCode(String waveCode, int type, int state) {
+        return callMaterialDao.updateCallMaterialStateByWaveCode(waveCode, type, state);
+    }
+
+    public List<MaterialModel> getMaterialModels(CallMaterialModel callMaterialModel) {
+        // 返回的原料列表
+        List<MaterialModel> backMaterials = new ArrayList<>();
+        if (!ObjectUtils.isEmpty(callMaterialModel)) {
+
+        }
+        return backMaterials;
     }
 }

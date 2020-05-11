@@ -66,7 +66,12 @@ public class DeliveryTask extends BaseEntity {
      */
     private Integer enabled;
 
-    public DeliveryTask(String taskNo, String workflowWorkId, long startSiteId, long endSiteId, long materialBoxId, String agvUuid, int state) {
+    /**
+     * 配送波次
+     */
+    private String waveCode;
+
+    public DeliveryTask(String taskNo, String workflowWorkId, long startSiteId, long endSiteId, long materialBoxId, String agvUuid, int state, String waveCode) {
         this.taskNo = taskNo;
         this.workflowWorkId = workflowWorkId;
         this.startSiteId = startSiteId;
@@ -74,5 +79,6 @@ public class DeliveryTask extends BaseEntity {
         this.materialBoxId = materialBoxId;
         this.agvUuid = agvUuid;
         this.state = state;
+        this.waveCode = waveCode;
     }
 }

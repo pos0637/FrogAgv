@@ -54,6 +54,16 @@ public class CallMaterialController {
     }
 
     /**
+     * 获取仓库任务
+     *
+     * @return 响应内容
+     */
+    @GetMapping("/callMaterials/selectWarehouseTask")
+    public RestResponse selectWarehouseTask() {
+        return new RestResponse(HttpStatus.OK, null, callMaterialService.selectWarehouseTask());
+    }
+
+    /**
      * 根据叫料ID获取叫料信息
      *
      * @param id 叫料ID

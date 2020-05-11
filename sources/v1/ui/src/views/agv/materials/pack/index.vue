@@ -10,13 +10,13 @@
         <div
           class="menu-item current-menu flex-box flex-justify-content-center flex-align-items-center"
         >配货任务</div>
-        <div
+        <!-- <div
           class="menu-item flex-box flex-justify-content-center flex-align-items-center"
           @click="turn('/materials/stock')"
         >
           备货任务
           <span class="pick">{{this.num}}</span>
-        </div>
+        </div>-->
       </div>
       <!-- 右边内容 -->
       <div
@@ -30,7 +30,10 @@
             <div v-for="(item) in tasks" :key="item.id">
               <div class="task-list-name">{{item.productName}}</div>
               <div v-for="(bom) in item.callMaterialModels" :key="bom.id" style="margin-top:5px;">
-                <div class="task-list-bom-name" style="display:inline-block;">{{bom.materialName}}</div>
+                <div
+                  class="task-list-bom-name"
+                  style="display:inline-block; width:65%;"
+                >{{bom.materialName}}</div>
                 <div class="task-list-bom-num" style="display:inline-block;">{{bom.count}}</div>
               </div>
             </div>
@@ -143,12 +146,9 @@
       },
       getDistributionTasks() {
         request({
-          url: '/agv/callMaterials/distributionTasks',
-          method: 'GET',
-          params: {
-            type: 2,
-            state: 0
-          }
+          // url: '/agv/callMaterials/distributionTasks',
+          url: '/agv/callMaterials/selectWarehouseTask',
+          method: 'GET'
         })
           .then(response => {
             if (response.errno === 0) {

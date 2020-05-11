@@ -55,6 +55,7 @@ public class ButtonBoxRead implements Runnable {
                 }
             } catch (Exception e) {
                 Tracker.error("====================================");
+                buttonBoxModel.setModbusMaster(null);
                 Tracker.error(e.getCause());
                 Tracker.error("===========********==============");
             }
@@ -73,7 +74,8 @@ public class ButtonBoxRead implements Runnable {
                 Tracker.error("不添加呼叫任务");
                 return;
             } else {
-                ModbusTcp.writeRegisters(currentMaster, 254, registersOffset[codeNo], new short[] { 0x0004, 0x0014 });
+                // 亮灯1分钟
+                ModbusTcp.writeRegisters(currentMaster, 254, registersOffset[codeNo], new short[] { 0x0004, 0x0258 });
                 buttonBoxModel.getCallTaskModels().add(taskModel);
                 Tracker.info("添加一个呼叫任务");
             }

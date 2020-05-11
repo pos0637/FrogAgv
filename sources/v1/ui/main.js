@@ -41,10 +41,10 @@ function createMainWnd() {
   // mainWnd.loadURL(`file://${__dirname}/dist/index.html#/demolition/task`);
   // // 消毒间
   // mainWnd.loadURL(`file://${__dirname}/dist/index.html#/disinfection/task`);
-  // // 包材仓
-  // mainWnd.loadURL(`file://${__dirname}/dist/index.html#/materials/pack`);
-  // 生产区
-  mainWnd.loadURL(`file://${__dirname}/dist/index.html#/login`);
+  // 包材仓
+  mainWnd.loadURL(`file://${__dirname}/dist/index.html#/materials/pack`);
+  // // 生产区
+  // mainWnd.loadURL(`file://${__dirname}/dist/index.html#/login`);
   // if (areaTypeString === 'demolition') {
   //   // 拆包间
   //   mainWnd.loadURL(`file://${__dirname}/dist/index.html#/demolition/task`);

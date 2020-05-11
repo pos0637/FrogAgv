@@ -131,7 +131,10 @@ public class WaveService extends BaseService<WaveDao, Wave> {
                     Map<String, WaveDetailModel> waveDetailModelMap = new HashMap<>();
                     // 将已叫料的波次详情放入Map种
                     callWaveDetailModels.forEach(callWaveDetailModel -> {
-                        waveDetailModelMap.put(callWaveDetailModel.getCode(), callWaveDetailModel);
+                        // 叫料如果未完成
+                        if (null != callWaveDetailModel.getCallState() && callWaveDetailModel.getCallState() == 1) {
+                            waveDetailModelMap.put(callWaveDetailModel.getCode(), callWaveDetailModel);
+                        }
                     });
                     // 存在已叫料的详情，则默认这个波次叫料了
                     waveModel.setIsCalled(true);

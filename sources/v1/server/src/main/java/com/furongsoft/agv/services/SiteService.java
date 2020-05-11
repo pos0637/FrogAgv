@@ -43,8 +43,8 @@ public class SiteService extends BaseService<SiteDao, Site> {
 
     @Autowired
     public SiteService(SiteDao siteDao, StockUpRecordDao stockUpRecordDao, MaterialBoxDao materialBoxDao,
-            MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao,
-            SiteDetailDao siteDetailDao) {
+                       MaterialBoxMaterialDao materialBoxMaterialDao, DeliveryTaskDao deliveryTaskDao, AgvAreaDao agvAreaDao,
+                       SiteDetailDao siteDetailDao) {
         super(siteDao);
         this.siteDao = siteDao;
         this.stockUpRecordDao = stockUpRecordDao;
@@ -252,5 +252,45 @@ public class SiteService extends BaseService<SiteDao, Site> {
      */
     public AgvArea selectAgvAreaByCode(String areaCode) {
         return agvAreaDao.selectAgvAreaByCode(areaCode);
+    }
+
+    /**
+     * 通过站点ID查找区域信息
+     *
+     * @param siteId 站点ID
+     * @return 区域信息
+     */
+    public AgvArea selectAgvAreaBySiteId(long siteId) {
+        return agvAreaDao.selectAgvAreaBySiteId(siteId);
+    }
+
+    /**
+     * 通过区域ID查找父级区域信息
+     *
+     * @param areaId 区域ID
+     * @return 父级区域信息
+     */
+    public AgvAreaModel selectParentAreaByAreaId(long areaId) {
+        return agvAreaDao.selectParentAreaById(areaId);
+    }
+
+    /**
+     * 通过ID查找区域详情
+     *
+     * @param areaId 区域ID
+     * @return 区域详情
+     */
+    public AgvAreaModel selectAgvAreaById(long areaId) {
+        return agvAreaDao.selectAgvAreaById(areaId);
+    }
+
+    /**
+     * 通过二维码查找站点信息
+     *
+     * @param qrCode 二维码
+     * @return 站点信息
+     */
+    public SiteModel selectSiteModeByQrCode(String qrCode) {
+        return siteDao.selectSiteModeByQrCode(qrCode);
     }
 }

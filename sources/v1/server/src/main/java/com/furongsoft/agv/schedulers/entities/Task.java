@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.furongsoft.base.entities.BaseEntity;
 
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Task extends BaseEntity {
     private static final long serialVersionUID = -4789637947241961018L;
 
@@ -79,6 +81,11 @@ public class Task extends BaseEntity {
      * 是否启用
      */
     private boolean enabled;
+
+    /**
+     * 失败原因
+     */
+    private String failReason;
 
     /**
      * 物料列表

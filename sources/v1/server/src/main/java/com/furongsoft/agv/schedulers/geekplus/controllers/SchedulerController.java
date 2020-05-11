@@ -8,11 +8,7 @@ import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * AGV调度管理器控制器
@@ -66,4 +62,54 @@ public class SchedulerController {
 
         return new RestResponse(HttpStatus.OK);
     }
+
+    /**
+     * 删除所有任务
+     *
+     * @return
+     */
+    @GetMapping("/cancelAllTasks")
+    public RestResponse removeAllTask() {
+        scheduler.removeAllTasks();
+        return new RestResponse(HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllTasks")
+    public RestResponse getAllTasks() {
+        return new RestResponse(HttpStatus.OK, null, scheduler.getAllTasks());
+    }
+
+    /**
+     * 通过源站点删除任务
+     *
+     * @param source 源站点
+     * @return 响应内容
+     */
+    @GetMapping("/removeTaskBySource")
+    public RestResponse removeTaskBySource(String source) {
+        return new RestResponse(HttpStatus.OK, null, scheduler.removeTaskBySource(source));
+    }
+
+    /**
+     * 获取所有区域
+     *
+     * @return 相应内容
+     */
+    @GetMapping("/getAllAreas")
+    public RestResponse getAllAreas() {
+        return new RestResponse(HttpStatus.OK, null, scheduler.getAreas());
+    }
+
+    /**
+     * 移除指定站点上的容器
+     *
+     * @param siteCode 站点编号
+     * @return 相应内容
+     */
+    @GetMapping("/removeSiteContainer")
+    public RestResponse removeContainerBySiteId(String siteCode) {
+        scheduler.removeSiteContainer(siteCode);
+        return new RestResponse(HttpStatus.OK);
+    }
+
 }

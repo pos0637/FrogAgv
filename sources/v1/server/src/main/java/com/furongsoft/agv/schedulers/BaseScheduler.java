@@ -18,18 +18,18 @@ import com.furongsoft.agv.schedulers.services.TaskService;
 import com.furongsoft.agv.services.SiteService;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.Tracker;
-import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.util.CollectionUtils;
 
 /**
  * AGV调度管理器
  *
  * @author Alex
  */
-@Log
+//@Log
 public abstract class BaseScheduler implements IScheduler, InitializingBean, Runnable {
     @Autowired
     private SiteService siteService;
@@ -80,7 +80,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         });
 
         // 启动守护线程
-        new Thread(this).start();
+//        new Thread(this).start();
     }
 
     @Override
@@ -91,6 +91,11 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     @Override
     public synchronized List<Task> getTasks() {
         return new ArrayList<Task>(tasks);
+    }
+
+    @Override
+    public synchronized List<Area> getAreas() {
+        return new ArrayList<Area>(areas);
     }
 
     @Override
@@ -107,7 +112,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized boolean cancel(Task task) {
         if (pendingTasks.contains(task)) {
             task.setEnabled(false);
-            taskService.updateById(task);
+//            taskService.updateById(task);
             pendingTasks.remove(task);
             return true;
         }
@@ -145,7 +150,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         }
 
         task.setEnabled(false);
-        taskService.updateById(task);
+//        taskService.updateById(task);
         tasks.remove(task);
 
         return true;
@@ -153,24 +158,46 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public synchronized void onMovingStarted(String agvId, String taskId) {
+        Tracker.agv("AGV接单了");
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setAgvId(agvId);
             task.setStatus(Status.Moving);
             task.setReplaceable(false);
             task.setCancelable(false);
-            taskService.updateById(task);
+            // TODO 出错
+//            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingStarted(agvId, task));
             Tracker.agv(String.format("OnMovingStarted: task: %s, agv: %s", task.toString(), agvId));
         });
     }
 
     @Override
+    public synchronized void onTakeAway(String agvId, String taskId) {
+        Tracker.agv("AGV把货驼走了");
+        getTaskByWcsTaskId(taskId).ifPresent(task -> {
+            notification.ifPresent(n -> n.onTakeAway(agvId, task));
+            Tracker.agv(String.format("onTakeAway: task: %s, agv: %s", task.toString(), agvId));
+        });
+    }
+
+    @Override
     public synchronized void onMovingArrived(String agvId, String taskId) {
+        Tracker.agv("AGV货送到了");
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Arrived);
             task.setEnabled(false);
-            taskService.updateById(task);
+            // todo 出错
+//            taskService.updateById(task);
             tasks.remove(task);
+            // 添加移除已完成的任务
+            if (!CollectionUtils.isEmpty(tasks)) {
+                tasks.forEach(task1 -> {
+                    if (task1.getStatus() == Status.Arrived) {
+                        tasks.remove(task1);
+                    }
+                });
+            }
+            Tracker.agv(String.format("OnMovingArrived-removeTaskBefore: tasks: %s, task: %s", tasks.toString(), task));
 
             // 设置源站点与目的站点容器
             String containerId = null;
@@ -194,7 +221,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingPaused(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
-            taskService.updateById(task);
+//            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingPaused(agvId, task));
             Tracker.agv(String.format("OnMovingPaused: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -204,7 +231,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     public synchronized void onMovingWaiting(String agvId, String taskId) {
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Paused);
-            taskService.updateById(task);
+//            taskService.updateById(task);
             notification.ifPresent(n -> n.onMovingWaiting(agvId, task));
             Tracker.agv(String.format("OnMovingWaiting: task: %s, agv: %s", task.toString(), agvId));
         });
@@ -215,7 +242,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Cancelled);
             task.setEnabled(false);
-            taskService.updateById(task);
+//            taskService.updateById(task);
             tasks.remove(task);
             removeContainer(null, task.getSource());
             removeContainer(null, task.getDestination());
@@ -229,7 +256,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         getTaskByWcsTaskId(taskId).ifPresent(task -> {
             task.setStatus(Status.Fail);
             task.setEnabled(false);
-            taskService.updateById(task);
+//            taskService.updateById(task);
             tasks.remove(task);
             removeContainer(null, task.getSource());
             removeContainer(null, task.getDestination());
@@ -258,6 +285,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
 
     @Override
     public synchronized boolean onContainerLeft(String containerId, String destination) {
+        Tracker.agv("开始执行容器离场");
         com.furongsoft.agv.schedulers.entities.Site site = getSite(destination);
         if (site == null) {
             return false;
@@ -283,7 +311,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
                     try {
                         Task task = addTask(t.getSource(), t.getDestination(), t.getDestinationArea(),
                                 t.getMaterials());
-                        if (task != null) {
+                        if (task != null && !StringUtils.isNullOrEmpty(task.getFailReason())) {
                             pendingTasks.remove(t);
                         }
                     } catch (Exception e) {
@@ -311,7 +339,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @throws Exception 异常
      */
     protected synchronized Task addTask(String source, String destination, String destinationArea,
-            List<Material> materials) throws Exception {
+                                        List<Material> materials) throws Exception {
         if (!hasContainer(source)) {
             Tracker.agv("无料车无法发货:" + source);
             throw new NonMaterialCarException();
@@ -320,14 +348,20 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         // 不允许在已有任务的源站点发送任务
         if (getTaskBySite(source).isPresent()) {
             Tracker.agv("不允许在已有任务的源站点发送任务:" + source);
-            return addPendingTask(source, destination, destinationArea, materials);
+            Task task = new Task();
+            task.setFailReason("不允许在已有任务的源站点发送任务:" + source);
+//            return addPendingTask(source, destination, destinationArea, materials);
+            return task;
         }
 
         if (StringUtils.isNullOrEmpty(destinationArea)) {
             // 不允许向已有容器或已有任务的站点内发送容器
             if (!isFreeSite(destination)) {
                 Tracker.agv("不允许向已有容器或已有任务的站点内发送容器:" + source + ", " + destination);
-                return addPendingTask(source, destination, destinationArea, materials);
+                Task task = new Task();
+                task.setFailReason("不允许向已有容器或已有任务的站点内发送容器:" + source + ", " + destination);
+//                return addPendingTask(source, destination, destinationArea, materials);
+                return task;
             }
 
             return onAddTask(source, destination, materials);
@@ -335,7 +369,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
             Optional<com.furongsoft.agv.schedulers.entities.Site> site = getFreeSite(destinationArea);
             if (site.isEmpty()) {
                 Tracker.agv("区域内没有空闲站点:" + source + ", " + destinationArea);
-                return addPendingTask(source, destination, destinationArea, materials);
+                Task task = new Task();
+                task.setFailReason("区域内没有空闲站点:" + source + ", " + destinationArea);
+//                return addPendingTask(source, destination, destinationArea, materials);
+                return task;
             }
 
             return onAddTask(source, site.get().getCode(), materials);
@@ -352,9 +389,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addRunningTask(String source, String destination, String wcsTaskId,
-            List<Material> materials) {
+                                               List<Material> materials) {
         Task task = new Task(source, destination, null, wcsTaskId, materials);
-        taskService.add(task);
+        // TODO
+//        taskService.add(task);
         tasks.add(task);
 
         return task;
@@ -370,10 +408,10 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Task addPendingTask(String source, String destination, String destinationArea,
-            List<Material> materials) {
+                                               List<Material> materials) {
         Task task = new Task(source, destination, destinationArea, null, materials);
-        taskService.add(task);
-        tasks.add(task);
+//        taskService.add(task);
+        pendingTasks.add(task);
 
         return task;
     }
@@ -454,7 +492,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
     }
 
     /**
-     * 是否为空闲站点
+     * 是否为空闲站点 TODO
      *
      * @param site 站点
      * @return 是否为空闲站点
@@ -490,7 +528,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Optional<Task> getTaskBySite(String code) {
-        return tasks.stream().filter(t -> t.getSource().equals(code) || t.getDestination().equals(code)).findFirst();
+        return tasks.stream().filter(t -> (null != t.getSource() && t.getSource().equals(code)) || (null != t.getDestination() && t.getDestination().equals(code))).findFirst();
     }
 
     /**
@@ -500,7 +538,7 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
      * @return 任务
      */
     protected synchronized Optional<Task> getTaskByWcsTaskId(String wcsTaskId) {
-        return tasks.stream().filter(t -> t.getWcsTaskId().equals(wcsTaskId)).findFirst();
+        return tasks.stream().filter(t -> null != t.getWcsTaskId() && t.getWcsTaskId().equals(wcsTaskId)).findFirst();
     }
 
     /**
@@ -516,5 +554,39 @@ public abstract class BaseScheduler implements IScheduler, InitializingBean, Run
         }
 
         return !StringUtils.isNullOrEmpty(site.getContainerId());
+    }
+
+    public synchronized boolean removeAllTasks() {
+        tasks = new LinkedList<>();
+        return false;
+    }
+
+    /**
+     * 通过源站点删除任务
+     *
+     * @param source 源站点
+     * @return 是否成功
+     */
+    public synchronized boolean removeTaskBySource(String source) {
+        Optional<Task> taskOptional = tasks.stream().filter(t -> null != t.getSource() && t.getSource().equals(source)).findFirst();
+        if (taskOptional.isPresent()) {
+            tasks.remove(taskOptional.get());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 移除指定站点上的容器
+     *
+     * @param siteCode 站点编号
+     * @return 是否成功
+     */
+    public synchronized void removeSiteContainer(String siteCode) {
+        areas.forEach(area -> area.getSites().forEach(site -> {
+            if (site.getCode().equalsIgnoreCase(siteCode)) {
+                site.setContainerId(null);
+            }
+        }));
     }
 }

@@ -35,22 +35,6 @@ public class ButtonBoxWrite implements Runnable {
                 buttonBoxes.forEach(buttonBoxModel -> {
                     // 未连接则创建连接,已连接则执行写入
                     ModbusMaster currentMaster = buttonBoxModel.getModbusMaster();
-                    // CopyOnWriteArrayList<Boolean> callState = buttonBoxModel.getCallState();
-                    // if (null != currentMaster && !CollectionUtils.isEmpty(callState)) {
-                    // for (int i = 0; i < callState.size(); ++i) {
-                    // if (callState.get(i)) {
-                    // // 执行成功后亮灯、
-                    // Tracker.warn("执行" +
-                    // buttonBoxModel.getCallButtonModelByButtonCode(i).getName() + "的逻辑,并将编号" +
-                    // buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode() +
-                    // "设置为false。第" + i);
-                    // if (ModbusTcp.writeCoil(currentMaster, 254, i, true)) {
-                    // callState.set(Integer.valueOf(buttonBoxModel.getCallButtonModelByButtonCode(i).getButtonCode()),
-                    // false);
-                    // }
-                    // }
-                    // }
-                    // }
                     synchronized (buttonBoxModel.getCallTaskModels()) {
                         List<TaskModel> taskModels = buttonBoxModel.getCallTaskModels();
                         if (null != currentMaster && !CollectionUtils.isEmpty(taskModels)) {
@@ -65,7 +49,7 @@ public class ButtonBoxWrite implements Runnable {
                                 } else if (callButtonModel.getCode().indexOf("BACK") > 0) {
                                     try {
                                         // 执行退货
-                                        executeSuccess = callMaterialService.backMaterialBox(callButtonModel);
+                                        executeSuccess = "success".equalsIgnoreCase(callMaterialService.backMaterialBox(callButtonModel));
                                         Tracker.agv("执行退货");
                                     } catch (Exception e) {
                                         Tracker.error(e);

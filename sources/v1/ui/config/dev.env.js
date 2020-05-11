@@ -10,7 +10,7 @@ module.exports = {
   MQTT_PASSWORD: '"public"',
   // AREA_TYPE: '"demolition"'
   // AREA_TYPE: '"disinfection"'
-  // AREA_TYPE: '"materials"'
+  AREA_TYPE: '"materials"'
   // AREA_TYPE: '"packing"'
-  AREA_TYPE: '"filling"'
+  // AREA_TYPE: '"filling"'
 }

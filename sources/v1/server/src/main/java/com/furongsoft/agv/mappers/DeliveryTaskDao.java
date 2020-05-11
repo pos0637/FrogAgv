@@ -90,7 +90,7 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String selectDeliveryTaskById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
+                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type,t1.wave_code");
                     FROM(DELIVERY_TASK_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -105,7 +105,7 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String selectDeliveryTasksByConditions(final Map<String, Object> param) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
+                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type,t1.wave_code");
                     FROM(DELIVERY_TASK_TABLE_NAME + " t1 ");
                     WHERE("t1.enabled = 1 ");
                     if (null != param.get("state")) {
@@ -143,7 +143,7 @@ public interface DeliveryTaskDao extends BaseMapper<DeliveryTask> {
         public String selectDeliveryTaskModelByWorkflowWorkId() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type");
+                    SELECT("t1.id,t1.task_no,t1.workflow_work_id,t1.start_site_id,t1.end_site_id,t1.material_box_id,t1.agv_uuid,t1.state,t1.type,t1.wave_code");
                     FROM(DELIVERY_TASK_TABLE_NAME + " t1");
                     WHERE("t1.workflow_work_id = #{workflowWorkId}");
                 }

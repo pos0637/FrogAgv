@@ -92,8 +92,7 @@
       loadingInfo() {
         this.$store.dispatch('updateTitle', '消毒间配货任务');
         this.$store.dispatch('updateNeedLogin', false);
-        this.getSites();
-        this.getDistributionTasks();
+        this.timer();
       },
       // 跳转到配送管理页面
       turn(url) {
@@ -101,6 +100,17 @@
       },
       toggleShow() {
         this.state.taskOutVisible = false;
+      },
+      timer() {
+        this.getSites();
+        this.getDistributionTasks();
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => {
+          this.getSites();
+          this.getDistributionTasks();
+        }, 5000);
       },
       taskOut(bom) {
         this.taskOutBom = bom;

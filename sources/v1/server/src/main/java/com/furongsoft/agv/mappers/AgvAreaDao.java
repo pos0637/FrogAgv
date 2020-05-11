@@ -3,6 +3,7 @@ package com.furongsoft.agv.mappers;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.furongsoft.agv.entities.AgvArea;
+import com.furongsoft.agv.entities.Site;
 import com.furongsoft.agv.entities.SiteDetail;
 import com.furongsoft.agv.models.AgvAreaModel;
 import com.furongsoft.agv.models.SiteDetailModel;
@@ -77,9 +78,19 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
     @SelectProvider(type = DaoProvider.class, method = "selectAgvAreaByCode")
     AgvArea selectAgvAreaByCode(@Param("areaCode") String areaCode);
 
+    /**
+     * 通过站点ID获取区域信息
+     *
+     * @param siteId 站点ID
+     * @return 区域信息
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectAgvAreaBySiteId")
+    AgvArea selectAgvAreaBySiteId(@Param("siteId") long siteId);
+
     class DaoProvider {
         private static final String AGV_AREA_TABLE_NAME = AgvArea.class.getAnnotation(TableName.class).value();
         private static final String SITE_DETAIL_TABLE_NAME = SiteDetail.class.getAnnotation(TableName.class).value();
+        private static final String SITE_TABLE_NAME = Site.class.getAnnotation(TableName.class).value();
         private static final String AREA_SITE_TABLE_NAME = "t_agv_area_site";
 
         /**
@@ -90,7 +101,7 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
         public String selectAgvAreaById() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.parent_id,t1.type,t1.code,t1.name,t1.uuid");
+                    SELECT("t1.id,t1.parent_id,t1.type,t1.code,t1.name");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     WHERE("t1.id = #{id}");
                 }
@@ -179,6 +190,23 @@ public interface AgvAreaDao extends BaseMapper<AgvArea> {
                     SELECT("t1.id, t1.parent_id, t1.type, t1.name, t1.code");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     WHERE("t1.code = #{areaCode} AND t1.enabled=1");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过站点ID获取区域信息
+         *
+         * @return sql
+         */
+        public String selectAgvAreaBySiteId() {
+            return new SQL() {
+                {
+                    SELECT("t1.id, t1.parent_id, t1.type, t1.name, t1.code");
+                    FROM(AGV_AREA_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(AREA_SITE_TABLE_NAME + " t2 ON t2.area_id = t1.id");
+                    LEFT_OUTER_JOIN(SITE_TABLE_NAME + " t3 ON t2.site_id = t3.id");
+                    WHERE("t3.id=#{siteId} AND t3.enabled=1 AND t1.enabled=1");
                 }
             }.toString();
         }

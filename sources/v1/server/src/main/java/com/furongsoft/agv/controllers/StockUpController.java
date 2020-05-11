@@ -58,7 +58,7 @@ public class StockUpController {
      */
     @PostMapping("/stockUp")
     public RestResponse stockUp(@RequestBody StockUpRecordModel stockUpRecordModel) {
-        stockUpRecordService.stockUp(stockUpRecordModel);
+//        stockUpRecordService.stockUp(stockUpRecordModel);
         return new RestResponse(HttpStatus.OK);
     }
 }

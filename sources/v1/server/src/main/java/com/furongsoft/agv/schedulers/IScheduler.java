@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.furongsoft.agv.entities.AgvArea;
 import com.furongsoft.agv.entities.Site;
+import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
 
@@ -173,4 +174,40 @@ public interface IScheduler {
      * @return 是否成功
      */
     boolean onContainerLeft(String containerId, String destination);
+
+    /**
+     * 移除所有任务
+     *
+     * @return 是否成功
+     */
+    boolean removeAllTasks();
+
+    /**
+     * 获取所有任务
+     *
+     * @return 任务列表
+     */
+    List<Task> getAllTasks();
+
+    /**
+     * 通过源站点删除任务
+     *
+     * @return 是否成功
+     */
+    boolean removeTaskBySource(String source);
+
+    /**
+     * 移除站点上的容器
+     *
+     * @param siteCode 站点编号
+     * @return 是否成功
+     */
+    void removeSiteContainer(String siteCode);
+
+    /**
+     * 获取所有区域
+     *
+     * @return
+     */
+    List<Area> getAreas();
 }

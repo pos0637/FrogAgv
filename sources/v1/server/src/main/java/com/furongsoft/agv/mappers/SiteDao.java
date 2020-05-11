@@ -77,6 +77,15 @@ public interface SiteDao extends BaseMapper<Site> {
     @SelectProvider(type = DaoProvider.class, method = "selectAreaByType")
     List<AgvArea> selectAreaByType(@Param("type") int type);
 
+    /**
+     * 通过二维码查找站点信息
+     *
+     * @param qrCode 二维码
+     * @return 站点信息
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectSiteModeByQrCode")
+    SiteModel selectSiteModeByQrCode(@Param("qrCode") String qrCode);
+
     class DaoProvider {
         private static final String SITE_TABLE_NAME = Site.class.getAnnotation(TableName.class).value();
         private static final String AGV_AREA_TABLE_NAME = AgvArea.class.getAnnotation(TableName.class).value();
@@ -129,12 +138,13 @@ public interface SiteDao extends BaseMapper<Site> {
         public String selectLocationsByAreaIdWithMaterialBox() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t5.code AS materialBoxCode");
+//                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code,t5.code AS materialBoxCode");
+                    SELECT("t1.id,t1.qr_code,t1.location_x,t1.location_y,t1.location_z,t1.type,t1.name,t1.code");
                     FROM(SITE_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(AGV_AREA_SITE_TABLE_NAME + " t2 ON t1.id = t2.site_id");
                     LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t3.id = t2.area_id");
                     LEFT_OUTER_JOIN(SITE_DETAIL_TABLE_NAME + " t4 ON t4.site_id = t1.id");
-                    RIGHT_OUTER_JOIN(MATERIAL_BOX_TABLE_NAME + " t5 ON t5.id = t4.material_box_id");
+//                    RIGHT_OUTER_JOIN(MATERIAL_BOX_TABLE_NAME + " t5 ON t5.id = t4.material_box_id");
                     WHERE("t1.enabled=1 AND t3.id=#{areaId}");
                 }
             }.toString();
@@ -179,6 +189,21 @@ public interface SiteDao extends BaseMapper<Site> {
                     SELECT("t1.id,t1.parent_id,t1.type,t1.name,t1.code");
                     FROM(AGV_AREA_TABLE_NAME + " t1");
                     WHERE("t1.enabled=1 AND t1.type=#{type}");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过二维码找到站点信息
+         *
+         * @return sql
+         */
+        public String selectSiteModeByQrCode() {
+            return new SQL() {
+                {
+                    SELECT("id, qr_code, location_x, location_y, location_z, name, type, code");
+                    FROM(SITE_TABLE_NAME);
+                    WHERE("qr_code=#{qrCode}");
                 }
             }.toString();
         }

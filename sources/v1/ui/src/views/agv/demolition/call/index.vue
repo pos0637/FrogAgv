@@ -32,7 +32,7 @@
           <div v-for="(item) in callPlans" :key="item.id">
             <div class="data-content-produce-row flex-box flex-align-items-center">
               <div
-                class="data-name textOverflow"
+                class="data-name"
               >{{item.materialName+" （"+item.productLineCode+"）"+item.executionTime}}</div>
               <div class="bom-num"></div>
               <div class="bom-done"></div>
@@ -65,7 +65,7 @@
                 :key="bom.id"
                 class="flex-box data-content-row"
               >
-                <div class="bom-name textOverflow">{{bom.materialName}}</div>
+                <div class="bom-name">{{bom.materialName}}</div>
                 <div
                   class="bom-num flex-box flex-align-items-center flex-justify-content-center"
                 >{{bom.count}}</div>

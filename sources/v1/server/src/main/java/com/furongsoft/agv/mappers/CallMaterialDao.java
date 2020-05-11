@@ -99,6 +99,26 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
     @UpdateProvider(type = DaoProvider.class, method = "updateCallMaterialState")
     boolean updateCallMaterialState(@Param("id") long id, int state);
 
+    /**
+     * 通过波次编号查找未完成的叫料列表
+     *
+     * @param waveCode 波次编号
+     * @return 未完成的叫料列表
+     */
+    @SelectProvider(type = DaoProvider.class, method = "selectUnFinishCallsByWaveCode")
+    List<CallMaterialModel> selectUnFinishCallsByWaveCode(@Param("waveCode") String waveCode);
+
+    /**
+     * 通过波次以及叫料类型更新叫料状态
+     *
+     * @param waveCode 波次
+     * @param type     类型
+     * @param state    状态
+     * @return 是否成功
+     */
+    @UpdateProvider(type = DaoProvider.class, method = "updateCallMaterialStateByWaveCode")
+    boolean updateCallMaterialStateByWaveCode(@Param("waveCode") String waveCode, @Param("type") int type, @Param("state") int state);
+
     class DaoProvider {
         private static final String CALL_MATERIAL_TABLE_NAME = CallMaterial.class.getAnnotation(TableName.class).value();
         private static final String MATERIAL_TABLE_NAME = Material.class.getAnnotation(TableName.class).value();
@@ -225,11 +245,16 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
         public String selectCallMaterialByWaveCodeAndAreaType(final Map<String, Object> params) {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, t3.code AS waveCode,t1.area_id,t1.team_id,t1.site_id");
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, " +
+                            "t3.code AS waveCode,t1.area_id,t1.team_id,t1.site_id,t4.code AS productLineCode");
                     FROM(CALL_MATERIAL_TABLE_NAME + " t1");
                     LEFT_OUTER_JOIN(WAVE_DETAIL_TABLE_NAME + " t2 ON t1.wave_detail_code = t2.code");
                     LEFT_OUTER_JOIN(WAVE_TABLE_NAME + " t3 ON t2.wave_code = t3.code");
-                    WHERE("t3.code = #{waveCode} AND t1.type = #{areaType} AND t1.enabled = 1 AND t3.enabled=1");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t4 ON t1.area_id = t4.id");
+                    WHERE("t1.type = #{areaType} AND t1.enabled = 1 AND t3.enabled=1");
+                    if (!StringUtils.isNullOrEmpty(params.get("waveCode"))) {
+                        WHERE("t3.code= #{waveCode}");
+                    }
                     if (null != params.get("state")) {
                         WHERE("t1.state=#{state}");
                     }
@@ -249,6 +274,47 @@ public interface CallMaterialDao extends BaseMapper<CallMaterial> {
                     UPDATE(CALL_MATERIAL_TABLE_NAME);
                     SET("state=#{state}");
                     WHERE("id=#{id}");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过波次查找未完成的叫料列表
+         *
+         * @return sql
+         */
+        public String selectUnFinishCallsByWaveCode() {
+            return new SQL() {
+                {
+                    SELECT("t1.id,t1.material_id,t1.count,t1.acceptance_count,t1.state,t1.call_time,t1.wave_detail_code,t1.type,t1.cancel_reason, " +
+                            "t3.code AS waveCode,t1.area_id,t1.team_id,t1.site_id");
+                    FROM(CALL_MATERIAL_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(WAVE_DETAIL_TABLE_NAME + " t2 ON t1.wave_detail_code = t2.code");
+                    LEFT_OUTER_JOIN(WAVE_TABLE_NAME + " t3 ON t2.wave_code = t3.code");
+                    WHERE("t3.code= #{waveCode} AND t1.enabled = 1 AND t3.enabled=1 AND t1.state<>3");
+                }
+            }.toString();
+        }
+
+        /**
+         * 通过波次以及叫料类型更新叫料状态
+         *
+         * @return sql
+         */
+        public String updateCallMaterialStateByWaveCode() {
+            return new SQL() {
+                {
+                    UPDATE(CALL_MATERIAL_TABLE_NAME + " t1");
+                    SET("t1.state=#{state}");
+                    WHERE(
+                            "t1.type=#{type} AND t1.wave_detail_code in (" + new SQL() {
+                                {
+                                    SELECT("t2.code");
+                                    FROM(WAVE_DETAIL_TABLE_NAME + " t2");
+                                    WHERE("t2.wave_code=#{waveCode}");
+                                }
+                            }.toString() + ")"
+                    );
                 }
             }.toString();
         }

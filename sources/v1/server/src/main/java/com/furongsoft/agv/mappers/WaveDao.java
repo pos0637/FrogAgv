@@ -148,8 +148,11 @@ public interface WaveDao extends BaseMapper<Wave> {
         public String selectWaveByCode() {
             return new SQL() {
                 {
-                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type,t1.production_order_no");
+                    SELECT("t1.id,t1.code,t1.team_id,t1.team_name,t1.area_id,t1.material_id,t1.execution_time,t1.finish_time,t1.state,t1.type," +
+                            "t1.production_order_no,t2.name AS materialName,t2.uuid AS materialCode,t3.name AS productLineName,t3.code AS productLineCode");
                     FROM(WAVE_TABLE_NAME + " t1");
+                    LEFT_OUTER_JOIN(MATERIAL_TABLE_NAME + " t2 ON t1.material_id = t2.id");
+                    LEFT_OUTER_JOIN(AGV_AREA_TABLE_NAME + " t3 ON t1.area_id = t3.id");
                     WHERE("t1.code=#{code} AND t1.enabled=1");
                 }
             }.toString();

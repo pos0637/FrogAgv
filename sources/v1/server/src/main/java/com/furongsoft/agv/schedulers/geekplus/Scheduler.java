@@ -3,6 +3,7 @@ package com.furongsoft.agv.schedulers.geekplus;
 import java.util.List;
 
 import com.furongsoft.agv.schedulers.BaseScheduler;
+import com.furongsoft.agv.schedulers.entities.Area;
 import com.furongsoft.agv.schedulers.entities.Material;
 import com.furongsoft.agv.schedulers.entities.Task;
 import com.furongsoft.agv.schedulers.geekplus.entities.MovingCancelRequestMsg;
@@ -14,7 +15,6 @@ import com.furongsoft.agv.schedulers.geekplus.entities.WarehouseControlResponseM
 import com.furongsoft.base.misc.HttpUtils;
 import com.furongsoft.base.misc.StringUtils;
 import com.furongsoft.base.misc.UUIDUtils;
-import com.furongsoft.base.monitor.aop.Log;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-@Log
+//@Log
 public class Scheduler extends BaseScheduler {
     @Value("${geekplus.url}")
     private String url;
@@ -64,7 +64,7 @@ public class Scheduler extends BaseScheduler {
                 new MovingRequestMsg.Header(UUIDUtils.getUUID(), channelId, clientCode, warehouseCode, userId, userKey,
                         language, version),
                 new MovingRequestMsg.Body("MovingRequestMsg", "", "", source, 2, null, null, 1, 1, 1,
-                        new MovingRequestMsg.Dest[] { new MovingRequestMsg.Dest(1, destination, 2, 1) }));
+                        new MovingRequestMsg.Dest[]{new MovingRequestMsg.Dest(1, destination, 2, 1)}));
         MovingResponseMsg response = HttpUtils.postJson(url, null, request, MovingResponseMsg.class);
         if ((response == null) || (response.getData() == null)) {
             return null;
@@ -126,5 +126,25 @@ public class Scheduler extends BaseScheduler {
         }
 
         return super.onContainerLeft(containerId, destination);
+    }
+
+    @Override
+    public synchronized boolean removeAllTasks() {
+        return super.removeAllTasks();
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        return super.getTasks();
+    }
+
+    @Override
+    public void removeSiteContainer(String siteCode) {
+        super.removeSiteContainer(siteCode);
+    }
+
+    @Override
+    public List<Area> getAreas() {
+        return super.getAreas();
     }
 }

@@ -90,9 +90,12 @@
   .data-content-row,
   .data-content-wave-row,
   .data-content-produce-row {
-    height: 40px;
+    height: auto;
+    min-height: 40px;
     font-size: 15px;
-    line-height: 40px;
+    // line-height: 40px;
+    
+    line-height: initial;
   }
 
   .data-content-produce-row {
