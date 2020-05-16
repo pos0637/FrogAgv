@@ -11,6 +11,7 @@ import com.furongsoft.agv.services.CallMaterialService;
 import com.furongsoft.agv.services.DeliveryTaskService;
 import com.furongsoft.agv.services.SiteService;
 
+import com.furongsoft.base.misc.Tracker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -49,13 +50,13 @@ public class SchedulerProcess implements ISchedulerNotification {
 
     @Override
     public void onMovingArrived(String agvId, Task task) {
-
         DeliveryTaskModel deliveryTaskModel = deliveryTaskService
                 .selectDeliveryTaskModelByWorkflowWorkId(task.getWcsTaskId());
         if (!ObjectUtils.isEmpty(deliveryTaskModel)) {
             deliveryTaskService.updateStateById(deliveryTaskModel.getId(), 3); // 任务改成已完成
             siteService.addMaterialBox(deliveryTaskModel.getEndSiteId(), deliveryTaskModel.getMaterialBoxId()); // 在目标点添加料框，并设为有货
             siteService.removeMaterialBox(deliveryTaskModel.getStartSiteId()); // 在起始点删除料框，并设为空闲
+            Tracker.agv(String.format("执行任务更新: Task: %s", task.toString()));
             //
             if (!StringUtils.isEmpty(deliveryTaskModel.getWaveCode())) {
                 List<CallMaterialModel> callMaterialModels = callMaterialService.selectUnFinishCallsByWaveCode(deliveryTaskModel.getWaveCode());
@@ -73,6 +74,8 @@ public class SchedulerProcess implements ISchedulerNotification {
                     });
                 }
             }
+        } else {
+            Tracker.agv("获取到的任务为空");
         }
     }
 

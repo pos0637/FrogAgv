@@ -131,9 +131,10 @@ public class WaveService extends BaseService<WaveDao, Wave> {
                     Map<String, WaveDetailModel> waveDetailModelMap = new HashMap<>();
                     // 将已叫料的波次详情放入Map种
                     callWaveDetailModels.forEach(callWaveDetailModel -> {
+                        waveDetailModelMap.put(callWaveDetailModel.getCode(), callWaveDetailModel);
                         // 叫料如果未完成
-                        if (null != callWaveDetailModel.getCallState() && callWaveDetailModel.getCallState() == 1) {
-                            waveDetailModelMap.put(callWaveDetailModel.getCode(), callWaveDetailModel);
+                        if (null != callWaveDetailModel.getCallState() && callWaveDetailModel.getCallState() != 1) {
+                            waveModel.setDelivered(true);
                         }
                     });
                     // 存在已叫料的详情，则默认这个波次叫料了
@@ -156,17 +157,23 @@ public class WaveService extends BaseService<WaveDao, Wave> {
             if (null != waveModel1) {
                 if (CollectionUtils.isEmpty(waveModel1.getWaveModels())) {
                     List<WaveModel> newWaveModels = new ArrayList<>();
-                    newWaveModels.add(waveModel);
+                    if (!waveModel.isDelivered()) {
+                        newWaveModels.add(waveModel);
+                    }
                     waveModel1.setWaveModels(newWaveModels);
                 } else {
-                    waveModel1.getWaveModels().add(waveModel);
+                    if (!waveModel.isDelivered()) {
+                        waveModel1.getWaveModels().add(waveModel);
+                    }
                 }
             } else {
                 List<WaveModel> newWaveModels = new ArrayList<>();
                 WaveModel newWaveModel = JSON.parseObject(JSON.toJSONString(waveModel), WaveModel.class);
                 newWaveModels.add(newWaveModel);
                 waveModel.setWaveModels(newWaveModels);
-                waveModelMap.put(waveKey, waveModel);
+                if (!waveModel.isDelivered()) {
+                    waveModelMap.put(waveKey, waveModel);
+                }
             }
         });
         List<WaveModel> backWaveModel = new ArrayList<>();

@@ -7,6 +7,7 @@ import com.furongsoft.agv.devices.model.ButtonBoxModel;
 import com.furongsoft.agv.devices.services.CallButtonService;
 import com.furongsoft.agv.services.CallMaterialService;
 import com.furongsoft.base.exceptions.BaseException;
+import com.furongsoft.base.misc.Tracker;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -48,7 +49,12 @@ public class DeviceInit implements CommandLineRunner {
         ExecutorService pool = Executors.newFixedThreadPool(10);
         if (!CollectionUtils.isEmpty(buttonBoxes)) {
             buttonBoxes.forEach(buttonBoxModel -> {
-                pool.submit(new ButtonBoxRead(buttonBoxModel));
+                try {
+                    pool.submit(new ButtonBoxRead(buttonBoxModel));
+                } catch (Exception ex) {
+                    Tracker.agv("线程异常");
+                    Tracker.error(ex);
+                }
             });
         }
         pool.submit(new ButtonBoxWrite(callMaterialService));

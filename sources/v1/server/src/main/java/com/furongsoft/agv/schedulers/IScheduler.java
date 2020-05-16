@@ -205,6 +205,14 @@ public interface IScheduler {
     void removeSiteContainer(String siteCode);
 
     /**
+     * 站点上添加容器
+     *
+     * @param siteCode      站点
+     * @param containerCode 容器
+     */
+    void addSiteContainer(String siteCode, String containerCode);
+
+    /**
      * 获取所有区域
      *
      * @return

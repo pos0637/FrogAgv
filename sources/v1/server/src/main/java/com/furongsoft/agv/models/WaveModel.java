@@ -112,4 +112,9 @@ public class WaveModel implements Serializable {
      * 是否已经叫料
      */
     private Boolean isCalled;
+
+    /**
+     * 是否已送达
+     */
+    private boolean isDelivered;
 }

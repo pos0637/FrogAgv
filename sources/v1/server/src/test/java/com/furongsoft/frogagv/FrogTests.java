@@ -84,4 +84,9 @@ class FrogTests {
         }
     }
 
+    @Test
+    public void sqlTest() {
+        callMaterialService.updateCallMaterialStateByWaveCode("3c275f1cebe241d49f201dbf9b0070ad", 4, 3);
+    }
+
 }

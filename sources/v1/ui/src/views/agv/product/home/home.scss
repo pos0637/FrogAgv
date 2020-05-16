@@ -57,13 +57,28 @@
   }
 }
 
+.setting-button-div {
+  .btn-default {
+    margin-left: 10px;
+  }
+  
+  .bom-sort {
+    width: 200px;
+    text-align: center;
+  }
+}
+.setting-table-div {
+  .bom-sort {
+    width: 180px;
+  }
+}
 .data-header-content {
   background-color: #c0504d;
   height: 60px;
   font-size: 30px;
   color: #ffffff;
   .data-header-sort {
-    width: 250px;
+    width: 200px;
     text-align: center;
   }
   .data-header-name {
@@ -125,7 +140,7 @@
     color: black;
   }
   .bom-sort {
-    width: 250px;
+    width: 200px;
     text-align: center;
   }
   .bom-num {

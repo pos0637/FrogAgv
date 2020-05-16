@@ -5,6 +5,7 @@ import com.furongsoft.agv.devices.model.TaskModel;
 import com.furongsoft.base.misc.Tracker;
 import com.furongsoft.communication.modbusTcp.ModbusTcp;
 import com.serotonin.modbus4j.ModbusMaster;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
 
 import java.nio.ByteBuffer;
 
@@ -24,41 +25,47 @@ public class ButtonBoxRead implements Runnable {
     @Override
     public void run() {
         boolean runState = true;
-        while (runState) {
-            try {
-                Thread.sleep(500);
-                // 未连接则创建连接,已连接则执行读取
-                ModbusMaster currentMaster = buttonBoxModel.getModbusMaster();
-                // TODO 需要进行修改
-                if (null != currentMaster) {
-                    // 执行读取
-                    short[] data = ModbusTcp.readInputRegisters(currentMaster, 254, 1000 + 4, 1);
-                    if (null == data) {
-                        return;
-                    }
-                    ByteBuffer byteBuffer = ByteBuffer.allocate(data.length * Short.SIZE / Byte.SIZE);
-                    for (short s : data) {
-                        byteBuffer.putShort(s);
-                    }
-                    boolean[] result = ModbusTcp.convert(byteBuffer);
-                    for (int i = 0; i < buttonBoxModel.getCallButtonModels().size(); ++i) {
-                        if (result[i]) {
-                            addTask(currentMaster, i);
-                            Tracker.error("***---***:m"+buttonBoxModel.getCallButtonModelByButtonCode(i).getName());
+        try {
+            while (runState) {
+                try {
+                    Thread.sleep(500);
+                    // 未连接则创建连接,已连接则执行读取
+                    ModbusMaster currentMaster = buttonBoxModel.getModbusMaster();
+                    // TODO 需要进行修改
+                    if (null != currentMaster) {
+                        // 执行读取
+                        short[] data = ModbusTcp.readInputRegisters(currentMaster, 254, 1000 + 4, 1);
+                        if (null == data) {
+                            return;
+                        }
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(data.length * Short.SIZE / Byte.SIZE);
+                        for (short s : data) {
+                            byteBuffer.putShort(s);
+                        }
+                        boolean[] result = ModbusTcp.convert(byteBuffer);
+                        for (int i = 0; i < buttonBoxModel.getCallButtonModels().size(); ++i) {
+                            if (result[i]) {
+                                addTask(currentMaster, i);
+                                Tracker.error("***---***:m"+buttonBoxModel.getCallButtonModelByButtonCode(i).getName());
+                            }
+                        }
+                    } else {
+                        ModbusMaster modbusMaster = ModbusTcp.createMaster(buttonBoxModel.getIpAddress(), buttonBoxModel.getPort());
+                        if (null != modbusMaster) {
+                            Tracker.agv("连接成功");
+                            buttonBoxModel.setModbusMaster(modbusMaster);
                         }
                     }
-                } else {
-                    ModbusMaster modbusMaster = ModbusTcp.createMaster(buttonBoxModel.getIpAddress(), buttonBoxModel.getPort());
-                    if (null != modbusMaster) {
-                        buttonBoxModel.setModbusMaster(modbusMaster);
-                    }
+                } catch (Exception e) {
+                    Tracker.error("========读取线程异常===========");
+                    buttonBoxModel.setModbusMaster(null);
+                    Tracker.error(e.getCause());
+                    Tracker.error("===========********==============");
                 }
-            } catch (Exception e) {
-                Tracker.error("====================================");
-                buttonBoxModel.setModbusMaster(null);
-                Tracker.error(e.getCause());
-                Tracker.error("===========********==============");
             }
+        } catch (Exception exception) {
+            Tracker.info("读取线程异常==");
+            Tracker.error(exception);
         }
     }
 
@@ -67,7 +74,7 @@ public class ButtonBoxRead implements Runnable {
      *
      * @param codeNo 按钮编号
      */
-    public void addTask(ModbusMaster currentMaster, int codeNo) {
+    public void addTask(ModbusMaster currentMaster, int codeNo) throws ModbusTransportException {
         TaskModel taskModel = new TaskModel(codeNo, buttonBoxModel.getIpAddress(), null);
         synchronized (buttonBoxModel.getCallTaskModels()) {
             if (buttonBoxModel.getCallTaskModels().contains(taskModel)) {

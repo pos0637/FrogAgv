@@ -218,6 +218,11 @@
             if (response.errno === 0) {
               this.getSites();
               this.getDistributionTasks();
+              if (response.data === 'success') {
+                this.$message.success('退货成功');
+              } else {
+                this.$message.error('退货失败：' + response.data);
+              }
             }
           })
           .catch(_ => {

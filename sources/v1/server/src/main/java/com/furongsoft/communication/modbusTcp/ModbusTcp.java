@@ -23,9 +23,9 @@ import com.serotonin.modbus4j.msg.WriteRegistersResponse;
  * @author Alex
  */
 public class ModbusTcp {
-    public static void test() {
+    public static void test() throws ModbusTransportException {
         ModbusMaster master = createMaster("192.168.115.157", 10000);
-        int[] registersOffset = { 3, 8, 13, 18 }; // 闪开寄存器偏移
+        int[] registersOffset = {3, 8, 13, 18}; // 闪开寄存器偏移
         while (true) {
             short[] data = readInputRegisters(master, 254, 1000 + 4, 2);
             if (null == data) {
@@ -42,7 +42,7 @@ public class ModbusTcp {
                 sb.append(i + ": " + result[i] + ", ");
                 if (result[i]) {
                     Tracker.error(i + ":" + result[i]);
-                    writeRegisters(master, 254, registersOffset[i], new short[] { 0x0004, 0x0014 });
+                    writeRegisters(master, 254, registersOffset[i], new short[]{0x0004, 0x0014});
                 }
             }
             Tracker.info(sb.toString());
@@ -56,7 +56,7 @@ public class ModbusTcp {
 
     /**
      * 创建主站
-     * 
+     *
      * @param ipAddress IP地址
      * @param port      端口
      * @return 主站
@@ -108,19 +108,10 @@ public class ModbusTcp {
      * @param numberOfBits 长度
      * @return 结果
      */
-    public static short[] readInputRegisters(ModbusMaster master, int slaveId, int offset, int numberOfBits) {
-        try {
-            ReadInputRegistersRequest request = new ReadInputRegistersRequest(slaveId, offset, numberOfBits);
-            ReadInputRegistersResponse response = (ReadInputRegistersResponse) master.send(request);
-            return response.getShortData();
-        } catch (ModbusTransportException e) {
-            Tracker.error(e.getStackTrace().toString());
-            Tracker.error(e.getCause());
-            Tracker.error(e.getMessage());
-            Tracker.error(e.getSlaveId());
-            Tracker.error(e);
-            return null;
-        }
+    public static short[] readInputRegisters(ModbusMaster master, int slaveId, int offset, int numberOfBits) throws ModbusTransportException {
+        ReadInputRegistersRequest request = new ReadInputRegistersRequest(slaveId, offset, numberOfBits);
+        ReadInputRegistersResponse response = (ReadInputRegistersResponse) master.send(request);
+        return response.getShortData();
     }
 
     /**
@@ -152,15 +143,10 @@ public class ModbusTcp {
      * @param value   值
      * @return 是否成功
      */
-    public static boolean writeRegisters(ModbusMaster master, int slaveId, int offset, short[] value) {
-        try {
-            WriteRegistersRequest request = new WriteRegistersRequest(slaveId, offset, value);
-            WriteRegistersResponse response = (WriteRegistersResponse) master.send(request);
-            return !response.isException();
-        } catch (ModbusTransportException e) {
-            Tracker.error(e);
-            return false;
-        }
+    public static boolean writeRegisters(ModbusMaster master, int slaveId, int offset, short[] value) throws ModbusTransportException {
+        WriteRegistersRequest request = new WriteRegistersRequest(slaveId, offset, value);
+        WriteRegistersResponse response = (WriteRegistersResponse) master.send(request);
+        return !response.isException();
     }
 
     /**

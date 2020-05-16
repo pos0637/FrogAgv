@@ -26,7 +26,7 @@
         style="width:100%;margin-left:10px;margin-right:20px;"
       >
         <!-- 按钮 -->
-        <div class="flex-box content-button flex-align-items-center">
+        <div class="flex-box content-button setting-button-div flex-align-items-center">
           <div
             class="btn btn-default btn-click flex-box flex-justify-content-center flex-align-items-center"
             @click="unSetting()"
@@ -49,7 +49,10 @@
           >更新计划</div>
         </div>
         <!-- 表头内容 -->
-        <div class="flex-box data-header-content flex-align-items-center" style="width:100%;">
+        <div
+          class="flex-box data-header-content setting-table-div flex-align-items-center"
+          style="width:100%;"
+        >
           <div class="data-header-name">产品名称</div>
           <div class="data-header-sort">版本号</div>
           <div class="data-header-num">数量</div>
@@ -61,7 +64,7 @@
             <div
               v-for="(bom) in boms"
               :key="bom.id"
-              class="flex-box data-content-row"
+              class="flex-box data-content-row setting-table-div"
               style="cursor: pointer;"
             >
               <div

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -243,10 +244,13 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
         }
         // 料车
         MaterialBoxModel materialBoxModel = selectMaterialBoxModelByQrCode(materialCarCode);
+        if (ObjectUtils.isEmpty(materialBoxModel)) {
+            return "发货失败,请确认料车编号";
+        }
         // 站点
         SiteModel siteModel = siteService.selectSiteModeByQrCode(landMaskCode);
         materialBoxMaterialDao.deleteMaterialBoxMaterialByMaterialId(materialBoxModel.getId()); // 将料框上的原料移除
-        // 发货区域
+        // 发货区域  TODO 空
         AgvArea agvArea = siteService.selectAgvAreaBySiteId(siteModel.getId());
         // 如果区域类型是库位
         if (agvArea.getType() == 8) {
@@ -301,7 +305,6 @@ public class StockUpRecordService extends BaseService<StockUpRecordDao, StockUpR
             }
         }
 
-        // TODO 通过波次编号、备货类型，删除备货表的备货信息
         return "发货失败，请在库位上执行发货";
     }
 }

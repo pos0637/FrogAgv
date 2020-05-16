@@ -254,6 +254,7 @@ public class ProductionPlanScheduler {
                                 Tracker.agv("灌装==》添加多少个波次：" + addCount.get());
                                 // 通过产线名称找到区域ID
                                 String productLineCode = "L" + moEntity.getProductlinename().substring(2, moEntity.getProductlinename().length());
+                                Tracker.agv("更新计划:"+productLineCode+"线");
                                 AgvAreaModel agvAreaModel = siteService.selectProductLocationByAreaCodeAndLineCode("PRODUCT_FILLING", productLineCode);
                                 // 不是11~14线的，不添加波次
                                 if (ObjectUtils.isEmpty(agvAreaModel)) {

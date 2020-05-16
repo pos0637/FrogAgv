@@ -144,6 +144,11 @@ public class Scheduler extends BaseScheduler {
     }
 
     @Override
+    public void addSiteContainer(String siteCode, String containerCode) {
+        super.addSiteContainer(siteCode, containerCode);
+    }
+
+    @Override
     public List<Area> getAreas() {
         return super.getAreas();
     }

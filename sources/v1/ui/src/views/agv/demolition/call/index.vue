@@ -268,6 +268,7 @@
           }
         })
           .then(response => {
+            console.log(response);
             if (response.errno === 0) {
               this.callPlans = response.data;
             }

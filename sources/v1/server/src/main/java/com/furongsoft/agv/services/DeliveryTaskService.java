@@ -439,7 +439,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
     }
 
     /**
-     * 执行调度-添加任务 TODO 失败
+     * 执行调度-添加任务 TODO 失败后修改了站点原本的信息
      *
      * @param startSiteId   起始点ID
      * @param taskNo        任务单号
@@ -484,7 +484,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
             }
             Tracker.error(errorMessage);
             Task task1 = new Task();
-            task1.setFailReason(errorMessage);
+            task1.setFailReason(ObjectUtils.isEmpty(task)?errorMessage:task.getFailReason());
             return task1;
         }
         return task;
@@ -540,7 +540,7 @@ public class DeliveryTaskService extends BaseService<DeliveryTaskDao, DeliveryTa
             }
             Tracker.error(errorMessage);
             Task task1 = new Task();
-            task1.setFailReason(errorMessage);
+            task1.setFailReason(ObjectUtils.isEmpty(task)?errorMessage:task.getFailReason());
             return task1;
         }
         return task;

@@ -112,4 +112,10 @@ public class SchedulerController {
         return new RestResponse(HttpStatus.OK);
     }
 
+    @GetMapping("/addSiteContainer")
+    public RestResponse addSiteContainer(String siteCode, String containerCode) {
+        scheduler.addSiteContainer(siteCode, containerCode);
+        return new RestResponse(HttpStatus.OK);
+    }
+
 }

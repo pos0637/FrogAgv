@@ -38,7 +38,7 @@ public class GeekPlusTests {
 
     @Test
     public void Test0() {
-        ModbusTcp.test();
+//        ModbusTcp.test();
     }
 
     /**
@@ -227,6 +227,6 @@ public class GeekPlusTests {
 
     @Test
     void read_remote_button() {
-        com.furongsoft.communication.modbusTcp.ModbusTcp.test();
+//        com.furongsoft.communication.modbusTcp.ModbusTcp.test();
     }
 }
